@@ -6,5 +6,5 @@ import react from "@vitejs/plugin-react";
 // change the base value below to "/YOUR-REPO-NAME/".
 export default defineConfig({
   plugins: [react()],
-  base: "/dental-recovery/",
+  base: "/recovery/",
 });

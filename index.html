@@ -3,21 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <title>Dental Recovery Guide</title>
-<meta name="theme-color" content="#095ee6" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="Recovery Guide" />
-<link rel="manifest" href="./manifest.json" />
-<link rel="apple-touch-icon" href="./logo.png" />
-<link rel="icon" type="image/png" href="./logo.png" />
-  <link rel="manifest" href="./pwa_manifest.json">
+<link rel="manifest" href="./pwa_manifest.json">
 <link rel="apple-touch-icon" href="./pwa_icon_192.png">
-
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
 <style>
 *{box-sizing:border-box}
 :root{
@@ -187,7 +179,13 @@ function pacificTodayString(){
   return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 }
 function parseYMD(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
-function dayCount(dateStr){return Math.max(0,Math.floor((parseYMD(pacificTodayString())-parseYMD(dateStr))/86400000))}
+function elapsedDayCount(dateStr){
+  return Math.max(0, Math.floor((parseYMD(pacificTodayString()) - parseYMD(dateStr)) / 86400000));
+}
+function displayRecoveryDay(dateStr){
+  // Clinic-friendly count: surgery date is Day 1, next day is Day 2.
+  return elapsedDayCount(dateStr) + 1;
+}
 function fmtDate(s){return parseYMD(s).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
 function stageFor(day,total){
   if(day<=1)return ['Initial Healing Phase','Initial healing & bleeding control'];
@@ -223,7 +221,10 @@ function card(cls,icon,title,items,isParagraph=false){
 function showGuide(){
   const type=localStorage.getItem('surgeryType'); const date=localStorage.getItem('surgeryDate');
   if(!type||!date){showHome();return}
-  const d=DATA[type]||DATA.flap; const day=dayCount(date); const pct=Math.min(100,Math.max(0,Math.round((day/d.days)*100))); const [phase,stage]=stageFor(day,d.days);
+  const d=DATA[type]||DATA.flap;
+  const day=displayRecoveryDay(date);
+  const pct=Math.min(100,Math.max(0,Math.round((day/d.days)*100)));
+  const [phase,stage]=stageFor(day,d.days);
   homeScreen.classList.add('hidden'); setupScreen.classList.add('hidden'); guideScreen.classList.remove('hidden');
   surgeryLabel.textContent=d.name; dayText.textContent=`Day ${day}`; phaseText.textContent=phase; stageText.textContent=stage; surgeryDateText.textContent=`Surgery date: ${fmtDate(date)}`; percentText.textContent=`${pct}%`; progressRing.style.setProperty('--p',pct); totalGuide.textContent=`${d.days} days`;
   const next=d.milestones.find(m=>m>day); nextStep.textContent=next?`Day ${next} is your next recovery milestone.`:'You are at the final recovery milestone.';

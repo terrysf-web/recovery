@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <title>Dental Recovery Guide</title>
 
-<link rel="manifest" href="./pwa_manifest.json?v=4">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=4">
+<link rel="manifest" href="./pwa_manifest.json?v=5">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=5">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -176,6 +176,91 @@ input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0
   color:#374151;
 }
 
+
+.assistant-card{
+  margin:16px 0;
+  padding:16px;
+  border-radius:26px;
+  background:#ffffff;
+  border:1px solid rgba(15,23,42,.08);
+  box-shadow:0 8px 24px rgba(15,23,42,.08);
+}
+.assistant-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.assistant-badge{
+  width:38px;
+  height:38px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#dbeafe,#eff6ff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+}
+.assistant-title{
+  font-size:18px;
+  font-weight:900;
+  color:#111827;
+}
+.assistant-subtitle{
+  font-size:13px;
+  color:#64748b;
+  line-height:1.35;
+  margin-top:2px;
+}
+.assistant-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+.assistant-btn{
+  border:0;
+  border-radius:18px;
+  padding:12px 10px;
+  background:#f8fafc;
+  color:#0f172a;
+  font-size:14px;
+  font-weight:800;
+  text-align:left;
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,.08);
+}
+.assistant-btn:active{ transform:scale(.98); }
+.assistant-answer{
+  margin-top:14px;
+  padding:14px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#eef6ff,#f8fbff);
+  border:1px solid rgba(37,99,235,.16);
+  display:none;
+}
+.assistant-answer.show{ display:block; }
+.answer-title{
+  font-size:15px;
+  font-weight:900;
+  color:#0f172a;
+  margin-bottom:6px;
+}
+.answer-text{
+  font-size:14px;
+  line-height:1.45;
+  color:#334155;
+}
+.answer-warning{
+  margin-top:10px;
+  padding:10px;
+  border-radius:16px;
+  background:#fff7ed;
+  color:#9a3412;
+  font-size:13px;
+  line-height:1.4;
+  border:1px solid rgba(251,146,60,.25);
+}
+
 </style>
 </head>
 <body>
@@ -220,6 +305,31 @@ input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0
           <div class="reminder-title" id="reminderTitle">Today’s Reminder</div>
           <div class="reminder-text" id="reminderText">Open this guide daily for your updated recovery reminder.</div>
         </div>
+        <div class="assistant-card" id="smartAssistantCard">
+          <div class="assistant-header">
+            <div class="assistant-badge">💬</div>
+            <div>
+              <div class="assistant-title">Ask Recovery Assistant</div>
+              <div class="assistant-subtitle">Choose a concern to get quick guidance based on your recovery day.</div>
+            </div>
+          </div>
+
+          <div class="assistant-buttons">
+            <button class="assistant-btn" onclick="askAssistant('bleeding')">🩸 Bleeding</button>
+            <button class="assistant-btn" onclick="askAssistant('swelling')">😮‍💨 Swelling</button>
+            <button class="assistant-btn" onclick="askAssistant('pain')">⚡ Pain</button>
+            <button class="assistant-btn" onclick="askAssistant('food')">🍲 Food</button>
+            <button class="assistant-btn" onclick="askAssistant('brushing')">🪥 Brushing</button>
+            <button class="assistant-btn" onclick="askAssistant('urgent')">🚨 Urgent Signs</button>
+          </div>
+
+          <div class="assistant-answer" id="assistantAnswer">
+            <div class="answer-title" id="assistantAnswerTitle"></div>
+            <div class="answer-text" id="assistantAnswerText"></div>
+            <div class="answer-warning" id="assistantAnswerWarning"></div>
+          </div>
+        </div>
+
 
         </div>
         <div class="ring" id="progressRing" style="--p:5"><div class="ringInner" id="percentText">5%</div></div>
@@ -380,7 +490,7 @@ showGuide();
 (function(){
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=4').catch(function(){});
+      navigator.serviceWorker.register('./sw.js?v=5').catch(function(){});
     });
   }
 
@@ -404,5 +514,85 @@ showGuide();
 })();
 </script>
 
+<script>
+
+function assistantResponse(topic, day){
+  const responses = {
+    bleeding: {
+      title: "Bleeding guidance",
+      text: day <= 3
+        ? "Light bleeding or pink saliva can happen during the first few days. Use gentle pressure with gauze if instructed. Avoid hard rinsing, spitting, straws, smoking, and heavy activity because they can restart bleeding."
+        : "Bleeding should generally be improving by this stage. A small amount of bleeding while brushing can happen, but new or heavy bleeding is not expected.",
+      warn: "Call the clinic if bleeding is heavy, does not slow with gentle pressure, fills the mouth quickly, or you feel dizzy."
+    },
+    swelling: {
+      title: "Swelling guidance",
+      text: day <= 3
+        ? "Swelling commonly increases during the first 2–3 days and may peak around this time. Keep your head elevated and follow the clinic’s ice/heat instructions."
+        : day <= 7
+          ? "Swelling should start to improve after the early peak. Some tightness or mild swelling may still be normal."
+          : "Swelling should be clearly improving now. New swelling or swelling that returns later should be checked.",
+      warn: "Call the clinic if swelling is rapidly worsening, spreading, associated with fever, trouble swallowing, or trouble breathing."
+    },
+    pain: {
+      title: "Pain guidance",
+      text: day <= 3
+        ? "Soreness and tenderness can be normal early after surgery. Take medications only as instructed by the clinic and avoid chewing directly on the surgical area."
+        : day <= 7
+          ? "Pain should gradually improve. Mild tenderness can continue, but pain should not suddenly become much worse."
+          : "Pain should be much better by now. New throbbing pain, bad taste, or worsening discomfort should be checked.",
+      warn: "Call the clinic if pain is severe, suddenly worsening, not controlled by prescribed instructions, or comes with fever or drainage."
+    },
+    food: {
+      title: "Food guidance",
+      text: day <= 3
+        ? "Stay with soft, cool or lukewarm foods. Good options include yogurt, smoothies without a straw, soup that is not hot, eggs, mashed potatoes, and soft noodles."
+        : day <= 7
+          ? "Continue soft foods and slowly return to normal texture only if comfortable. Avoid hard, sharp, crunchy, sticky, or spicy foods near the surgical area."
+          : "You may be able to expand foods gradually, but avoid chewing directly on the area until the clinic confirms healing is ready.",
+      warn: "Avoid straws, smoking, crunchy chips, seeds, nuts, and anything that can poke or get trapped in the surgical site."
+    },
+    brushing: {
+      title: "Brushing and cleaning guidance",
+      text: day <= 3
+        ? "Keep the mouth clean, but be very gentle around the surgical area. Do not scrub the site or disturb sutures. Rinse only if and how the clinic instructed."
+        : day <= 7
+          ? "Gentle brushing around nearby teeth is usually important, but avoid pulling on the tissue or sutures. Continue any rinse instructions from the clinic."
+          : "Oral hygiene remains important. If the area feels tender, clean gently and follow the clinic’s specific instructions.",
+      warn: "Call the clinic if brushing causes heavy bleeding, increasing pain, or if sutures loosen earlier than expected."
+    },
+    urgent: {
+      title: "When to call the clinic now",
+      text: "Contact the clinic promptly if you notice heavy bleeding, fever, rapidly increasing swelling, pus or drainage, severe pain, allergic reaction symptoms, trouble swallowing, or trouble breathing.",
+      warn: "For breathing difficulty, severe allergic reaction, chest pain, or emergency symptoms, seek emergency care immediately."
+    }
+  };
+  return responses[topic] || responses.urgent;
+}
+
+function askAssistant(topic){
+  const date = localStorage.getItem('surgeryDate');
+  let day = 1;
+  if(date){
+    if(typeof displayRecoveryDay === 'function'){
+      day = displayRecoveryDay(date);
+    }else if(typeof dayCount === 'function'){
+      day = dayCount(date) + 1;
+    }
+  }
+
+  const res = assistantResponse(topic, day);
+  const box = document.getElementById('assistantAnswer');
+  const title = document.getElementById('assistantAnswerTitle');
+  const text = document.getElementById('assistantAnswerText');
+  const warn = document.getElementById('assistantAnswerWarning');
+
+  if(title) title.textContent = res.title + " · Day " + day;
+  if(text) text.textContent = res.text;
+  if(warn) warn.textContent = res.warn;
+  if(box) box.classList.add('show');
+}
+
+</script>
 </body>
 </html>

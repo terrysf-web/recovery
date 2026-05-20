@@ -1,0 +1,20 @@
+{
+  "name": "Dental Recovery Guide",
+  "short_name": "Recovery Guide",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#062278",
+  "theme_color": "#062278",
+  "icons": [
+    {
+      "src": "pwa_icon_192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa_icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

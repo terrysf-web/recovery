@@ -6,7 +6,26 @@
 <title>Dental Recovery Guide</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#111827}.app{max-width:430px;margin:0 auto;min-height:100vh;background:#eef2f7}.header{background:linear-gradient(135deg,#021b57,#0b2e8a);color:white;padding:8px 20px 12px;border-radius:0 0 28px 28px;box-shadow:0 6px 16px rgba(0,0,0,.15)}.top{display:flex;align-items:center;gap:10px}.logo{width:58px;height:58px;object-fit:contain}.title{font-size:18px;font-weight:800;line-height:1.1}.desc{margin-top:8px;line-height:1.35;font-size:14px;opacity:.95}.content{padding:18px}.section{font-size:26px;font-weight:900;margin:8px 0 16px}.card{background:white;border-radius:26px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);cursor:pointer;transition:.15s}.card:active{transform:scale(.98)}.icon{width:64px;height:64px;border-radius:22px;background:#f3f6fb;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}.name{font-size:18px;font-weight:800}.days{margin-top:5px;color:#6b7280;font-size:14px}.arrow{margin-left:auto;color:#9ca3af;font-size:36px}.screen{display:none}.screen.active{display:block}.back{border:0;background:white;color:#0b2e8a;border-radius:999px;padding:10px 14px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:14px}.panel{background:white;border-radius:26px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:14px}.label{font-size:14px;color:#6b7280;font-weight:700;margin-bottom:8px}.dateInput{width:100%;font-size:18px;padding:14px;border:1px solid #d1d5db;border-radius:16px}.primary{width:100%;border:0;background:#0b2e8a;color:white;border-radius:18px;padding:15px;font-size:17px;font-weight:900;margin-top:14px}.dayBadge{display:inline-flex;align-items:center;gap:8px;background:#e8efff;color:#0b2e8a;border-radius:999px;padding:9px 13px;font-weight:900;font-size:15px;margin-bottom:12px}.guideTitle{font-size:25px;font-weight:900;margin:0 0 6px}.guideSub{font-size:14px;color:#6b7280;margin-bottom:16px}.guideBox{background:#f8fafc;border-radius:22px;padding:16px;margin-top:12px}.guideBox h3{margin:0 0 8px;font-size:18px}.guideBox ul{margin:0;padding-left:20px;line-height:1.55;color:#374151}.reset{border:0;background:#f3f4f6;color:#374151;border-radius:16px;padding:13px;font-size:15px;font-weight:800;width:100%;margin-top:10px}.warning{background:#fff7ed;border-left:5px solid #fb923c;border-radius:18px;padding:14px;line-height:1.45;color:#7c2d12;font-size:14px;margin-top:12px}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#111827}
+.app{max-width:430px;margin:0 auto;min-height:100vh;background:#eef2f7}
+.header{background:linear-gradient(135deg,#021b57,#0b2e8a);color:white;padding:8px 20px 12px;border-radius:0 0 28px 28px;box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.top{display:flex;align-items:center;gap:10px}
+.logo{width:58px;height:58px;object-fit:contain;flex-shrink:0}
+.title{font-size:18px;font-weight:800;line-height:1.1}
+.desc{margin-top:8px;line-height:1.35;font-size:14px;opacity:.95}
+.content{padding:16px}
+.section{font-size:27px;font-weight:900;margin:8px 0 14px}
+.sub{color:#6b7280;font-size:14px;line-height:1.45;margin:-6px 0 14px}
+.card{background:white;border-radius:24px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:2px solid transparent;cursor:pointer}
+.card.disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.2)}
+.card.selected{border-color:#0b2e8a;background:#f8fbff}
+.icon{width:64px;height:64px;border-radius:21px;background:#f3f6fb;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.name{font-size:18px;font-weight:800}.days{margin-top:5px;color:#6b7280;font-size:15px}.arrow{margin-left:auto;color:#9ca3af;font-size:38px}
+.panel{background:white;border-radius:26px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.label{font-size:13px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.big{font-size:30px;font-weight:900;margin-top:4px}.stage{display:inline-block;margin-top:10px;padding:8px 12px;border-radius:999px;background:#eaf0ff;color:#0b2e8a;font-weight:800;font-size:13px}
+.progressWrap{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:12px}.progress{height:100%;background:#0b2e8a;border-radius:999px;width:0%}
+.map{display:flex;justify-content:space-between;gap:6px;margin-top:16px}.step{flex:1;text-align:center;font-size:11px;color:#6b7280}.dot{width:24px;height:24px;margin:0 auto 6px;border-radius:50%;background:#d1d5db;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}.step.done .dot,.step.active .dot{background:#0b2e8a}.step.active{color:#0b2e8a;font-weight:800}
+.guideTitle{font-size:20px;font-weight:900;margin:0 0 10px}.guideList{padding-left:20px;margin:0}.guideList li{margin:8px 0;line-height:1.4}.warning{background:#fff7ed;border:1px solid #fed7aa;border-radius:20px;padding:13px;margin-top:12px;color:#9a3412;font-size:14px;line-height:1.4}.btn{width:100%;border:0;border-radius:18px;padding:14px;font-size:16px;font-weight:900;cursor:pointer}.primary{background:#0b2e8a;color:white}.secondary{background:#e5e7eb;color:#111827}.row{display:flex;gap:10px}.row .btn{flex:1}.dateInput{width:100%;font-size:18px;padding:14px;border:2px solid #d1d5db;border-radius:18px;margin:12px 0}.lockedNote{background:#eaf0ff;border-radius:18px;padding:12px;margin-bottom:14px;color:#0b2e8a;font-size:14px;font-weight:700;line-height:1.35}.hidden{display:none}.smallText{font-size:13px;color:#6b7280;line-height:1.4;margin-top:8px}
 </style>
 </head>
 <body>
@@ -20,158 +39,141 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,san
   </div>
 
   <div class="content">
-    <div id="homeScreen" class="screen active">
+    <div id="homeView">
       <div class="section">Select Surgery Type</div>
-      <div id="surgeryList"></div>
+      <div id="lockedNote" class="lockedNote hidden">A surgery type is already selected. To choose a different type, reset the current guide first.</div>
+      <div class="sub">Choose one surgery type only. After it is saved, other surgery types will be locked until reset.</div>
+      <div id="cards"></div>
     </div>
 
-    <div id="dateScreen" class="screen">
-      <button class="back" onclick="showScreen('homeScreen')">‹ Back</button>
-      <div class="section" id="dateTitle">Select Surgery Date</div>
+    <div id="dateView" class="hidden">
+      <div class="section">Surgery Date</div>
       <div class="panel">
-        <div class="label">Surgery Date</div>
+        <div class="label">Selected surgery</div>
+        <div id="selectedName" class="big"></div>
         <input id="surgeryDate" class="dateInput" type="date" />
-        <button class="primary" onclick="saveDate()">Save & Open Guide</button>
+        <button class="btn primary" onclick="saveDate()">Save & Open Guide</button>
+        <div class="smallText">The date will be saved on this device and used to calculate the recovery day automatically.</div>
       </div>
+      <button class="btn secondary" onclick="goHome()">Back</button>
     </div>
 
-    <div id="guideScreen" class="screen">
-      <button class="back" onclick="showScreen('homeScreen')">‹ Change Surgery Type</button>
+    <div id="guideView" class="hidden">
       <div class="panel">
-        <div class="dayBadge" id="dayBadge">Day 0</div>
-        <h2 class="guideTitle" id="guideTitle">Recovery Guide</h2>
-        <div class="guideSub" id="guideSub"></div>
-        <div class="guideBox">
-          <h3>Today's Instructions</h3>
-          <ul id="instructionList"></ul>
-        </div>
-        <div class="warning">Call the dental office if you have heavy bleeding, fever, severe swelling, difficulty breathing, or pain that is getting worse instead of better.</div>
-        <button class="reset" onclick="resetGuide()">Reset Saved Date</button>
+        <div class="label" id="guideType"></div>
+        <div class="big" id="dayTitle"></div>
+        <div class="stage" id="stageText"></div>
+        <div class="progressWrap"><div id="progress" class="progress"></div></div>
+        <div class="map" id="processMap"></div>
+      </div>
+
+      <div class="panel">
+        <div class="guideTitle">Today's Guide</div>
+        <ul id="guideList" class="guideList"></ul>
+        <div class="warning">Call the clinic right away for heavy bleeding, increasing swelling after several days, fever, severe pain, trouble breathing/swallowing, or anything that feels unusual.</div>
+      </div>
+
+      <div class="panel">
+        <div class="guideTitle">Overall Recovery Overview</div>
+        <ul class="guideList" id="overviewList"></ul>
+      </div>
+
+      <div class="row">
+        <button class="btn secondary" onclick="goHome()">Home</button>
+        <button class="btn secondary" onclick="resetGuide()">Reset</button>
       </div>
     </div>
   </div>
 </div>
-
 <script>
-const surgeries = [
-  {id:'flap', icon:'🔬', name:'Periodontal Flap Surgery', days:21},
-  {id:'gingivectomy', icon:'✂️', name:'Gingivectomy', days:14},
-  {id:'bone', icon:'🦴', name:'Bone Graft', days:28},
-  {id:'implant', icon:'🔩', name:'Dental Implant', days:21},
-  {id:'extraction', icon:'🦷', name:'Tooth Extraction', days:14},
-  {id:'srp', icon:'🪥', name:'Scaling & Root Planing', days:10}
-];
-
-const guides = {
-  flap: {
-    early:['Use ice pack 20 minutes on and 20 minutes off while awake.','Bite gently on gauze if bleeding continues.','Eat soft, cool foods and avoid hot drinks today.','Do not smoke, spit forcefully, or use a straw.'],
-    mid:['Rinse gently with warm salt water after meals.','Brush carefully, avoiding the surgical area unless instructed.','Swelling and mild bruising can still be normal.','Continue medications exactly as directed.'],
-    late:['Gradually return to normal foods if comfortable.','Avoid chewing hard foods directly on the surgical area.','Keep the area clean with gentle brushing.','Attend your follow-up or suture removal appointment if scheduled.']
-  },
-  gingivectomy: {
-    early:['Expect mild bleeding or oozing for the first day.','Avoid spicy, hot, crunchy, or sharp foods.','Use ice pack as needed for swelling.','Do not disturb the surgical dressing if one was placed.'],
-    mid:['Start gentle warm salt water rinses after meals.','Keep brushing other areas normally.','Avoid pulling the lip or cheek to look at the area.','Mild tenderness is expected while the gum heals.'],
-    late:['Gum tissue may still look uneven while healing.','Continue gentle cleaning around the area.','Avoid hard brushing until the tissue feels comfortable.','Call the office if swelling or bleeding increases.']
-  },
-  bone: {
-    early:['Do not touch or rinse aggressively around the graft area.','Avoid pressure on the graft site.','Use ice pack as directed.','Eat soft foods and avoid chewing on the surgical side.'],
-    mid:['Rinse gently with warm salt water.','Some small graft particles may appear; this can be normal.','Avoid smoking because it can delay healing.','Continue antibiotics or medication as prescribed.'],
-    late:['Protect the graft area from hard chewing.','Continue careful oral hygiene.','Healing continues under the gum even if the surface looks better.','Keep all follow-up appointments.']
-  },
-  implant: {
-    early:['Avoid chewing directly on the implant site.','Use ice pack for swelling.','Some bleeding or pink saliva can be normal.','Take prescribed medications exactly as directed.'],
-    mid:['Rinse gently with warm salt water.','Keep the area clean but do not scrub the implant site.','Avoid hard, crunchy, or sticky foods.','Do not smoke or vape during healing.'],
-    late:['Continue avoiding heavy chewing pressure on the implant.','Mild tenderness can continue while tissue heals.','Follow diet instructions from the office.','Call if implant area becomes increasingly painful or swollen.']
-  },
-  extraction: {
-    early:['Keep gauze pressure as instructed.','Do not rinse, spit, use a straw, or smoke today.','Soft foods only; avoid hot foods and drinks.','Ice pack can help swelling.'],
-    mid:['Begin gentle warm salt water rinses.','Avoid food getting trapped in the socket.','Do not poke the extraction area.','Pain should gradually improve, not get worse.'],
-    late:['Continue rinsing after meals.','The socket may take weeks to fully close.','Return slowly to normal eating as comfortable.','Call if you develop worsening pain, bad taste, or strong odor.']
-  },
-  srp: {
-    early:['Mild gum soreness and sensitivity are common.','Avoid very hot, spicy, or acidic foods today.','Brush gently with a soft toothbrush.','Use recommended rinse if provided.'],
-    mid:['Continue gentle brushing and flossing.','Warm salt water rinses may help soreness.','Tooth sensitivity should slowly improve.','Avoid aggressive brushing near tender gums.'],
-    late:['Maintain daily brushing and flossing.','Sensitivity may continue but should improve.','Follow periodontal maintenance schedule.','Call if gums become increasingly swollen or painful.']
-  }
+const surgeries={
+  flap:{name:'Periodontal Flap Surgery',days:21,icon:'🔬'},
+  gingivectomy:{name:'Gingivectomy',days:14,icon:'✂️'},
+  graft:{name:'Bone Graft',days:28,icon:'🦴'},
+  implant:{name:'Dental Implant',days:21,icon:'🔩'},
+  extraction:{name:'Tooth Extraction',days:14,icon:'🦷'},
+  srp:{name:'Scaling & Root Planing',days:10,icon:'🪥'}
 };
 
-let selectedSurgery = null;
+const overview=[
+  'Day 0–2: Rest, bleeding control, swelling control, soft foods.',
+  'Day 3–7: Gentle rinsing, careful brushing, swelling should begin improving.',
+  'Day 8–14: Tissue healing continues; avoid hard or sharp foods.',
+  'Day 15+: Gradual return to normal care unless your clinic gives different instructions.'
+];
 
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function guideFor(day,type){
+  if(day<=2) return {stage:'Initial Healing Phase',items:['Rest and avoid heavy activity.','Use ice pack if instructed: 20 minutes on, 20 minutes off.','Eat soft foods and avoid hot, spicy, hard, or crunchy foods.','Do not smoke, spit forcefully, or use a straw.']};
+  if(day<=7) return {stage:'Swelling & Tissue Stabilization',items:['Continue gentle warm salt-water rinses if approved by your clinic.','Brush carefully and avoid direct trauma to the surgical area.','Swelling should start to improve. Contact the clinic if it is getting worse.','Stay with soft foods and avoid chewing directly on the treated side.']};
+  if(day<=14) return {stage:'Active Healing Phase',items:['Most discomfort should gradually improve.','Keep the area clean but do not over-brush the surgical site.','Avoid hard, sharp, sticky, or seeded foods.','Follow any suture-removal or follow-up appointment instructions.']};
+  return {stage:'Final Recovery Phase',items:['Resume normal routine only as directed by your clinic.','Continue excellent oral hygiene around the area.','Watch for delayed pain, swelling, bad taste, or drainage.','Keep any scheduled follow-up visit.']};
 }
 
-function renderSurgeryList(){
-  const list = document.getElementById('surgeryList');
-  list.innerHTML = surgeries.map(s => `
-    <div class="card" onclick="selectSurgery('${s.id}')">
-      <div class="icon">${s.icon}</div>
-      <div>
-        <div class="name">${s.name}</div>
-        <div class="days">${s.days} day recovery guide</div>
-      </div>
-      <div class="arrow">›</div>
-    </div>
-  `).join('');
+function renderCards(){
+  const savedType=localStorage.getItem('surgeryType');
+  const cards=document.getElementById('cards');
+  document.getElementById('lockedNote').classList.toggle('hidden',!savedType);
+  cards.innerHTML=Object.entries(surgeries).map(([key,s])=>{
+    const locked=savedType && savedType!==key;
+    const selected=savedType===key;
+    return `<div class="card ${locked?'disabled':''} ${selected?'selected':''}" onclick="selectSurgery('${key}')">
+      <div class="icon">${s.icon}</div><div><div class="name">${s.name}</div><div class="days">${s.days} day recovery guide</div></div><div class="arrow">›</div>
+    </div>`;
+  }).join('');
 }
 
-function selectSurgery(id){
-  selectedSurgery = id;
-  const s = surgeries.find(x => x.id === id);
-  document.getElementById('dateTitle').textContent = s.name;
-  document.getElementById('surgeryDate').value = localStorage.getItem('surgeryDate') || new Date().toISOString().slice(0,10);
-  showScreen('dateScreen');
+function show(view){
+  ['homeView','dateView','guideView'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  document.getElementById(view).classList.remove('hidden');
 }
-
+function selectSurgery(type){
+  const savedType=localStorage.getItem('surgeryType');
+  if(savedType && savedType!==type){alert('Only one surgery type can be active. Please reset first.');return;}
+  localStorage.setItem('pendingType',type);
+  document.getElementById('selectedName').textContent=surgeries[type].name;
+  document.getElementById('surgeryDate').value=localStorage.getItem('surgeryDate')||new Date().toISOString().slice(0,10);
+  show('dateView');
+}
 function saveDate(){
-  const date = document.getElementById('surgeryDate').value;
-  if(!selectedSurgery || !date){ alert('Please select a surgery date.'); return; }
-  localStorage.setItem('surgeryType', selectedSurgery);
-  localStorage.setItem('surgeryDate', date);
+  const type=localStorage.getItem('pendingType');
+  const date=document.getElementById('surgeryDate').value;
+  if(!type||!date){alert('Please select a surgery date.');return;}
+  localStorage.setItem('surgeryType',type);
+  localStorage.setItem('surgeryDate',date);
+  localStorage.removeItem('pendingType');
   openGuide();
 }
-
-function getDayCount(dateString){
-  const start = new Date(dateString + 'T00:00:00');
-  const today = new Date();
-  const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  return Math.floor((todayLocal - start) / (1000 * 60 * 60 * 24));
+function getDayCount(dateStr){
+  const start=new Date(dateStr+'T00:00:00');
+  const today=new Date();
+  const now=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  return Math.max(0,Math.floor((now-start)/(1000*60*60*24))+1);
 }
-
-function getStage(day){
-  if(day <= 2) return 'early';
-  if(day <= 7) return 'mid';
-  return 'late';
-}
-
 function openGuide(){
-  const type = localStorage.getItem('surgeryType');
-  const date = localStorage.getItem('surgeryDate');
-  if(!type || !date){ showScreen('homeScreen'); return; }
-
-  const s = surgeries.find(x => x.id === type);
-  const day = getDayCount(date);
-  const safeDay = Math.max(0, day);
-  const stage = getStage(safeDay);
-  const instructions = guides[type][stage];
-
-  document.getElementById('dayBadge').textContent = `Day ${safeDay}`;
-  document.getElementById('guideTitle').textContent = s.name;
-  document.getElementById('guideSub').textContent = `Surgery date: ${date} • ${s.days} day guide`;
-  document.getElementById('instructionList').innerHTML = instructions.map(i => `<li>${i}</li>`).join('');
-  showScreen('guideScreen');
+  const type=localStorage.getItem('surgeryType');
+  const date=localStorage.getItem('surgeryDate');
+  if(!type||!date){renderCards();show('homeView');return;}
+  const s=surgeries[type];
+  const day=getDayCount(date);
+  const capped=Math.min(day,s.days);
+  const g=guideFor(day,type);
+  document.getElementById('guideType').textContent=s.name;
+  document.getElementById('dayTitle').textContent=`Today is Day ${day}`;
+  document.getElementById('stageText').textContent=g.stage;
+  document.getElementById('progress').style.width=Math.min(100,Math.round((capped/s.days)*100))+'%';
+  document.getElementById('guideList').innerHTML=g.items.map(x=>`<li>${x}</li>`).join('');
+  document.getElementById('overviewList').innerHTML=overview.map(x=>`<li>${x}</li>`).join('');
+  const points=[1,3,7,14,s.days];
+  document.getElementById('processMap').innerHTML=points.map(p=>`<div class="step ${day>p?'done':day===p?'active':''}"><div class="dot">${day>p?'✓':p}</div><div>Day ${p}</div></div>`).join('');
+  show('guideView');
 }
-
+function goHome(){renderCards();show('homeView');}
 function resetGuide(){
-  localStorage.removeItem('surgeryType');
-  localStorage.removeItem('surgeryDate');
-  selectedSurgery = null;
-  showScreen('homeScreen');
+  if(confirm('Reset the saved surgery type and date?')){
+    localStorage.removeItem('surgeryType');localStorage.removeItem('surgeryDate');localStorage.removeItem('pendingType');renderCards();show('homeView');
+  }
 }
-
-renderSurgeryList();
-openGuide();
+window.addEventListener('load',()=>{renderCards(); if(localStorage.getItem('surgeryType')&&localStorage.getItem('surgeryDate')) openGuide();});
 </script>
 </body>
 </html>

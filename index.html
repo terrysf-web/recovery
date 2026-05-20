@@ -2,115 +2,239 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Dental Recovery Guide</title>
 <style>
-:root{--navy:#061b4f;--blue:#123c9c;--bg:#eef3f9;--card:#fff;--text:#111827;--muted:#6b7280;--soft:#f5f7fb;--green:#16a34a;--red:#dc2626;--line:#e5e7eb;--shadow:0 14px 32px rgba(15,23,42,.10);--radius:26px}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-button,input{font:inherit}
-.app{max-width:430px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#f8fbff 0%,#eef3f9 45%,#eef3f9 100%);position:relative;overflow:hidden}
-.header{background:radial-gradient(circle at 85% 0%,rgba(255,255,255,.28),transparent 32%),linear-gradient(135deg,var(--navy),var(--blue));color:white;padding:8px 20px 18px;border-radius:0 0 30px 30px;box-shadow:0 12px 26px rgba(6,27,79,.25)}
-.top{display:flex;align-items:center;gap:10px}
-.logoWrap{width:58px;height:58px;border-radius:18px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:0 0 auto;font-size:30px}
-.logo{width:52px;height:52px;object-fit:contain}
-.brand{min-width:0}
-.title{font-size:18px;font-weight:850;letter-spacing:-.2px;line-height:1.1}
-.subtitle{margin-top:3px;font-size:12px;opacity:.78}
-.desc{margin-top:10px;line-height:1.35;font-size:14px;opacity:.95}
-.headerPill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.13);font-size:12px;font-weight:700}
-.content{padding:18px;padding-bottom:34px}
-.screen{display:none}.screen.active{display:block}
-.heroCard{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.75);margin-bottom:16px}
-.sectionTitle{font-size:25px;font-weight:900;letter-spacing:-.7px;margin:2px 0 7px}
-.sectionSub{color:var(--muted);font-size:14px;line-height:1.45}
-.surgeryList{display:grid;gap:13px;margin-top:16px}
-.card{width:100%;border:0;text-align:left;background:white;border-radius:24px;padding:15px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 18px rgba(15,23,42,.06);cursor:pointer;transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease}
-.card:active{transform:scale(.985)}
-.card.locked{opacity:.42;filter:grayscale(.35)}
-.icon{width:62px;height:62px;border-radius:22px;background:linear-gradient(180deg,#f5f9ff,#edf4ff);display:flex;align-items:center;justify-content:center;font-size:34px;flex:0 0 auto}
-.cardBody{min-width:0;flex:1}.name{font-size:18px;font-weight:850;letter-spacing:-.3px;line-height:1.15}.days{margin-top:5px;color:var(--muted);font-size:14px}.arrow{color:#a3aab8;font-size:30px;line-height:1}
-.dateBox{margin-top:16px;background:white;border-radius:26px;padding:18px;box-shadow:var(--shadow)}
-.selectedType{display:flex;align-items:center;gap:12px;padding:13px;border-radius:20px;background:var(--soft);margin-bottom:16px}
-.selectedIcon{width:48px;height:48px;border-radius:17px;display:flex;align-items:center;justify-content:center;background:white;font-size:27px}
-label{display:block;font-size:13px;font-weight:800;color:#374151;margin-bottom:8px}
-input[type="date"]{width:100%;border:1px solid #d7ddea;background:white;border-radius:18px;padding:14px 15px;font-size:16px;outline:none}
-.primaryBtn,.secondaryBtn,.dangerBtn{border:0;border-radius:18px;padding:14px 16px;font-weight:850;width:100%;margin-top:13px;cursor:pointer}
-.primaryBtn{background:linear-gradient(135deg,var(--navy),var(--blue));color:white;box-shadow:0 10px 18px rgba(18,60,156,.24)}
-.secondaryBtn{background:#eef2f7;color:#111827}.dangerBtn{background:#fff1f2;color:#be123c}
-.dashboardTop{background:radial-gradient(circle at 100% 0%,#dbeafe,transparent 40%),white;border-radius:30px;padding:18px;box-shadow:var(--shadow);margin-bottom:15px}
-.statusRow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.surgeryBadge{display:inline-flex;align-items:center;gap:7px;background:#eff6ff;color:#1d4ed8;padding:8px 11px;border-radius:999px;font-size:12px;font-weight:850;margin-bottom:12px}
-.dayNumber{font-size:48px;font-weight:950;line-height:.95;letter-spacing:-2px}.dayLabel{color:var(--muted);font-size:13px;margin-top:5px}
-.progressCircle{width:86px;height:86px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--blue) var(--progress),#e5ecf7 0);position:relative;flex:0 0 auto}
-.progressCircle:after{content:"";position:absolute;inset:8px;background:white;border-radius:50%}.progressText{position:relative;z-index:1;font-weight:900;color:var(--navy);font-size:18px}
-.stageCard{margin-top:16px;background:#f8fbff;border:1px solid #dbeafe;border-radius:22px;padding:14px}.stageLabel{color:#1d4ed8;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}.stageText{margin-top:4px;font-size:18px;font-weight:900}
-.mapCard,.guideCard,.warningCard{background:white;border-radius:26px;padding:17px;box-shadow:0 8px 18px rgba(15,23,42,.06);margin-bottom:15px}.cardTitle{font-size:18px;font-weight:900;margin-bottom:12px;letter-spacing:-.3px}
-.timeline{display:flex;align-items:center;gap:5px;margin:10px 0 4px}.step{flex:1;text-align:center;position:relative}.dot{width:22px;height:22px;margin:0 auto 7px;border-radius:50%;background:#d9e2f0;border:4px solid #f4f7fb}.step.done .dot{background:var(--green)}.step.current .dot{background:var(--blue);box-shadow:0 0 0 6px rgba(18,60,156,.12)}.stepText{font-size:10px;font-weight:800;color:#7a8494}.step.done .stepText,.step.current .stepText{color:#111827}
-.overviewGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.mini{background:#f7f9fc;border-radius:18px;padding:12px}.miniLabel{color:var(--muted);font-size:12px;font-weight:750}.miniValue{margin-top:4px;font-size:15px;font-weight:900}
-.guideSection{margin-top:13px;padding-top:13px;border-top:1px solid var(--line)}.guideSection:first-of-type{margin-top:0;padding-top:0;border-top:0}.guideHeader{display:flex;align-items:center;gap:8px;font-weight:900;margin-bottom:8px}
-ul{margin:0;padding-left:21px}li{margin:7px 0;line-height:1.35;color:#374151;font-size:14px}
-.warningCard{border:1px solid #fee2e2;background:linear-gradient(180deg,#fff,#fff7f7)}.warningTitle{color:#b91c1c;font-size:18px;font-weight:950;margin-bottom:8px}
-.nextMilestone{background:#f0fdf4;border:1px solid #dcfce7;border-radius:20px;padding:13px;margin-top:12px}.nextMilestone strong{color:#15803d}
-.footerActions{display:flex;gap:10px}.footerActions button{margin-top:0}.smallNote{color:var(--muted);font-size:12px;line-height:1.35;margin-top:12px;text-align:center}
-@media(max-width:360px){.content{padding:14px}.sectionTitle{font-size:23px}.icon{width:56px;height:56px;font-size:30px}.name{font-size:17px}.dayNumber{font-size:43px}}
+*{box-sizing:border-box}
+:root{
+  --blue:#0b5fe0;
+  --deep:#081b4f;
+  --text:#111827;
+  --muted:#64748b;
+  --bg:#eef4fb;
+  --line:#e5ebf5;
+  --green:#22c55e;
+  --orange:#f97316;
+  --red:#ef4444;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#f7fbff 0%,#eaf1f8 100%);
+  color:var(--text);
+}
+.app{
+  width:100%;
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  padding:12px 14px 22px;
+}
+.header{
+  background:linear-gradient(135deg,#071b55,#095ee6);
+  color:#fff;
+  border-radius:0 0 26px 26px;
+  padding:10px 16px 14px;
+  box-shadow:0 10px 24px rgba(3,18,54,.22);
+  margin:0 -14px 16px;
+}
+.headerTop{display:flex;align-items:center;gap:12px}
+.logo{width:56px;height:56px;object-fit:contain;border-radius:12px}
+.header h1{font-size:19px;line-height:1.12;margin:0;font-weight:900}
+.header p{margin:7px 0 0;font-size:13.5px;line-height:1.35;opacity:.95}
+.hidden{display:none!important}
+.homeTitle{font-size:28px;font-weight:950;margin:18px 4px 16px}
+.surgeryCard{
+  width:100%;border:0;background:#fff;border-radius:25px;padding:16px;
+  display:flex;align-items:center;gap:14px;margin:0 0 14px;text-align:left;
+  box-shadow:0 8px 22px rgba(15,23,42,.07);cursor:pointer;
+}
+.surgeryCard.locked{opacity:.48;filter:grayscale(.3);cursor:not-allowed}
+.iconBox{width:68px;height:68px;border-radius:22px;background:#f3f7fc;display:flex;align-items:center;justify-content:center;font-size:36px;flex:0 0 auto}
+.surgeryName{font-size:20px;font-weight:900;line-height:1.15}
+.surgeryDays{font-size:15px;color:#6b7280;margin-top:4px}
+.chev{margin-left:auto;font-size:36px;color:#9aa4b2}
+.setupCard,.dashboardCard,.mapCard,.infoCard{
+  background:#fff;border-radius:24px;box-shadow:0 8px 22px rgba(15,23,42,.07);
+}
+.setupCard{padding:18px;margin-top:16px}
+.setupCard h2{margin:0 0 6px;font-size:22px}
+.setupCard p{color:var(--muted);margin:0 0 14px;line-height:1.4}
+input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0;border-radius:16px;background:#f8fbff;margin:6px 0 12px}
+.primaryBtn,.secondaryBtn{border:0;border-radius:16px;font-weight:900;padding:13px 16px;font-size:15px;cursor:pointer}
+.primaryBtn{background:var(--blue);color:#fff;width:100%}
+.secondaryBtn{background:#fff;color:#0f2254;box-shadow:0 6px 16px rgba(15,23,42,.08)}
+.dashboardCard{padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.kicker{display:flex;align-items:center;gap:7px;color:var(--blue);font-weight:950;letter-spacing:.05em;text-transform:uppercase;font-size:13px}
+.dayRow{display:flex;justify-content:space-between;align-items:flex-start;margin-top:6px}
+.dayText{font-size:54px;line-height:.95;font-weight:950;letter-spacing:-.05em;color:#0c1733}
+.phase{font-size:18px;color:#52627a;font-weight:700;margin-top:4px}
+.date{font-size:14px;color:#52627a;margin-top:8px}
+.ring{width:82px;height:82px;border-radius:50%;background:conic-gradient(var(--blue) calc(var(--p)*1%),#edf2fa 0);display:grid;place-items:center;flex:0 0 auto}
+.ringInner{width:62px;height:62px;background:#fff;border-radius:50%;display:grid;place-items:center;font-weight:950;font-size:18px;color:#0c1733}
+.stageBox{border:1px solid #dfe7f2;border-radius:18px;padding:12px 14px;margin-top:16px}
+.stageBox small{display:block;color:var(--blue);font-weight:950;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.stageBox b{font-size:17px}
+.mapCard{padding:16px;margin-bottom:14px}
+.mapCard h3{font-size:19px;margin:0 0 16px;font-weight:950}
+.timeline{position:relative;display:flex;justify-content:space-between;margin:4px 4px 16px}
+.timeline:before{content:"";position:absolute;left:18px;right:18px;top:14px;height:3px;background:#e4ebf5;z-index:0}
+.milestone{position:relative;z-index:1;text-align:center;font-weight:900;color:#667085;font-size:12px}
+.dot{width:30px;height:30px;border-radius:50%;background:#dbe3ef;margin:0 auto 8px;border:5px solid #eef4fb}
+.milestone.done{color:#13a34a}.milestone.current{color:#075ed8}.milestone.done .dot{background:var(--green);color:#fff;display:grid;place-items:center;border-color:#d7f8e2}.milestone.current .dot{background:var(--blue);border-color:#cfe1ff}
+.mapStats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.miniBox{background:#f7f9fd;border:1px solid #e8eef7;border-radius:18px;padding:13px}.miniBox span{display:block;color:#6b7280;font-size:14px}.miniBox b{display:block;font-size:18px;margin-top:4px}
+/* IMPORTANT: each lower section is its own independent card */
+.infoStack{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.infoCard{padding:15px 16px;display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(226,232,240,.9)}
+.infoCard.normal{background:linear-gradient(90deg,#f0fdf4 0,#fff 34%)}
+.infoCard.care{background:linear-gradient(90deg,#eff6ff 0,#fff 34%)}
+.infoCard.avoid{background:linear-gradient(90deg,#fff7ed 0,#fff 34%);border-color:#fed7aa}
+.infoCard.call{background:linear-gradient(90deg,#fff1f2 0,#fff 34%);border-color:#fecdd3}
+.infoCard.next{background:linear-gradient(90deg,#f0fdf4 0,#fff 34%)}
+.infoIcon{width:42px;height:42px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:0 5px 12px rgba(15,23,42,.06);flex:0 0 auto}
+.infoBody h3{font-size:18px;margin:0 0 8px;font-weight:950}.infoBody ul{margin:0;padding-left:18px}.infoBody li{font-size:14px;line-height:1.45;margin:3px 0;color:#1f2a44}.infoBody p{margin:0;font-size:14px;line-height:1.45;color:#1f2a44}.avoid h3{color:#c2410c}.call h3{color:#be123c}
+.actions{display:flex;gap:12px;justify-content:center;margin:16px 0 4px}.actions button{min-width:128px}
+.note{font-size:12px;color:#64748b;line-height:1.35;text-align:center;margin-top:10px}
+@media(max-width:360px){.dayText{font-size:46px}.ring{width:74px;height:74px}.ringInner{width:56px;height:56px}.infoCard{padding:13px}.infoIcon{width:36px;height:36px}.infoBody li,.infoBody p{font-size:13px}}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header">
-<div class="top">
-<div class="logoWrap"><img class="logo" src="./logo.png" alt="Dental logo" onerror="this.style.display='none';this.parentElement.innerHTML='🦷';" /></div>
-<div class="brand"><div class="title">Dental Recovery Guide</div><div class="subtitle">Personalized daily healing instructions</div></div>
+  <header class="header">
+    <div class="headerTop">
+      <img class="logo" src="./logo.png" alt="Spark Dental logo" onerror="this.style.display='none'" />
+      <div>
+        <h1>Dental Recovery Guide</h1>
+        <p>Personalized daily care after surgery</p>
+      </div>
+    </div>
+    <p>Open this guide anytime. Your recovery day updates automatically using Pacific Time.</p>
+  </header>
+
+  <main id="homeScreen">
+    <div class="homeTitle">Select Surgery Type</div>
+    <button class="surgeryCard" data-type="flap"><div class="iconBox">🔬</div><div><div class="surgeryName">Periodontal Flap Surgery</div><div class="surgeryDays">21 day recovery guide</div></div><div class="chev">›</div></button>
+    <button class="surgeryCard" data-type="gingivectomy"><div class="iconBox">✂️</div><div><div class="surgeryName">Gingivectomy</div><div class="surgeryDays">14 day recovery guide</div></div><div class="chev">›</div></button>
+    <button class="surgeryCard" data-type="bone"><div class="iconBox">🦴</div><div><div class="surgeryName">Bone Graft</div><div class="surgeryDays">28 day recovery guide</div></div><div class="chev">›</div></button>
+    <button class="surgeryCard" data-type="implant"><div class="iconBox">🔩</div><div><div class="surgeryName">Dental Implant</div><div class="surgeryDays">21 day recovery guide</div></div><div class="chev">›</div></button>
+    <button class="surgeryCard" data-type="extraction"><div class="iconBox">🦷</div><div><div class="surgeryName">Tooth Extraction</div><div class="surgeryDays">14 day recovery guide</div></div><div class="chev">›</div></button>
+  </main>
+
+  <section id="setupScreen" class="setupCard hidden">
+    <h2 id="setupTitle">Surgery Date</h2>
+    <p>Select the surgery date. This will be saved on this device.</p>
+    <input id="dateInput" type="date" />
+    <button class="primaryBtn" id="saveBtn">Save & Start Guide</button>
+  </section>
+
+  <main id="guideScreen" class="hidden">
+    <section class="dashboardCard">
+      <div class="kicker"><span>🦷</span><span id="surgeryLabel">Periodontal Flap Surgery</span></div>
+      <div class="dayRow">
+        <div>
+          <div class="dayText" id="dayText">Day 1</div>
+          <div class="phase" id="phaseText">Initial Healing Phase</div>
+          <div class="date" id="surgeryDateText">Surgery date: May 18, 2026</div>
+        </div>
+        <div class="ring" id="progressRing" style="--p:5"><div class="ringInner" id="percentText">5%</div></div>
+      </div>
+      <div class="stageBox"><small>Current Healing Stage</small><b id="stageText">Initial healing & bleeding control</b></div>
+    </section>
+
+    <section class="mapCard">
+      <h3>Recovery Process Map</h3>
+      <div class="timeline" id="timeline"></div>
+      <div class="mapStats">
+        <div class="miniBox"><span>Total guide</span><b id="totalGuide">21 days</b></div>
+        <div class="miniBox"><span>Next step</span><b id="nextStep">Day 3 is your next recovery milestone.</b></div>
+      </div>
+    </section>
+
+    <section class="infoStack" id="infoStack"></section>
+
+    <div class="actions">
+      <button class="secondaryBtn" id="homeBtn">🏠 Home</button>
+      <button class="secondaryBtn" id="resetBtn">↻ Reset Guide</button>
+    </div>
+    <div class="note">This guide is general information only. Always follow your clinic’s specific instructions.</div>
+  </main>
 </div>
-<div class="desc">Select one surgery type, save the surgery date, and this guide will update automatically each day.</div>
-<div class="headerPill">🌎 Pacific Time based day count</div>
-</header>
-<main class="content">
-<section id="homeScreen" class="screen">
-<div class="heroCard"><div class="sectionTitle">Select Surgery Type</div><div class="sectionSub">Once selected, the surgery type will stay locked until you reset the guide.</div></div>
-<div id="surgeryList" class="surgeryList"></div>
-<p class="smallNote">This guide supports recovery education only. Always follow your clinic’s specific instructions.</p>
-</section>
-<section id="dateScreen" class="screen">
-<div class="heroCard"><div class="sectionTitle">Surgery Date</div><div class="sectionSub">Choose the date the procedure was completed.</div></div>
-<div class="dateBox">
-<div id="selectedTypeBox" class="selectedType"></div>
-<label for="surgeryDateInput">Surgery date</label>
-<input id="surgeryDateInput" type="date" />
-<button class="primaryBtn" onclick="saveSurgeryDate()">Save & View Guide</button>
-<button class="secondaryBtn" onclick="goHome()">Back</button>
-</div>
-</section>
-<section id="guideScreen" class="screen">
-<div id="dashboard"></div><div id="processMap"></div><div id="guideContent"></div>
-<div class="footerActions"><button class="secondaryBtn" onclick="goHome()">Home</button><button class="dangerBtn" onclick="resetGuide()">Reset</button></div>
-<p class="smallNote">If symptoms feel severe or unusual, contact your dental clinic.</p>
-</section>
-</main>
-</div>
+
 <script>
-const SURGERIES={flap:{name:"Periodontal Flap Surgery",icon:"🔬",days:21,milestones:[0,3,7,14,21],stages:[{until:2,text:"Initial healing & bleeding control"},{until:6,text:"Swelling and tenderness phase"},{until:13,text:"Gum tissue stabilization"},{until:21,text:"Late healing and comfort return"}]},gingivectomy:{name:"Gingivectomy",icon:"✂️",days:14,milestones:[0,2,5,7,14],stages:[{until:2,text:"Initial gum surface healing"},{until:5,text:"Tenderness and soft tissue recovery"},{until:9,text:"Improving comfort"},{until:14,text:"Late tissue smoothing"}]},bone:{name:"Bone Graft",icon:"🦴",days:28,milestones:[0,3,7,14,28],stages:[{until:2,text:"Protecting the graft site"},{until:6,text:"Swelling and clot stability"},{until:13,text:"Soft tissue closure"},{until:28,text:"Early graft integration"}]},implant:{name:"Dental Implant",icon:"🔩",days:21,milestones:[0,3,7,14,21],stages:[{until:2,text:"Initial implant site protection"},{until:6,text:"Swelling and tenderness phase"},{until:13,text:"Soft tissue healing"},{until:21,text:"Comfort and stability phase"}]},extraction:{name:"Tooth Extraction",icon:"🦷",days:14,milestones:[0,1,3,7,14],stages:[{until:1,text:"Bleeding control and clot formation"},{until:3,text:"Clot protection phase"},{until:7,text:"Socket healing"},{until:14,text:"Comfort return"}]},scaling:{name:"Scaling & Root Planing",icon:"🪥",days:10,milestones:[0,1,3,7,10],stages:[{until:1,text:"Gum tenderness phase"},{until:3,text:"Sensitivity improvement"},{until:7,text:"Inflammation reduction"},{until:10,text:"Routine care return"}]}};
-const BASE_GUIDES={normal:["Mild soreness, tenderness, or tightness can be normal.","A small amount of pink saliva may occur early in healing.","Swelling may increase during the first few days before improving."],avoid:["Avoid smoking, vaping, straws, and spitting forcefully.","Avoid crunchy, spicy, hard, or very hot foods.","Avoid heavy exercise unless your clinic says it is okay."],warning:["Heavy bleeding that does not slow with firm pressure.","Fever, worsening swelling, pus, or bad taste that is getting worse.","Severe pain that is not improving with medication."]};
-function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active")}
-function getPacificDateParts(date=new Date()){const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);const obj={};parts.forEach(p=>obj[p.type]=p.value);return{year:Number(obj.year),month:Number(obj.month),day:Number(obj.day)}}
-function dateToUTC(p){return Date.UTC(p.year,p.month-1,p.day)}
-function parseInputDate(v){const[y,m,d]=v.split("-").map(Number);return{year:y,month:m,day:d}}
-function formatDate(v){if(!v)return"";const[y,m,d]=v.split("-");return`${m}/${d}/${y}`}
-function calculateDayCount(savedDate){const surgery=parseInputDate(savedDate);const today=getPacificDateParts();const diff=dateToUTC(today)-dateToUTC(surgery);return Math.max(0,Math.floor(diff/86400000))}
-function getStage(s,day){const stage=s.stages.find(x=>day<=x.until);return stage?stage.text:"Maintenance and continued recovery"}
-function getNextMilestone(s,day){const next=s.milestones.find(m=>m>day);return next===undefined?"You have reached the end of this recovery timeline.":`Day ${next} is your next recovery milestone.`}
-function getDailyGuide(type,day){let timing=[];if(day<=1){timing=["Focus on rest, bleeding control, and protecting the healing site.","Use cold compresses if your clinic recommended them.","Choose cool or room-temperature soft foods."]}else if(day<=3){timing=["Swelling or stiffness may still be noticeable today.","Continue gentle rinsing only if your clinic instructed you to start.","Keep meals soft and avoid chewing directly on the treated area."]}else if(day<=7){timing=["Discomfort should gradually improve compared with the first few days.","Continue careful brushing away from the treated area.","Do not pull your lip or cheek to inspect the site."]}else if(day<=14){timing=["Most daily comfort should be improving.","Continue avoiding hard or sharp foods near the healing site.","Follow your clinic’s instructions for sutures or follow-up visits."]}else{timing=["Healing is moving into a later recovery phase.","Return to normal habits only as directed by your clinic.","Continue monitoring for unusual pain, swelling, or bleeding."]}const typeSpecific={flap:["Avoid brushing directly over the flap area until cleared.","Do not disturb sutures or periodontal dressing if present."],gingivectomy:["The gum surface may feel raw or sensitive.","Avoid irritating the reshaped gum area."],bone:["Protect the graft site carefully and avoid pressure on the area.","Do not disturb graft material if you notice small particles."],implant:["Avoid chewing on the implant area during early healing.","Do not touch or twist any healing cap or abutment."],extraction:["Protect the blood clot; avoid straws and forceful rinsing.","Call the clinic if pain suddenly worsens after initially improving."],scaling:["Tooth sensitivity can happen after deep cleaning.","Use gentle brushing and follow any rinse instructions."]};return{timing,typeSpecific:typeSpecific[type]||[]}}
-function renderHome(){const savedType=localStorage.getItem("surgeryType");const savedDate=localStorage.getItem("surgeryDate");const list=document.getElementById("surgeryList");list.innerHTML=Object.entries(SURGERIES).map(([key,s])=>{const locked=savedType&&savedType!==key;const selected=savedType===key;return`<button class="card ${locked?"locked":""}" onclick="${locked?"":`selectSurgery('${key}')`}"><div class="icon">${s.icon}</div><div class="cardBody"><div class="name">${s.name}</div><div class="days">${s.days} day recovery guide ${selected?"· Selected":""}</div></div><div class="arrow">${locked?"🔒":"›"}</div></button>`}).join("");if(savedType&&savedDate){setTimeout(()=>renderGuide(),0)}else{showScreen("homeScreen")}}
-function selectSurgery(type){const savedType=localStorage.getItem("surgeryType");if(savedType&&savedType!==type){alert("Only one surgery type can be active. Please reset the guide to choose another surgery.");return}localStorage.setItem("surgeryType",type);const s=SURGERIES[type];document.getElementById("selectedTypeBox").innerHTML=`<div class="selectedIcon">${s.icon}</div><div><div class="name">${s.name}</div><div class="days">${s.days} day recovery guide</div></div>`;const existingDate=localStorage.getItem("surgeryDate");if(existingDate)document.getElementById("surgeryDateInput").value=existingDate;showScreen("dateScreen")}
-function saveSurgeryDate(){const date=document.getElementById("surgeryDateInput").value;if(!date){alert("Please select the surgery date.");return}localStorage.setItem("surgeryDate",date);renderGuide()}
-function renderDashboard(type,surgery,day){const percent=Math.min(100,Math.round((day/surgery.days)*100));const stage=getStage(surgery,day);document.getElementById("dashboard").innerHTML=`<div class="dashboardTop"><div class="surgeryBadge">${surgery.icon} ${surgery.name}</div><div class="statusRow"><div><div class="dayNumber">Day ${day}</div><div class="dayLabel">Surgery date: ${formatDate(localStorage.getItem("surgeryDate"))}</div></div><div class="progressCircle" style="--progress:${percent}%"><div class="progressText">${percent}%</div></div></div><div class="stageCard"><div class="stageLabel">Current Healing Stage</div><div class="stageText">${stage}</div></div></div>`}
-function renderProcessMap(surgery,day){const milestones=surgery.milestones;const current=milestones.find(x=>x>=day)??milestones[milestones.length-1];document.getElementById("processMap").innerHTML=`<div class="mapCard"><div class="cardTitle">Recovery Process Map</div><div class="timeline">${milestones.map(m=>{const cls=day>m?"done":m===current?"current":"";return`<div class="step ${cls}"><div class="dot"></div><div class="stepText">Day ${m}</div></div>`}).join("")}</div><div class="overviewGrid"><div class="mini"><div class="miniLabel">Total guide</div><div class="miniValue">${surgery.days} days</div></div><div class="mini"><div class="miniLabel">Next step</div><div class="miniValue">${getNextMilestone(surgery,day)}</div></div></div></div>`}
-function renderGuideContent(type,surgery,day){const daily=getDailyGuide(type,day);document.getElementById("guideContent").innerHTML=`<div class="guideCard"><div class="cardTitle">Today’s Recovery Guide</div><div class="guideSection"><div class="guideHeader">✅ What’s Normal Today</div><ul>${BASE_GUIDES.normal.map(x=>`<li>${x}</li>`).join("")}</ul></div><div class="guideSection"><div class="guideHeader">🧭 Today’s Care</div><ul>${daily.timing.map(x=>`<li>${x}</li>`).join("")}</ul></div><div class="guideSection"><div class="guideHeader">🦷 Procedure-Specific Notes</div><ul>${daily.typeSpecific.map(x=>`<li>${x}</li>`).join("")}</ul></div><div class="guideSection"><div class="guideHeader">🚫 Avoid Today</div><ul>${BASE_GUIDES.avoid.map(x=>`<li>${x}</li>`).join("")}</ul></div><div class="nextMilestone"><strong>Next milestone:</strong> ${getNextMilestone(surgery,day)}</div></div><div class="warningCard"><div class="warningTitle">Call Clinic If…</div><ul>${BASE_GUIDES.warning.map(x=>`<li>${x}</li>`).join("")}</ul></div>`}
-function renderGuide(){const type=localStorage.getItem("surgeryType");const date=localStorage.getItem("surgeryDate");if(!type||!date){renderHome();return}const surgery=SURGERIES[type];const day=calculateDayCount(date);renderDashboard(type,surgery,day);renderProcessMap(surgery,day);renderGuideContent(type,surgery,day);showScreen("guideScreen")}
-function goHome(){renderHome()}
-function resetGuide(){const ok=confirm("Reset this guide? This will clear the selected surgery type and surgery date.");if(!ok)return;localStorage.removeItem("surgeryType");localStorage.removeItem("surgeryDate");document.getElementById("surgeryDateInput").value="";renderHome()}
-renderHome();
+const DATA={
+  flap:{name:'Periodontal Flap Surgery',days:21,milestones:[0,3,7,14,21]},
+  gingivectomy:{name:'Gingivectomy',days:14,milestones:[0,2,5,7,14]},
+  bone:{name:'Bone Graft',days:28,milestones:[0,3,7,14,28]},
+  implant:{name:'Dental Implant',days:21,milestones:[0,3,7,14,21]},
+  extraction:{name:'Tooth Extraction',days:14,milestones:[0,1,3,7,14]}
+};
+let pendingType=null;
+function pacificTodayString(){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+}
+function parseYMD(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function dayCount(dateStr){return Math.max(0,Math.floor((parseYMD(pacificTodayString())-parseYMD(dateStr))/86400000))}
+function fmtDate(s){return parseYMD(s).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}
+function stageFor(day,total){
+  if(day<=1)return ['Initial Healing Phase','Initial healing & bleeding control'];
+  if(day<=3)return ['Swelling Phase','Swelling may peak and then gradually improve'];
+  if(day<=7)return ['Early Tissue Recovery','Gum tissue is closing and tenderness should reduce'];
+  if(day<=14)return ['Stability Phase','Comfort and chewing confidence should improve'];
+  return ['Final Recovery Phase','Continue gentle care until fully released by clinic'];
+}
+function guidance(day){
+  if(day<=1)return{
+    normal:['Mild bleeding or pink saliva may occur.','Tenderness, swelling, and numbness can be normal.','You may feel tired after the procedure.'],
+    care:['Rest with your head elevated.','Use ice pack 20 minutes on / 20 minutes off if instructed.','Eat cool, soft foods and drink plenty of water.','Take medications as directed by the clinic.'],
+    avoid:['Do not use a straw.','Avoid smoking, alcohol, and vigorous rinsing.','Avoid hard, spicy, crunchy, or hot foods.','Do not touch the surgical area with fingers or tongue.'],
+    call:['Heavy bleeding that does not slow with pressure.','Trouble breathing or swallowing.','Severe pain not improved by medication.','Fever or rapidly increasing swelling.'],
+    next:'Day 3: swelling usually peaks and then gradually improves.'};
+  if(day<=3)return{
+    normal:['Swelling and tightness may be more noticeable today.','Light bruising can appear.','Mild oozing may happen after eating or brushing.'],
+    care:['Use warm salt-water rinses only if your clinic instructed.','Continue soft foods and good hydration.','Brush gently away from the surgical area.'],
+    avoid:['Avoid heavy exercise.','Avoid chewing directly on the surgical site.','Do not pull your cheek or lip to inspect the area repeatedly.'],
+    call:['Swelling is rapidly worsening.','Pain is increasing instead of improving.','Bad taste or drainage continues.','Fever develops.'],
+    next:'Day 7: early tissue healing and follow-up check may occur.'};
+  return{
+    normal:['Tenderness should gradually improve.','Some sensitivity while brushing may remain.','Gums may still look uneven while healing.'],
+    care:['Continue gentle brushing as instructed.','Return to normal foods slowly as comfortable.','Keep follow-up appointments.'],
+    avoid:['Avoid crunchy foods until cleared.','Avoid aggressive brushing or flossing near the area.','Do not skip prescribed rinses or medication instructions.'],
+    call:['Pain suddenly worsens.','Swelling returns after improving.','Bleeding restarts heavily.','You notice pus, fever, or severe odor.'],
+    next:'Continue the recovery plan until your clinic clears you.'};
+}
+function card(cls,icon,title,items,isParagraph=false){
+  const body=isParagraph?`<p>${items}</p>`:`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  return `<article class="infoCard ${cls}"><div class="infoIcon">${icon}</div><div class="infoBody"><h3>${title}</h3>${body}</div></article>`;
+}
+function showGuide(){
+  const type=localStorage.getItem('surgeryType'); const date=localStorage.getItem('surgeryDate');
+  if(!type||!date){showHome();return}
+  const d=DATA[type]||DATA.flap; const day=dayCount(date); const pct=Math.min(100,Math.max(0,Math.round((day/d.days)*100))); const [phase,stage]=stageFor(day,d.days);
+  homeScreen.classList.add('hidden'); setupScreen.classList.add('hidden'); guideScreen.classList.remove('hidden');
+  surgeryLabel.textContent=d.name; dayText.textContent=`Day ${day}`; phaseText.textContent=phase; stageText.textContent=stage; surgeryDateText.textContent=`Surgery date: ${fmtDate(date)}`; percentText.textContent=`${pct}%`; progressRing.style.setProperty('--p',pct); totalGuide.textContent=`${d.days} days`;
+  const next=d.milestones.find(m=>m>day); nextStep.textContent=next?`Day ${next} is your next recovery milestone.`:'You are at the final recovery milestone.';
+  timeline.innerHTML=d.milestones.map(m=>`<div class="milestone ${m<day?'done':m===day||m===next?'current':''}"><div class="dot">${m<day?'✓':''}</div><div>Day ${m}</div></div>`).join('');
+  const g=guidance(day);
+  infoStack.innerHTML=card('normal','✅',"What’s Normal Today",g.normal)+card('care','💙',"Today’s Care",g.care)+card('avoid','🚫','Avoid Today',g.avoid)+card('call','📞','Call Clinic If',g.call)+card('next','🚩','Next Milestone',g.next,true);
+}
+function showHome(){
+  guideScreen.classList.add('hidden'); setupScreen.classList.add('hidden'); homeScreen.classList.remove('hidden');
+  const selected=localStorage.getItem('surgeryType');
+  document.querySelectorAll('.surgeryCard').forEach(btn=>{
+    const locked=selected&&btn.dataset.type!==selected;
+    btn.classList.toggle('locked',!!locked);
+    btn.disabled=!!locked;
+  });
+}
+document.querySelectorAll('.surgeryCard').forEach(btn=>btn.onclick=()=>{
+  const selected=localStorage.getItem('surgeryType');
+  if(selected&&selected!==btn.dataset.type)return;
+  pendingType=btn.dataset.type; setupTitle.textContent=DATA[pendingType].name; dateInput.value=pacificTodayString(); homeScreen.classList.add('hidden'); setupScreen.classList.remove('hidden');
+});
+saveBtn.onclick=()=>{if(!pendingType||!dateInput.value)return; localStorage.setItem('surgeryType',pendingType); localStorage.setItem('surgeryDate',dateInput.value); showGuide()};
+homeBtn.onclick=showHome;
+resetBtn.onclick=()=>{if(confirm('Reset this recovery guide and choose another surgery type?')){localStorage.removeItem('surgeryType');localStorage.removeItem('surgeryDate');showHome()}};
+showGuide();
 </script>
 </body>
 </html>

@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <title>Dental Recovery Guide</title>
 
-<link rel="manifest" href="./pwa_manifest.json?v=5">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=5">
+<link rel="manifest" href="./pwa_manifest.json?v=6">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=6">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -261,6 +261,170 @@ input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0
   border:1px solid rgba(251,146,60,.25);
 }
 
+
+/* Floating Smart Assistant */
+.assistant-card{display:none !important;}
+
+.chat-fab{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:80;
+  width:62px;
+  height:62px;
+  border-radius:22px;
+  border:0;
+  background:linear-gradient(135deg,#0b2e8a,#2563eb);
+  color:white;
+  box-shadow:0 16px 34px rgba(37,99,235,.35);
+  font-size:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.chat-fab:active{transform:scale(.96);}
+
+.chat-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  background:rgba(15,23,42,.38);
+  display:none;
+}
+.chat-backdrop.show{display:block;}
+
+.chat-panel{
+  position:fixed;
+  left:12px;
+  right:12px;
+  bottom:12px;
+  z-index:100;
+  background:#ffffff;
+  border-radius:28px;
+  box-shadow:0 24px 70px rgba(15,23,42,.28);
+  padding:16px;
+  display:none;
+  max-width:430px;
+  margin:0 auto;
+  max-height:78vh;
+  overflow:auto;
+}
+.chat-panel.show{display:block;}
+
+.chat-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(15,23,42,.08);
+}
+.chat-title-wrap{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.chat-avatar{
+  width:40px;
+  height:40px;
+  border-radius:16px;
+  background:linear-gradient(135deg,#dbeafe,#eff6ff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:21px;
+}
+.chat-title{
+  font-size:17px;
+  font-weight:900;
+  color:#111827;
+}
+.chat-subtitle{
+  font-size:12px;
+  color:#64748b;
+  margin-top:2px;
+}
+.chat-close{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:0;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:22px;
+  line-height:34px;
+}
+
+.chat-question-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+.chat-chip{
+  border:0;
+  border-radius:18px;
+  padding:12px 10px;
+  background:#f8fafc;
+  color:#0f172a;
+  font-size:14px;
+  font-weight:800;
+  text-align:left;
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,.08);
+}
+.chat-chip:active{transform:scale(.98);}
+
+.chat-answer{
+  margin-top:14px;
+  padding:14px;
+  border-radius:22px;
+  background:linear-gradient(135deg,#eef6ff,#f8fbff);
+  border:1px solid rgba(37,99,235,.16);
+  display:none;
+}
+.chat-answer.show{display:block;}
+
+.chat-answer-title{
+  font-size:15px;
+  font-weight:900;
+  color:#0f172a;
+  margin-bottom:7px;
+}
+.chat-answer-text{
+  font-size:14px;
+  line-height:1.45;
+  color:#334155;
+}
+.chat-answer-warning{
+  margin-top:10px;
+  padding:10px;
+  border-radius:16px;
+  background:#fff7ed;
+  color:#9a3412;
+  font-size:13px;
+  line-height:1.4;
+  border:1px solid rgba(251,146,60,.25);
+}
+.chat-actions{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.chat-small-btn{
+  flex:1;
+  border:0;
+  border-radius:16px;
+  padding:11px;
+  font-size:14px;
+  font-weight:800;
+  background:#eef2ff;
+  color:#1e3a8a;
+}
+.chat-small-btn.secondary{
+  background:#f8fafc;
+  color:#475569;
+}
+
 </style>
 </head>
 <body>
@@ -304,33 +468,6 @@ input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0
           <div class="reminder-label">Daily Reminder</div>
           <div class="reminder-title" id="reminderTitle">Today’s Reminder</div>
           <div class="reminder-text" id="reminderText">Open this guide daily for your updated recovery reminder.</div>
-        </div>
-        <div class="assistant-card" id="smartAssistantCard">
-          <div class="assistant-header">
-            <div class="assistant-badge">💬</div>
-            <div>
-              <div class="assistant-title">Ask Recovery Assistant</div>
-              <div class="assistant-subtitle">Choose a concern to get quick guidance based on your recovery day.</div>
-            </div>
-          </div>
-
-          <div class="assistant-buttons">
-            <button class="assistant-btn" onclick="askAssistant('bleeding')">🩸 Bleeding</button>
-            <button class="assistant-btn" onclick="askAssistant('swelling')">😮‍💨 Swelling</button>
-            <button class="assistant-btn" onclick="askAssistant('pain')">⚡ Pain</button>
-            <button class="assistant-btn" onclick="askAssistant('food')">🍲 Food</button>
-            <button class="assistant-btn" onclick="askAssistant('brushing')">🪥 Brushing</button>
-            <button class="assistant-btn" onclick="askAssistant('urgent')">🚨 Urgent Signs</button>
-          </div>
-
-          <div class="assistant-answer" id="assistantAnswer">
-            <div class="answer-title" id="assistantAnswerTitle"></div>
-            <div class="answer-text" id="assistantAnswerText"></div>
-            <div class="answer-warning" id="assistantAnswerWarning"></div>
-          </div>
-        </div>
-
-
         </div>
         <div class="ring" id="progressRing" style="--p:5"><div class="ringInner" id="percentText">5%</div></div>
       </div>
@@ -490,7 +627,7 @@ showGuide();
 (function(){
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=5').catch(function(){});
+      navigator.serviceWorker.register('./sw.js?v=6').catch(function(){});
     });
   }
 
@@ -591,6 +728,73 @@ function askAssistant(topic){
   if(text) text.textContent = res.text;
   if(warn) warn.textContent = res.warn;
   if(box) box.classList.add('show');
+  const grid=document.getElementById('chatQuestionGrid');
+  if(grid) grid.style.display='none';
+}
+
+</script>
+
+<button class="chat-fab" id="chatFab" onclick="openAssistantPopup()" aria-label="Open Recovery Assistant">💬</button>
+
+<div class="chat-backdrop" id="chatBackdrop" onclick="closeAssistantPopup()"></div>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="chat-title-wrap">
+      <div class="chat-avatar">💬</div>
+      <div>
+        <div class="chat-title">Recovery Assistant</div>
+        <div class="chat-subtitle">Quick guidance based on your recovery day</div>
+      </div>
+    </div>
+    <button class="chat-close" onclick="closeAssistantPopup()">×</button>
+  </div>
+
+  <div class="chat-question-grid" id="chatQuestionGrid">
+    <button class="chat-chip" onclick="askAssistant('bleeding')">🩸 Bleeding</button>
+    <button class="chat-chip" onclick="askAssistant('swelling')">😮‍💨 Swelling</button>
+    <button class="chat-chip" onclick="askAssistant('pain')">⚡ Pain</button>
+    <button class="chat-chip" onclick="askAssistant('food')">🍲 Food</button>
+    <button class="chat-chip" onclick="askAssistant('brushing')">🪥 Brushing</button>
+    <button class="chat-chip" onclick="askAssistant('urgent')">🚨 Urgent Signs</button>
+  </div>
+
+  <div class="chat-answer" id="assistantAnswer">
+    <div class="chat-answer-title" id="assistantAnswerTitle"></div>
+    <div class="chat-answer-text" id="assistantAnswerText"></div>
+    <div class="chat-answer-warning" id="assistantAnswerWarning"></div>
+    <div class="chat-actions">
+      <button class="chat-small-btn" onclick="backToAssistantQuestions()">Ask another</button>
+      <button class="chat-small-btn secondary" onclick="closeAssistantPopup()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function openAssistantPopup(){
+  const backdrop=document.getElementById('chatBackdrop');
+  const panel=document.getElementById('chatPanel');
+  const answer=document.getElementById('assistantAnswer');
+  const grid=document.getElementById('chatQuestionGrid');
+  if(backdrop) backdrop.classList.add('show');
+  if(panel) panel.classList.add('show');
+  if(answer) answer.classList.remove('show');
+  if(grid) grid.style.display='grid';
+}
+
+function closeAssistantPopup(){
+  const backdrop=document.getElementById('chatBackdrop');
+  const panel=document.getElementById('chatPanel');
+  if(backdrop) backdrop.classList.remove('show');
+  if(panel) panel.classList.remove('show');
+}
+
+function backToAssistantQuestions(){
+  const answer=document.getElementById('assistantAnswer');
+  const grid=document.getElementById('chatQuestionGrid');
+  if(answer) answer.classList.remove('show');
+  if(grid) grid.style.display='grid';
 }
 
 </script>

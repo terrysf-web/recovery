@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <title>Dental Recovery Guide</title>
 
-<link rel="manifest" href="./pwa_manifest.json?v=3">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=3">
+<link rel="manifest" href="./pwa_manifest.json?v=4">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=4">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -147,6 +147,35 @@ input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0
   line-height:28px;
 }
 
+
+.reminder-card{
+  margin:14px 0 16px;
+  padding:16px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#fff7ed,#ffedd5);
+  border:1px solid rgba(251,146,60,.35);
+  box-shadow:0 8px 22px rgba(251,146,60,.16);
+}
+.reminder-label{
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#c2410c;
+  margin-bottom:6px;
+}
+.reminder-title{
+  font-size:18px;
+  font-weight:900;
+  color:#111827;
+  margin-bottom:6px;
+}
+.reminder-text{
+  font-size:14px;
+  line-height:1.45;
+  color:#374151;
+}
+
 </style>
 </head>
 <body>
@@ -186,6 +215,12 @@ input[type=date]{width:100%;font-size:18px;padding:13px;border:1px solid #dbe4f0
           <div class="dayText" id="dayText">Day 1</div>
           <div class="phase" id="phaseText">Initial Healing Phase</div>
           <div class="date" id="surgeryDateText">Surgery date: May 18, 2026</div>
+        <div class="reminder-card" id="dailyReminderCard">
+          <div class="reminder-label">Daily Reminder</div>
+          <div class="reminder-title" id="reminderTitle">Today’s Reminder</div>
+          <div class="reminder-text" id="reminderText">Open this guide daily for your updated recovery reminder.</div>
+        </div>
+
         </div>
         <div class="ring" id="progressRing" style="--p:5"><div class="ringInner" id="percentText">5%</div></div>
       </div>
@@ -263,6 +298,38 @@ function card(cls,icon,title,items,isParagraph=false){
   const body=isParagraph?`<p>${items}</p>`:`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
   return `<article class="infoCard ${cls}"><div class="infoIcon">${icon}</div><div class="infoBody"><h3>${title}</h3>${body}</div></article>`;
 }
+
+function dailyReminder(day){
+  if(day <= 1){
+    return {
+      title: "Focus on rest, bleeding control, and swelling prevention.",
+      text: "Use gentle pressure if bleeding occurs, keep your head elevated, use ice packs as instructed, and avoid rinsing hard, spitting, straws, smoking, or crunchy foods."
+    };
+  }
+  if(day <= 3){
+    return {
+      title: "Swelling may peak around this stage.",
+      text: "Continue soft foods, gentle care, and avoid heavy activity. Mild swelling or tightness can be normal, but call the clinic if swelling is severe or getting worse quickly."
+    };
+  }
+  if(day <= 7){
+    return {
+      title: "Keep the area clean, but be gentle.",
+      text: "Rinse gently if instructed, brush carefully around the area, and avoid chewing directly on the surgical site. Do not disturb sutures or the healing tissue."
+    };
+  }
+  if(day <= 14){
+    return {
+      title: "Healing should feel more stable now.",
+      text: "Most discomfort should be improving. Continue avoiding hard, sharp, or sticky foods near the area and follow any clinic-specific instructions."
+    };
+  }
+  return {
+    title: "Continue protecting the healing area.",
+    text: "You may feel mostly normal, but deeper tissue healing can still be ongoing. Follow clinic instructions and contact the office if pain, swelling, drainage, or bleeding returns."
+  };
+}
+
 function showGuide(){
   const type=localStorage.getItem('surgeryType'); const date=localStorage.getItem('surgeryDate');
   if(!type||!date){showHome();return}
@@ -275,6 +342,9 @@ function showGuide(){
   const next=d.milestones.find(m=>m>day); nextStep.textContent=next?`Day ${next} is your next recovery milestone.`:'You are at the final recovery milestone.';
   timeline.innerHTML=d.milestones.map(m=>`<div class="milestone ${m<day?'done':m===day||m===next?'current':''}"><div class="dot">${m<day?'✓':''}</div><div>Day ${m}</div></div>`).join('');
   const g=guidance(day);
+  const r=dailyReminder(day);
+  if(document.getElementById('reminderTitle')) document.getElementById('reminderTitle').textContent=r.title;
+  if(document.getElementById('reminderText')) document.getElementById('reminderText').textContent=r.text;
   infoStack.innerHTML=card('normal','✅',"What’s Normal Today",g.normal)+card('care','💙',"Today’s Care",g.care)+card('avoid','🚫','Avoid Today',g.avoid)+card('call','📞','Call Clinic If',g.call)+card('next','🚩','Next Milestone',g.next,true);
 }
 function showHome(){
@@ -310,7 +380,7 @@ showGuide();
 (function(){
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('./sw.js?v=3').catch(function(){});
+      navigator.serviceWorker.register('./sw.js?v=4').catch(function(){});
     });
   }
 

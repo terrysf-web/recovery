@@ -67,6 +67,64 @@ body{
   margin:10px 0 18px;
 }
 
+.status-card{
+  display:none;
+  background:white;
+  border-radius:24px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+
+.status-label{
+  color:#6b7280;
+  font-size:14px;
+  font-weight:700;
+}
+
+.status-title{
+  margin-top:6px;
+  font-size:21px;
+  font-weight:900;
+}
+
+.status-day{
+  margin-top:8px;
+  font-size:34px;
+  font-weight:900;
+  color:#0b2e8a;
+}
+
+.status-date{
+  margin-top:4px;
+  color:#6b7280;
+  font-size:14px;
+}
+
+.status-actions{
+  margin-top:14px;
+  display:flex;
+  gap:10px;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.primary-btn{
+  background:#0b2e8a;
+  color:white;
+}
+
+.secondary-btn{
+  background:#eef2f7;
+  color:#111827;
+}
+
 .card{
   background:white;
   border-radius:28px;
@@ -76,6 +134,12 @@ body{
   gap:16px;
   margin-bottom:18px;
   box-shadow:0 2px 10px rgba(0,0,0,.05);
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+
+.card:active{
+  transform:scale(.98);
 }
 
 .icon{
@@ -87,6 +151,7 @@ body{
   align-items:center;
   justify-content:center;
   font-size:42px;
+  flex-shrink:0;
 }
 
 .name{
@@ -105,6 +170,37 @@ body{
   color:#9ca3af;
   font-size:42px;
 }
+
+.date-screen{
+  display:none;
+}
+
+.date-box{
+  background:white;
+  border-radius:28px;
+  padding:20px;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.date-box h2{
+  margin:0 0 8px;
+  font-size:24px;
+}
+
+.date-box p{
+  margin:0 0 16px;
+  color:#6b7280;
+  line-height:1.45;
+}
+
+input[type="date"]{
+  width:100%;
+  font-size:18px;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid #d1d5db;
+  margin-bottom:14px;
+}
 </style>
 </head>
 
@@ -113,125 +209,178 @@ body{
 <div class="app">
 
   <div class="header">
-
     <div class="top">
       <img class="logo" src="./logo.png" alt="Dental logo" />
-      <div class="title">
-        Dental Recovery Guide
-      </div>
+      <div class="title">Dental Recovery Guide</div>
     </div>
 
     <div class="desc">
       Open this guide anytime. It automatically shows today's recovery instructions based on the surgery date.
     </div>
-
   </div>
 
   <div class="content">
 
-    <div class="section">
-      Select Surgery Type
+    <div id="statusCard" class="status-card">
+      <div class="status-label">Current Recovery Plan</div>
+      <div id="statusTitle" class="status-title"></div>
+      <div id="statusDay" class="status-day"></div>
+      <div id="statusDate" class="status-date"></div>
+      <div class="status-actions">
+        <button class="primary-btn" onclick="showDateScreen(savedType)">Change Date</button>
+        <button class="secondary-btn" onclick="resetPlan()">Reset</button>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="icon">🔬</div>
+    <div id="listScreen">
+      <div class="section">Select Surgery Type</div>
 
-      <div>
-        <div class="name">
-          Periodontal Flap Surgery
+      <div class="card" onclick="showDateScreen('Periodontal Flap Surgery')">
+        <div class="icon">🔬</div>
+        <div>
+          <div class="name">Periodontal Flap Surgery</div>
+          <div class="days">21 day recovery guide</div>
         </div>
-
-        <div class="days">
-          21 day recovery guide
-        </div>
+        <div class="arrow">›</div>
       </div>
 
-      <div class="arrow">›</div>
+      <div class="card" onclick="showDateScreen('Gingivectomy')">
+        <div class="icon">✂️</div>
+        <div>
+          <div class="name">Gingivectomy</div>
+          <div class="days">14 day recovery guide</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+
+      <div class="card" onclick="showDateScreen('Bone Graft')">
+        <div class="icon">🦴</div>
+        <div>
+          <div class="name">Bone Graft</div>
+          <div class="days">28 day recovery guide</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+
+      <div class="card" onclick="showDateScreen('Dental Implant')">
+        <div class="icon">🔩</div>
+        <div>
+          <div class="name">Dental Implant</div>
+          <div class="days">21 day recovery guide</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+
+      <div class="card" onclick="showDateScreen('Tooth Extraction')">
+        <div class="icon">🦷</div>
+        <div>
+          <div class="name">Tooth Extraction</div>
+          <div class="days">14 day recovery guide</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
+
+      <div class="card" onclick="showDateScreen('Scaling & Root Planing')">
+        <div class="icon">🪥</div>
+        <div>
+          <div class="name">Scaling & Root Planing</div>
+          <div class="days">10 day recovery guide</div>
+        </div>
+        <div class="arrow">›</div>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="icon">✂️</div>
-
-      <div>
-        <div class="name">
-          Gingivectomy
-        </div>
-
-        <div class="days">
-          14 day recovery guide
-        </div>
+    <div id="dateScreen" class="date-screen">
+      <div class="section">Surgery Date</div>
+      <div class="date-box">
+        <h2 id="dateTitle"></h2>
+        <p>Select the surgery date. The app will save it and calculate the recovery day automatically.</p>
+        <input id="surgeryDateInput" type="date" />
+        <button class="primary-btn" style="width:100%;" onclick="savePlan()">Save & Show Day Count</button>
+        <button class="secondary-btn" style="width:100%; margin-top:10px;" onclick="backToList()">Back</button>
       </div>
-
-      <div class="arrow">›</div>
-    </div>
-
-    <div class="card">
-      <div class="icon">🦴</div>
-
-      <div>
-        <div class="name">
-          Bone Graft
-        </div>
-
-        <div class="days">
-          28 day recovery guide
-        </div>
-      </div>
-
-      <div class="arrow">›</div>
-    </div>
-
-    <div class="card">
-      <div class="icon">🔩</div>
-
-      <div>
-        <div class="name">
-          Dental Implant
-        </div>
-
-        <div class="days">
-          21 day recovery guide
-        </div>
-      </div>
-
-      <div class="arrow">›</div>
-    </div>
-
-    <div class="card">
-      <div class="icon">🦷</div>
-
-      <div>
-        <div class="name">
-          Tooth Extraction
-        </div>
-
-        <div class="days">
-          14 day recovery guide
-        </div>
-      </div>
-
-      <div class="arrow">›</div>
-    </div>
-
-    <div class="card">
-      <div class="icon">🪥</div>
-
-      <div>
-        <div class="name">
-          Scaling & Root Planing
-        </div>
-
-        <div class="days">
-          10 day recovery guide
-        </div>
-      </div>
-
-      <div class="arrow">›</div>
     </div>
 
   </div>
 
 </div>
+
+<script>
+let selectedType = '';
+let savedType = localStorage.getItem('surgeryType') || '';
+
+function getTodayLocal(){
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function calculateDayCount(dateString){
+  const start = new Date(dateString + 'T00:00:00');
+  const todayString = getTodayLocal();
+  const today = new Date(todayString + 'T00:00:00');
+  const diffTime = today - start;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function showDateScreen(type){
+  selectedType = type;
+  document.getElementById('listScreen').style.display = 'none';
+  document.getElementById('dateScreen').style.display = 'block';
+  document.getElementById('dateTitle').textContent = type;
+  document.getElementById('surgeryDateInput').value = localStorage.getItem('surgeryDate') || getTodayLocal();
+}
+
+function savePlan(){
+  const date = document.getElementById('surgeryDateInput').value;
+  if(!date){
+    alert('Please select a surgery date.');
+    return;
+  }
+
+  localStorage.setItem('surgeryType', selectedType);
+  localStorage.setItem('surgeryDate', date);
+  savedType = selectedType;
+
+  document.getElementById('dateScreen').style.display = 'none';
+  document.getElementById('listScreen').style.display = 'block';
+  showStatus();
+}
+
+function showStatus(){
+  const type = localStorage.getItem('surgeryType');
+  const date = localStorage.getItem('surgeryDate');
+
+  if(!type || !date){
+    document.getElementById('statusCard').style.display = 'none';
+    return;
+  }
+
+  const dayCount = calculateDayCount(date);
+  const displayDay = dayCount < 0 ? `Starts in ${Math.abs(dayCount)} day(s)` : `Day ${dayCount}`;
+
+  document.getElementById('statusCard').style.display = 'block';
+  document.getElementById('statusTitle').textContent = type;
+  document.getElementById('statusDay').textContent = displayDay;
+  document.getElementById('statusDate').textContent = `Surgery date: ${date}`;
+}
+
+function resetPlan(){
+  localStorage.removeItem('surgeryType');
+  localStorage.removeItem('surgeryDate');
+  savedType = '';
+  document.getElementById('statusCard').style.display = 'none';
+}
+
+function backToList(){
+  document.getElementById('dateScreen').style.display = 'none';
+  document.getElementById('listScreen').style.display = 'block';
+}
+
+showStatus();
+</script>
 
 </body>
 </html>

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./pwa_manifest.json?v=39">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=39">
+<link rel="manifest" href="./pwa_manifest.json?v=40">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=40">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -34,6 +34,23 @@
 .accessOk{margin-top:10px;font-size:13px;font-weight:850;color:#15803d;line-height:1.35}
 .codeBadge{font-size:12px;color:#64748b;margin-top:7px}
 
+
+.staffModeBtn{
+  width:100%;
+  margin-top:12px;
+  border:0;
+  border-radius:16px;
+  padding:13px;
+  font-size:14px;
+  font-weight:900;
+  background:#e2e8f0;
+  color:#334155;
+  cursor:pointer;
+}
+.staffModeBtn:active{
+  transform:scale(.99);
+}
+
 </style>
 </head>
 <body>
@@ -45,6 +62,8 @@
     <div class="accessText">Enter the recovery code provided by the clinic to open your personalized recovery guide.</div>
     <input id="accessCodeInput" class="accessInput" placeholder="Enter code" autocomplete="one-time-code">
     <button class="primary-btn" onclick="verifyAccessCode()">Open Recovery Guide</button>
+    <button class="staffModeBtn" onclick="openStaffMode()">Staff Code Generator</button>
+
     <div id="accessMessage" class="accessError"></div>
     <div class="codeBadge">This code expires automatically when the recovery period is complete.</div>
   </div>
@@ -89,6 +108,11 @@ function protocolStage(type,day){
 
 const ACCESS_API_URL="https://shrill-union-34e3.terryjseo.workers.dev";
 let ACCESS_READY=false;
+
+
+function openStaffMode(){
+  location.href='./code.html';
+}
 
 function showAccessGate(msg){
   const gate=document.getElementById("accessGate");
@@ -274,7 +298,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=39").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=40").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{

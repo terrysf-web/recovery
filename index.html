@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./pwa_manifest.json?v=9">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=8">
+<link rel="manifest" href="./pwa_manifest.json?v=10">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=10">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -108,13 +108,13 @@ async function askGemini(){
     assistantText.textContent=data.answer||"I could not generate an answer right now.";
     assistantWarning.textContent="This is general guidance only. Contact the clinic for severe, worsening, or unusual symptoms.";
   }catch(err){
-    assistantTitle.textContent="Gemini not connected yet";
-    assistantText.textContent="The app UI is ready, but the Cloudflare Worker URL is not connected yet. Replace the Worker placeholder URL after deployment.";
-    assistantWarning.textContent="Quick assistant buttons still work without Gemini.";
+    assistantTitle.textContent="Gemini connection error";
+    assistantText.textContent="Request failed: " + (err && err.message ? err.message : String(err));
+    assistantWarning.textContent="Check Cloudflare Worker deploy, GEMINI_API_KEY secret, and Worker URL.";
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=9").catch(()=>{}))}renderToday();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=10").catch(()=>{}))}renderToday();
 updateGeminiRemaining();
 </script>
 </body>

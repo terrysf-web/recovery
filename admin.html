@@ -277,10 +277,7 @@ function renderStages(){
   const s=currentSurgery();
   surgeryName.value=s.name;
   totalDays.value=s.totalDays;
-  stageTabs.innerHTML=s.stages.map((st,i)=>`<div style="display:flex;align-items:center;gap:4px">
-<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>
-<button class="miniBtn upBtn" style="width:34px;height:34px;border-radius:999px" title="Add week after this" onclick="addWeekAfter(${i})">+</button>
-</div>`).join('');
+  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new week at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
   renderStageEditor();
   renderPreview();
 }

@@ -39,23 +39,15 @@ textarea{min-height:78px;line-height:1.4}
 .lockedNotice{background:#fff7ed;border:1px solid rgba(251,146,60,.35);color:#9a3412;border-radius:18px;padding:12px;margin-top:12px;font-size:14px;line-height:1.4}
 .fileInput{background:#fff}
 
-.livePreviewBox{margin-top:14px}
-.previewShell{background:#111827;border-radius:30px;padding:12px;max-width:390px;margin:12px auto 0;box-shadow:0 18px 50px rgba(15,23,42,.25)}
-.previewScreen{background:#eef2f7;border-radius:24px;min-height:520px;max-height:680px;overflow:auto;padding:12px}
-.previewTop{background:linear-gradient(135deg,#021b57,#0b2e8a);color:white;border-radius:20px;padding:14px;margin-bottom:12px}
-.previewTitle{font-weight:950;font-size:17px}
-.previewSub{font-size:12px;opacity:.9;margin-top:3px}
-.previewCard{background:white;border-radius:18px;padding:12px;margin-bottom:10px;box-shadow:0 6px 18px rgba(15,23,42,.07)}
-.previewCard.blue{background:linear-gradient(135deg,#eef6ff,#fff)}
-.previewCard.green{background:linear-gradient(135deg,#ecfdf5,#fff)}
-.previewCard.orange{background:linear-gradient(135deg,#fff7ed,#fff)}
-.previewCard.red{background:linear-gradient(135deg,#fff1f2,#fff)}
-.previewCardTitle{font-weight:950;font-size:14px;margin-bottom:6px}
-.previewText{font-size:12px;line-height:1.42;color:#374151}
-.previewList{margin:0;padding:0;list-style:none}
-.previewList li{font-size:12px;line-height:1.38;color:#374151;padding:5px 0;border-bottom:1px solid rgba(15,23,42,.06)}
-.previewList li:last-child{border-bottom:0}
-.previewControls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.adminSplit{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,46vw);gap:16px;align-items:start}
+.adminLeft{min-width:0}
+.adminRight{position:sticky;top:12px;min-width:0}
+.appPreviewFrame{background:#111827;border-radius:30px;padding:10px;box-shadow:0 18px 50px rgba(15,23,42,.25)}
+.appPreviewFrame iframe{width:100%;height:760px;border:0;border-radius:22px;background:#eef2f7}
+.previewHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.previewHeader .sectionTitle{margin:0}
+.previewHint{font-size:12px;color:#64748b;line-height:1.35}
+@media(max-width:900px){.adminSplit{grid-template-columns:1fr}.adminRight{position:relative;top:0}.appPreviewFrame iframe{height:680px}}
 
 </style>
 </head>
@@ -115,34 +107,8 @@ textarea{min-height:78px;line-height:1.4}
 
 
   <div id="editor" class="hidden">
-
-    <div class="card livePreviewBox">
-      <div class="sectionTitle">Live App Preview</div>
-      <div class="small">This preview updates from the current Admin data before saving. Use it to check what the patient will see.</div>
-
-      <div class="previewControls">
-        <div>
-          <label>Preview Surgery</label>
-          <select id="previewSurgery" onchange="renderLivePreview()"></select>
-        </div>
-        <div>
-          <label>Preview Day</label>
-          <input id="previewDay" type="number" min="1" value="1" oninput="renderLivePreview()">
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn secondary" onclick="previewCurrentStage()">Preview Current Stage</button>
-        <button class="btn secondary" onclick="renderLivePreview()">Refresh Preview</button>
-      </div>
-
-      <div class="previewShell">
-        <div class="previewScreen" id="livePreview">
-          <div class="previewCard"><div class="previewText">Login and load protocol to preview the app.</div></div>
-        </div>
-      </div>
-    </div>
-
+  <div class="adminSplit">
+    <div class="adminLeft">
 
     <div class="card">
       <div class="sectionTitle">Admin Account</div>
@@ -298,12 +264,11 @@ function loadDefault(){
 
 function initEditor(){
   editor.classList.remove('hidden');
+  const lc=document.getElementById('loginCard'); if(lc) lc.classList.add('hidden');
   /* passwordCard remains hidden until Change Password is clicked */
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
-  syncPreviewOptions();
-  previewCurrentStage();
 }
 
 function currentSurgeryKey(){
@@ -430,6 +395,8 @@ async function saveProtocol(){
     const data=await res.json();
     if(!res.ok)throw new Error(data.error||'Save failed');
     setSaveStatus('Saved successfully.');
+    reloadPatientPreview();
+    reloadPatientPreview();
   }catch(e){
     setSaveStatus('Save failed: '+e.message,false);
   }
@@ -768,91 +735,15 @@ function moveStageDown(){
 
 
 
-function syncPreviewOptions(){
-  const sel = document.getElementById('previewSurgery');
-  if(!sel || !protocol) return;
-
-  const current = sel.value || currentSurgeryKey();
-  sel.innerHTML = Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
-
-  if(protocol[current]) sel.value = current;
-  else sel.value = currentSurgeryKey();
-}
-
-function previewCurrentStage(){
-  if(!document.getElementById('previewDay')) return;
-  const st = currentSurgery().stages[currentStageIndex];
-  previewSurgery.value = currentSurgeryKey();
-  previewDay.value = st.startDay || 1;
-  renderLivePreview();
-}
-
-function findPreviewStage(type,day){
-  const s = protocol[type];
-  if(!s || !s.stages) return null;
-  return s.stages.find(st=>day>=Number(st.startDay)&&day<=Number(st.endDay)) || s.stages[s.stages.length-1];
-}
-
-function previewList(items){
-  const arr = Array.isArray(items) ? items.filter(x=>String(x||'').trim()) : [];
-  if(!arr.length) return '<div class="previewText">None</div>';
-  return '<ul class="previewList">' + arr.map(x=>`<li>${esc(x)}</li>`).join('') + '</ul>';
-}
-
-function renderLivePreview(){
-  const box = document.getElementById('livePreview');
-  if(!box || !protocol || !isLoggedIn) return;
-
-  syncPreviewOptions();
-
-  const type = previewSurgery.value || currentSurgeryKey();
-  const day = Number(previewDay.value || 1);
-  const s = protocol[type];
-  const st = findPreviewStage(type,day);
-
-  if(!s || !st){
-    box.innerHTML = '<div class="previewCard"><div class="previewText">No preview available.</div></div>';
-    return;
+function reloadPatientPreview(){
+  const frame=document.getElementById('patientAppPreview');
+  if(frame){
+    frame.src='./?adminPreview=1&t=' + Date.now();
   }
-
-  const label = day <= 1 ? 'First 24 Hours' : 'Day ' + day;
-
-  box.innerHTML = `
-    <div class="previewTop">
-      <div class="previewTitle">Dental Recovery Guide</div>
-      <div class="previewSub">${esc(s.name)} · ${esc(label)}</div>
-    </div>
-
-    <div class="previewCard blue">
-      <div class="previewCardTitle">${esc(label)} · ${esc(st.phase || st.label || '')}</div>
-      <div class="previewText">${esc(st.reminder || '')}</div>
-    </div>
-
-    <div class="previewCard">
-      <div class="previewCardTitle">✅ Home Care / Instructions</div>
-      ${previewList(st.normal)}
-    </div>
-
-    <div class="previewCard green">
-      <div class="previewCardTitle">🍲 Food Examples</div>
-      ${previewList(st.foods)}
-    </div>
-
-    <div class="previewCard orange">
-      <div class="previewCardTitle">🚫 Avoid / Restrictions</div>
-      ${previewList(st.avoid)}
-    </div>
-
-    <div class="previewCard red">
-      <div class="previewCardTitle">📞 Additional Notes / Warnings</div>
-      ${previewList(st.warnings)}
-    </div>
-  `;
 }
 
 function renderPreview(){
   jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);
-  renderLivePreview();
 }
 </script>
 </body>

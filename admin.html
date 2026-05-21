@@ -49,6 +49,22 @@ textarea{min-height:78px;line-height:1.4}
 .previewHint{font-size:12px;color:#64748b;line-height:1.35}
 @media(max-width:900px){.adminSplit{grid-template-columns:1fr}.adminRight{position:relative;top:0}.appPreviewFrame iframe{height:680px}}
 
+
+body{overflow-x:hidden}
+.card{width:100%;box-sizing:border-box}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.actions .btn{width:auto !important;min-width:150px}
+.btn{white-space:normal;line-height:1.2}
+.adminSplit{align-items:start}
+.adminLeft{min-width:0;width:100%}
+.adminRight{min-width:320px}
+input,select,textarea{width:100%;box-sizing:border-box}
+.stageTabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{display:inline-flex;align-items:center;justify-content:center;min-width:110px}
+@media(max-width:900px){
+  .actions .btn{width:100% !important}
+}
+
 </style>
 </head>
 <body>
@@ -106,8 +122,8 @@ textarea{min-height:78px;line-height:1.4}
   </div>
 
 
-  <div id="editor" class="hidden">
-  <div class="adminSplit">
+  <div id="editor" class="hidden" style="width:100%">
+  <div class="adminSplit" style="width:100%">
     <div class="adminLeft">
 
     <div class="card">

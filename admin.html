@@ -57,6 +57,14 @@ textarea{min-height:78px;line-height:1.4}
     <div class="lockedNotice">
       Editing, deleting, uploading, and saving are locked until the admin password is entered.
     </div>
+    
+    <button class="btn secondary" style="margin-top:10px" onclick="toggleForgotPassword()">Forgot password?</button>
+    <div class="lockedNotice hidden" id="forgotPasswordBox">
+      <b>Password recovery:</b><br>
+      If the admin password is forgotten, open Cloudflare Worker settings and update the Secret named <b>ADMIN_PASSWORD</b>.
+      That secret is the master recovery password. After using it to login, you can set a new admin password from this page.
+    </div>
+
     <div class="status" id="status"></div>
   </div>
 
@@ -76,7 +84,7 @@ textarea{min-height:78px;line-height:1.4}
 
     <div class="actions">
       <button class="btn primary" onclick="changePassword()">Change Password</button>
-      <button class="btn secondary" onclick="clearPasswordFields()">Clear</button>
+      <button class="btn secondary" onclick="clearPasswordFields()">Clear</button><button class="btn secondary" onclick="passwordCard.classList.add(\'hidden\')">Hide Password Panel</button>
     </div>
 
     <div class="lockedNotice">
@@ -88,6 +96,15 @@ textarea{min-height:78px;line-height:1.4}
 
 
   <div id="editor" class="hidden">
+
+    <div class="card">
+      <div class="sectionTitle">Admin Account</div>
+      <div class="small">Change password only when needed. If forgotten, use the Cloudflare ADMIN_PASSWORD Secret as the master recovery password.</div>
+      <div class="actions">
+        <button class="btn secondary" onclick="togglePasswordCard()">Change Password</button>
+      </div>
+    </div>
+
     <div class="card">
       <div class="actions">
         <button class="btn secondary" onclick="loadProtocol()">Reload Current Protocol</button>
@@ -234,7 +251,7 @@ function loadDefault(){
 
 function initEditor(){
   editor.classList.remove('hidden');
-  passwordCard.classList.remove('hidden');
+  /* passwordCard remains hidden until Change Password is clicked */
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
@@ -402,6 +419,17 @@ function uploadJsonFile(event){
   reader.readAsText(file);
 }
 
+
+
+function toggleForgotPassword(){
+  const box = document.getElementById('forgotPasswordBox');
+  if(box) box.classList.toggle('hidden');
+}
+
+function togglePasswordCard(){
+  if(!requireLogin())return;
+  passwordCard.classList.toggle('hidden');
+}
 
 async function changePassword(){
   if(!requireLogin())return;

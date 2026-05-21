@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./pwa_manifest.json?v=37">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=37">
+<link rel="manifest" href="./pwa_manifest.json?v=39">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=39">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -43,7 +43,7 @@
     <img class="accessLogo" src="./logo.png" alt="Dental logo">
     <div class="accessTitle">Recovery Access Code</div>
     <div class="accessText">Enter the recovery code provided by the clinic to open your personalized recovery guide.</div>
-    <input id="accessCodeInput" class="accessInput" placeholder="SPARK-1234" autocomplete="one-time-code">
+    <input id="accessCodeInput" class="accessInput" placeholder="Enter code" autocomplete="one-time-code">
     <button class="primary-btn" onclick="verifyAccessCode()">Open Recovery Guide</button>
     <div id="accessMessage" class="accessError"></div>
     <div class="codeBadge">This code expires automatically when the recovery period is complete.</div>
@@ -274,7 +274,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=37").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=39").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{

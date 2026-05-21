@@ -23,9 +23,32 @@ function currentSurgeryKey(){return surgerySelect.value}function currentSurgery(
 function saveSurgeryMeta(){const s=currentSurgery();s.name=surgeryName.value;s.totalDays=Number(totalDays.value||0);renderPreview()}
 function renderStages(){const s=currentSurgery();surgeryName.value=s.name;totalDays.value=s.totalDays;stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('');renderStageEditor();renderPreview()}
 function renderStageEditor(){const st=currentSurgery().stages[currentStageIndex];stageEditor.innerHTML=`<div class="card"><div class="stageTitle">${st.label}</div><div class="small">Edit the text below. Each list item appears in the patient app.</div><div class="row"><div><label>Label</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div><div><label>Phase</label><input value="${esc(st.phase)}" oninput="updateStage('phase',this.value)"></div></div><div class="row"><div><label>Start Day</label><input type="number" value="${st.startDay}" oninput="updateStage('startDay',Number(this.value))"></div><div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div></div><label>Reminder / Diet Instruction</label><textarea oninput="updateStage('reminder',this.value)">${esc(st.reminder)}</textarea>${arrayEditor('normal','Home Care / Instructions')}${arrayEditor('foods','Food Examples')}${arrayEditor('avoid','Avoid / Restrictions')}${arrayEditor('warnings','Additional Notes / Warnings')}</div>`}
-function arrayEditor(key,title){const arr=currentSurgery().stages[currentStageIndex][key]||[];return `<label>${title}</label><div class="arrayBox">${arr.map((v,i)=>`<div class="arrayRow"><textarea oninput="updateArray('${key}',${i},this.value)">${esc(v)}</textarea><button onclick="removeArray('${key}',${i})">×</button></div>`).join('')}</div><button class="btn secondary" onclick="addArray('${key}')">+ Add ${title}</button>`}
+function arrayEditor(key,title){const arr=currentSurgery().stages[currentStageIndex][key]||[];return `<label>${title}</label><div class="arrayBox">${arr.map((v,i)=>`<div class="arrayRow">
+<textarea oninput="updateArray('${key}',${i},this.value)">${esc(v)}</textarea>
+<div style="display:flex;gap:6px;align-items:flex-start">
+<button onclick="moveUp('${key}',${i})" style="background:#dbeafe;color:#1d4ed8">↑</button>
+<button onclick="moveDown('${key}',${i})" style="background:#dcfce7;color:#166534">↓</button>
+<button onclick="removeArray('${key}',${i})">×</button>
+</div>
+</div>`).join('')}</div><button class="btn secondary" onclick="addArray('${key}')">+ Add ${title}</button>`}
 function updateStage(k,v){currentSurgery().stages[currentStageIndex][k]=v;renderPreview()}
 function updateArray(k,i,v){currentSurgery().stages[currentStageIndex][k][i]=v;renderPreview()}
+
+function moveUp(k,i){
+  if(i<=0)return;
+  const arr=currentSurgery().stages[currentStageIndex][k];
+  [arr[i-1],arr[i]]=[arr[i],arr[i-1]];
+  renderStageEditor();
+  renderPreview();
+}
+function moveDown(k,i){
+  const arr=currentSurgery().stages[currentStageIndex][k];
+  if(i>=arr.length-1)return;
+  [arr[i+1],arr[i]]=[arr[i],arr[i+1]];
+  renderStageEditor();
+  renderPreview();
+}
+
 function addArray(k){currentSurgery().stages[currentStageIndex][k].push('');renderStageEditor();renderPreview()}
 function removeArray(k,i){currentSurgery().stages[currentStageIndex][k].splice(i,1);renderStageEditor();renderPreview()}
 async function saveProtocol(){try{if(!getPass()){setSaveStatus('Enter admin password first.',false);return}setSaveStatus('Saving...');const res=await fetch(WORKER_URL+'/protocol',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':getPass()},body:JSON.stringify(protocol)});const data=await res.json();if(!res.ok)throw new Error(data.error||'Save failed');setSaveStatus('Saved successfully.')}catch(e){setSaveStatus('Save failed: '+e.message,false)}}

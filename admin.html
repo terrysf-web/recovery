@@ -39,58 +39,68 @@ textarea{min-height:78px;line-height:1.4}
 .lockedNotice{background:#fff7ed;border:1px solid rgba(251,146,60,.35);color:#9a3412;border-radius:18px;padding:12px;margin-top:12px;font-size:14px;line-height:1.4}
 .fileInput{background:#fff}
 
-/* v31 guaranteed split layout */
-.app{
-  max-width:1040px !important;
-  width:100% !important;
-  margin:0 auto !important;
-  padding:16px 18px 80px !important;
-}
-#editor{
-  width:100% !important;
-}
-#editor.splitReady{
+/* v32 aligned app/editor + live preview */
+body.adminActive .app{
+  max-width:960px !important;
+  width:960px !important;
   display:grid !important;
   grid-template-columns:430px 430px !important;
   gap:44px !important;
   align-items:start !important;
   justify-content:center !important;
+  margin:0 auto !important;
+  padding:16px 14px 80px !important;
 }
-#adminEditorColumn{
+
+body.adminActive #editor{
   grid-column:1 !important;
   width:430px !important;
   max-width:430px !important;
 }
-#adminPreviewColumn{
+
+body.adminActive #editor .card{
+  width:430px !important;
+  max-width:430px !important;
+}
+
+body.adminActive #adminPreviewColumn{
+  display:block !important;
   grid-column:2 !important;
+  grid-row:1 !important;
   width:430px !important;
   max-width:430px !important;
   position:sticky !important;
   top:14px !important;
 }
-#adminEditorColumn .card,
-#adminPreviewColumn .card{
-  width:100% !important;
-  max-width:430px !important;
+
+#adminPreviewColumn{
+  display:none;
 }
-.actions{
-  display:flex !important;
-  flex-wrap:wrap !important;
-  gap:10px !important;
+
+.previewHeaderRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
 }
-.actions .btn{
-  width:auto !important;
-  min-width:0 !important;
-  flex:1 1 calc(50% - 10px) !important;
-  white-space:normal !important;
-  line-height:1.2 !important;
+
+.previewInfo{
+  font-size:12px;
+  color:#64748b;
+  line-height:1.4;
+  margin-top:4px;
 }
+
 .phonePreviewShell{
   background:#111827;
   border-radius:42px;
   padding:14px 10px;
   box-shadow:0 25px 70px rgba(15,23,42,.35);
+  width:430px;
+  box-sizing:border-box;
 }
+
 .phonePreviewShell iframe{
   width:410px;
   height:760px;
@@ -99,28 +109,51 @@ textarea{min-height:78px;line-height:1.4}
   background:#eef2f7;
   display:block;
 }
-.previewInfo{
-  font-size:12px;
-  color:#64748b;
-  line-height:1.4;
-  margin-top:4px;
+
+body.adminActive .actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
 }
-.previewHeaderRow{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:12px;
+
+body.adminActive .actions .btn{
+  width:auto !important;
+  min-width:0 !important;
+  flex:1 1 calc(50% - 10px) !important;
+  white-space:normal !important;
+  line-height:1.2 !important;
 }
-@media(max-width:940px){
-  .app{max-width:460px !important;}
-  #editor.splitReady{grid-template-columns:430px !important;gap:18px !important;}
-  #adminPreviewColumn{grid-column:1 !important;position:relative !important;top:0 !important;}
+
+@media(max-width:980px){
+  body.adminActive .app{
+    max-width:460px !important;
+    width:100% !important;
+    display:block !important;
+  }
+  body.adminActive #editor,
+  body.adminActive #editor .card,
+  body.adminActive #adminPreviewColumn{
+    width:430px !important;
+    max-width:430px !important;
+    margin:0 auto 16px auto !important;
+  }
+  body.adminActive #adminPreviewColumn{
+    position:relative !important;
+    top:0 !important;
+  }
 }
 @media(max-width:460px){
-  #editor.splitReady{grid-template-columns:1fr !important;}
-  #adminEditorColumn,#adminPreviewColumn{width:100% !important;max-width:100% !important;}
-  .phonePreviewShell iframe{width:100%;height:680px;}
+  body.adminActive #editor,
+  body.adminActive #editor .card,
+  body.adminActive #adminPreviewColumn,
+  .phonePreviewShell{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .phonePreviewShell iframe{
+    width:100% !important;
+    height:680px !important;
+  }
 }
 
 </style>
@@ -180,8 +213,23 @@ textarea{min-height:78px;line-height:1.4}
   </div>
 
 
-  <div id="editor" class="hidden splitReady">
-  <div id="adminEditorColumn">
+  
+  <div id="adminPreviewColumn">
+    <div class="card">
+      <div class="previewHeaderRow">
+        <div>
+          <div class="sectionTitle">Actual App Live Preview</div>
+          <div class="previewInfo">Real patient app at phone width. Save changes, then reload preview.</div>
+        </div>
+        <button class="btn secondary" onclick="reloadPatientPreview()">Reload</button>
+      </div>
+      <div class="phonePreviewShell">
+        <iframe id="patientAppPreview" src="https://terrysf-web.github.io/recovery/?adminPreview=1"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="editor" class="hidden">
 
     <div class="card">
       <div class="sectionTitle">Admin Account</div>
@@ -267,25 +315,6 @@ textarea{min-height:78px;line-height:1.4}
   </div>
 </div>
 
-  </div>
-  <div id="adminPreviewColumn">
-    <div class="card">
-      <div class="previewHeaderRow">
-        <div>
-          <div class="sectionTitle">Actual App Live Preview</div>
-          <div class="previewInfo">Real patient app at phone width. Save changes, then reload preview.</div>
-        </div>
-        <button class="btn secondary" onclick="reloadPatientPreview()">Reload</button>
-      </div>
-      <div class="phonePreviewShell">
-        <iframe
-  id="patientAppPreview"
-  src="https://terrysf-web.github.io/recovery/?adminPreview=1">
-</iframe>
-      </div>
-    </div>
-  </div>
-
 <script>
 const WORKER_URL = "https://shrill-union-34e3.terryjseo.workers.dev";
 const DEFAULT_PROTOCOL = {"periodontal": {"name": "Periodontal Surgery / Implant", "totalDays": 56, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, Overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more regularly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "More normal diet, but still avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Still avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Normal diet", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing", "Normal flossing", "Use etb/waterpik on low setting"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "You may resume etb/waterpik normally if it is not tender."], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}]}, "graft": {"name": "Gum Grafting", "totalDays": 63, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Wear as much as possible, only remove to clean or eat", "Keep wearing it without interruption. Just make sure the retainer does not press against your gums at the surgery site", "Use the Stella Life Kit as directed on the box and video"]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Wear as much as possible, only remove to clean or eat", "Keep wearing it without interruption. Just make sure the retainer does not press against your gums at the surgery site", "Use the Stella Life Kit as directed on the box and video"]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Cottage cheese, Porridge, hummus"], "avoid": ["Avoid spicy foods, hot temperature, seeds, carbonated beverages"], "warnings": ["Most patients stop wearing the stent after one week. If you still have pain or bleeding and find it helpful, keep wearing it.", "Keep wearing it without interruption. Just make sure the retainer does not press against your gums at the surgery site", "Use the Stella Life Kit as directed on the box and video", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, Soft bread, overcooked vegetables, steamed rice, scrambled eggs, pastas"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Please save the stent for next surgery", "Keep wearing it without interruption.", "Use the Stella Life Kit as directed on the box and video", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently", "You may continue flossing lightly.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, Soft bread, overcooked vegetables, steamed rice, scrambled eggs, pastas"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "Use the Stella Life Kit as directed on the box and video", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently, but more thoroughly", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently, but more thoroughly", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing.", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week9", "label": "Week 9", "startDay": 57, "endDay": 63, "phase": "Week 9", "reminder": "Go back to normal routine", "normal": ["Go back to normal routine", "Go back to normal routine", "Go back to normal routine"], "foods": ["Go back to normal routine"], "avoid": [], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}]}, "extraction": {"name": "Extraction", "totalDays": 63, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine", "No straws", "No sucking on the socket", "No forceful spitting", "No vigorous rinsing"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine", "No straws", "No sucking on the socket", "No forceful spitting", "No vigorous rinsing"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, Overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds", "No straws", "No sucking on the socket", "No forceful spitting", "No vigorous rinsing"], "warnings": ["Continue to wear. Do not stop wearing them.", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more regularly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods", "Week 4-5: Socket may have been closed by now. If socket is completely closed, you may go back to normal routine for home care and diet."], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods", "Week 4-5: Socket may have been closed by now. If socket is completely closed, you may go back to normal routine for home care and diet."], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "More normal diet, but still avoid: Crunchy, sharp and hard foods on the extraction site", "normal": ["Use a soft tooth brush to brush teeth and gums thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["More solid foods"], "avoid": ["Still avoid crunchy, sharp and hard foods on the extraction site"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "Use etb/waterpik on low setting"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "Normal use of etb/waterpik"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week9", "label": "Week 9", "startDay": 57, "endDay": 63, "phase": "Week 9", "reminder": "Go back to normal routine", "normal": ["Go back to normal routine", "Go back to normal routine", "Go back to normal routine"], "foods": ["Go back to normal routine"], "avoid": [], "warnings": []}]}};
@@ -356,7 +385,8 @@ function loadDefault(){
 
 function initEditor(){
   editor.classList.remove('hidden');
-  const login=document.getElementById('loginCard'); if(login) login.classList.add('hidden');
+  document.getElementById('loginCard')?.classList.add('hidden');
+  document.body.classList.add('adminActive');
   /* passwordCard remains hidden until Change Password is clicked */
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
@@ -827,13 +857,13 @@ function moveStageDown(){
 
 function reloadPatientPreview(){
   const frame=document.getElementById('patientAppPreview');
-  if(frame) frame.src='./index.html?adminPreview=1&t=' + Date.now();
+  if(frame) frame.src='https://terrysf-web.github.io/recovery/?adminPreview=1&t=' + Date.now();
 }
 
 function renderPreview(){
   jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);
 }
 </script>
-<!-- ADMIN_GUARANTEED_SPLIT_PREVIEW_V31 -->
+<!-- ADMIN_ALIGNED_PREVIEW_V32 -->
 </body>
 </html>

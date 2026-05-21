@@ -144,7 +144,7 @@ textarea{min-height:78px;line-height:1.4}
       <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
 
       <div class="actions">
-        <button class="btn primary" onclick="addStage()">Add Week / Stage</button>
+        <button class="btn primary" onclick="addStageAfterCurrent()">Add Week After Current</button>
         <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Stage</button>
         <button class="btn secondary" onclick="moveStageUp()">Move Stage Up</button>
         <button class="btn secondary" onclick="moveStageDown()">Move Stage Down</button>
@@ -277,7 +277,10 @@ function renderStages(){
   const s=currentSurgery();
   surgeryName.value=s.name;
   totalDays.value=s.totalDays;
-  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('');
+  stageTabs.innerHTML=s.stages.map((st,i)=>`<div style="display:flex;align-items:center;gap:4px">
+<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>
+<button class="miniBtn upBtn" style="width:34px;height:34px;border-radius:999px" title="Add week after this" onclick="addWeekAfter(${i})">+</button>
+</div>`).join('');
   renderStageEditor();
   renderPreview();
 }
@@ -590,35 +593,74 @@ function deleteSurgeryType(){
   setStatus('Surgery type deleted. Click Save to Cloudflare when ready.');
 }
 
-function nextStageTemplate(){
-  const s = currentSurgery();
-  const last = s.stages[s.stages.length - 1];
-  const nextStart = last ? Number(last.endDay || 0) + 1 : 1;
-  const nextEnd = nextStart === 1 ? 1 : nextStart + 6;
-  const weekNumber = nextStart === 1 ? 1 : Math.ceil(nextStart / 7);
 
+function parseWeekNumber(label){
+  const m = String(label || '').match(/week\s*(\d+)/i);
+  return m ? Number(m[1]) : null;
+}
+
+function renumberWeeks(){
+  const s = currentSurgery();
+  let weekCounter = 1;
+
+  s.stages.forEach((st,index)=>{
+    if(index===0 && /first 24/i.test(st.label)){
+      st.label='First 24 Hours';
+      st.phase='First 24 Hours';
+      st.startDay=1;
+      st.endDay=1;
+      return;
+    }
+
+    st.label='Week ' + weekCounter;
+    st.phase='Week ' + weekCounter;
+
+    if(index===1){
+      st.startDay=2;
+      st.endDay=7;
+    }else{
+      const prev=s.stages[index-1];
+      st.startDay=Number(prev.endDay)+1;
+      st.endDay=st.startDay+6;
+    }
+
+    weekCounter++;
+  });
+}
+
+function blankStage(){
   return {
-    id: 'stage_' + Date.now(),
-    label: nextStart === 1 ? 'First 24 Hours' : 'Week ' + weekNumber,
-    startDay: nextStart,
-    endDay: nextEnd,
-    phase: nextStart === 1 ? 'First 24 Hours' : 'Week ' + weekNumber,
-    reminder: '',
-    normal: [''],
-    foods: [''],
-    avoid: [''],
-    warnings: ['']
+    id:'stage_'+Date.now(),
+    label:'Week',
+    phase:'Week',
+    startDay:1,
+    endDay:7,
+    reminder:'',
+    normal:[''],
+    foods:[''],
+    avoid:[''],
+    warnings:['']
   };
 }
 
-function addStage(){
+function addWeekAfter(index){
   if(!requireLogin())return;
 
-  const s = currentSurgery();
-  s.stages.push(nextStageTemplate());
-  currentStageIndex = s.stages.length - 1;
+  const s=currentSurgery();
+  const stage=blankStage();
+
+  s.stages.splice(index+1,0,stage);
+
+  renumberWeeks();
+
+  currentStageIndex=index+1;
   renderStages();
-  setStatus('New week/stage added. Edit the day range and instructions, then Save.');
+
+  setStatus('New week added after current stage. Auto-numbering updated.');
+}
+
+function addStageAfterCurrent(){
+  addWeekAfter(currentStageIndex);
 }
 
 function copyCurrentStage(){

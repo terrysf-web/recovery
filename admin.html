@@ -221,8 +221,18 @@ body.adminActive .actions .btn{
   <div id="editor" class="hidden">
 
     <div class="card">
+      <div class="sectionTitle">Admin Session</div>
+      <div class="small">You are logged in. Use logout when finished editing.</div>
+      <div class="actions">
+        <button class="btn secondary" onclick="logoutAdmin()">Logout</button>
+        <button class="btn secondary" onclick="togglePasswordCard()">Change Password</button>
+      </div>
+    </div>
+
+
+    <div class="card">
       <div class="sectionTitle">Patient Access Codes</div>
-      <div class="small">Generate one-time recovery codes for patients. The code opens the app without a login, locks to the first device that uses it, and expires after recovery is complete.</div>
+      <div class="small">Generate one-time random recovery codes for patients. The random code opens the app without a login, locks to the first device that uses it, and expires after recovery is complete.</div>
 
       <label>Code Surgery Type</label>
       <select id="codeSurgery"></select>
@@ -400,6 +410,7 @@ function initEditor(){
   editor.classList.remove('hidden');
   document.getElementById('loginCard')?.classList.add('hidden');
   document.body.classList.add('adminActive');
+  const ap=document.getElementById('adminPreviewColumn'); if(ap) ap.style.display='block';
   /* passwordCard remains hidden until Change Password is clicked */
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
@@ -576,6 +587,21 @@ function uploadJsonFile(event){
 function toggleForgotPassword(){
   const box = document.getElementById('forgotPasswordBox');
   if(box) box.classList.toggle('hidden');
+}
+
+
+function logoutAdmin(){
+  isLoggedIn=false;
+  const editorEl=document.getElementById('editor');
+  const loginEl=document.getElementById('loginCard');
+  const previewEl=document.getElementById('adminPreviewColumn');
+  if(editorEl) editorEl.classList.add('hidden');
+  if(loginEl) loginEl.classList.remove('hidden');
+  if(previewEl) previewEl.style.display='none';
+  document.body.classList.remove('adminActive');
+  password.value='';
+  setStatus('Logged out.');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function togglePasswordCard(){
@@ -902,7 +928,7 @@ async function generatePatientCode(){
     });
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||'Failed to generate code');
-    generatedCodeBox.innerHTML=`<b>Code:</b> ${data.code}<br><b>Surgery:</b> ${protocol[surgeryType]?.name||surgeryType}<br><b>Date:</b> ${surgeryDate}<br><b>Expires:</b> ${data.expiresAt}<br><br><b>Patient link:</b><br>https://terrysf-web.github.io/recovery/`;
+    generatedCodeBox.innerHTML=`<b>Random Access Code:</b> ${data.code}<br><b>Surgery:</b> ${protocol[surgeryType]?.name||surgeryType}<br><b>Date:</b> ${surgeryDate}<br><b>Expires:</b> ${data.expiresAt}<br><br><b>Patient link:</b><br>https://terrysf-web.github.io/recovery/`;
     codeStatus.textContent='Patient code generated.';
     reloadPatientPreview();
     codeStatus.style.color='#15803d';

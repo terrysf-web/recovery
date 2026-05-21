@@ -60,6 +60,33 @@ textarea{min-height:78px;line-height:1.4}
     <div class="status" id="status"></div>
   </div>
 
+  
+  <div class="card hidden" id="passwordCard">
+    <h2 style="margin:0 0 8px;font-size:20px">Change Admin Password</h2>
+    <div class="small">Use the current admin password or the Cloudflare master recovery password to change it.</div>
+
+    <label>Current Password</label>
+    <input id="currentPassword" type="password" placeholder="Current password">
+
+    <label>New Password</label>
+    <input id="newPassword" type="password" placeholder="New password">
+
+    <label>Confirm New Password</label>
+    <input id="confirmPassword" type="password" placeholder="Confirm new password">
+
+    <div class="actions">
+      <button class="btn primary" onclick="changePassword()">Change Password</button>
+      <button class="btn secondary" onclick="clearPasswordFields()">Clear</button>
+    </div>
+
+    <div class="lockedNotice">
+      If the password is forgotten, reset the Cloudflare Worker Secret named <b>ADMIN_PASSWORD</b>. That secret works as the master recovery password.
+    </div>
+
+    <div class="status" id="passwordStatus"></div>
+  </div>
+
+
   <div id="editor" class="hidden">
     <div class="card">
       <div class="actions">
@@ -168,6 +195,7 @@ function loadDefault(){
 
 function initEditor(){
   editor.classList.remove('hidden');
+  passwordCard.classList.remove('hidden');
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
@@ -333,6 +361,64 @@ function uploadJsonFile(event){
     }
   };
   reader.readAsText(file);
+}
+
+
+async function changePassword(){
+  if(!requireLogin())return;
+
+  const current = currentPassword.value.trim();
+  const next = newPassword.value.trim();
+  const confirm = confirmPassword.value.trim();
+
+  if(!current || !next || !confirm){
+    passwordStatus.textContent='Please complete all password fields.';
+    passwordStatus.style.color='#b91c1c';
+    return;
+  }
+
+  if(next.length < 8){
+    passwordStatus.textContent='New password should be at least 8 characters.';
+    passwordStatus.style.color='#b91c1c';
+    return;
+  }
+
+  if(next !== confirm){
+    passwordStatus.textContent='New passwords do not match.';
+    passwordStatus.style.color='#b91c1c';
+    return;
+  }
+
+  try{
+    passwordStatus.textContent='Changing password...';
+    passwordStatus.style.color='#334155';
+
+    const res = await fetch(WORKER_URL + '/change-password', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        currentPassword: current,
+        newPassword: next
+      })
+    });
+
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Password change failed');
+
+    password.value = next;
+    clearPasswordFields();
+    passwordStatus.textContent='Password changed successfully.';
+    passwordStatus.style.color='#15803d';
+  }catch(e){
+    passwordStatus.textContent='Password change failed: ' + e.message;
+    passwordStatus.style.color='#b91c1c';
+  }
+}
+
+function clearPasswordFields(){
+  currentPassword.value='';
+  newPassword.value='';
+  confirmPassword.value='';
 }
 
 function renderPreview(){

@@ -771,7 +771,7 @@ body.previewHidden.adminActive .app{
     </div>
 
 <div class="card">
-      <div class="sectionTitle">Patient Access Codes</div>
+      <div class="sectionTitle">Patient Access Codes</div><div class="small">Times are shown in Pacific Time.</div>
       <div class="small">Generate one-time random recovery codes for patients. The random code opens the app without a login, locks to the first device that uses it, and expires after recovery is complete.</div>
 
       <label>Code Surgery Type</label>
@@ -1474,6 +1474,25 @@ async function generatePatientCode(){
   }
 }
 
+
+function formatPacificDateTime(iso){
+  if(!iso) return '-';
+  try{
+    const d = new Date(iso);
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone:'America/Los_Angeles',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit',
+      hour:'numeric',
+      minute:'2-digit',
+      hour12:true
+    }).format(d);
+  }catch(e){
+    return String(iso).replace('T',' ').slice(0,16);
+  }
+}
+
 async function loadPatientCodes(){
   if(!requireLogin()) return;
 
@@ -1530,7 +1549,7 @@ async function loadPatientCodes(){
               const st = getStatus(c);
               const typeName = protocol[c.surgeryType]?.name || c.surgeryType || '-';
               const usedText = c.usedAt ? c.usedAt.slice(0,10) : '-';
-              const createdText = c.createdAt ? c.createdAt.replace('T',' ').slice(0,16) : '-';
+              const createdText = formatPacificDateTime(c.createdAt);
               const action = c.active === false || st.text === 'Expired'
                 ? '<span class="tableMuted">—</span>'
                 : `<button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`;

@@ -96,6 +96,8 @@ textarea{min-height:78px;line-height:1.4}
 
 
   <div id="editor" class="hidden">
+  <div class="editorGrid">
+    <div class="editorLeft">
 
     <div class="card">
       <div class="sectionTitle">Admin Account</div>
@@ -255,6 +257,8 @@ function initEditor(){
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
+  syncPreviewOptions();
+  previewCurrentStage();
 }
 
 function currentSurgeryKey(){
@@ -718,8 +722,93 @@ function moveStageDown(){
 }
 
 
+
+function syncPreviewOptions(){
+  if(!document.getElementById('previewSurgery')) return;
+  const current = previewSurgery.value || currentSurgeryKey();
+  previewSurgery.innerHTML = Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
+  if(protocol[current]) previewSurgery.value = current;
+  else previewSurgery.value = currentSurgeryKey();
+}
+
+function syncPreviewFromControls(){
+  renderLivePreview();
+}
+
+function previewCurrentStage(){
+  if(!document.getElementById('previewDay')) return;
+  const st = currentSurgery().stages[currentStageIndex];
+  previewSurgery.value = currentSurgeryKey();
+  previewDay.value = st.startDay || 1;
+  renderLivePreview();
+}
+
+function findPreviewStage(type,day){
+  const s = protocol[type];
+  if(!s || !s.stages) return null;
+  return s.stages.find(st=>day>=Number(st.startDay)&&day<=Number(st.endDay)) || s.stages[s.stages.length-1];
+}
+
+function listHtml(items){
+  const arr = Array.isArray(items) ? items.filter(x=>String(x||'').trim()) : [];
+  if(!arr.length) return '<div class="previewText">None</div>';
+  return '<ul class="previewList">' + arr.map(x=>`<li>${esc(x)}</li>`).join('') + '</ul>';
+}
+
+function renderLivePreview(){
+  const box = document.getElementById('livePreview');
+  if(!box || !isLoggedIn) return;
+
+  syncPreviewOptions();
+
+  const type = previewSurgery.value || currentSurgeryKey();
+  const day = Number(previewDay.value || 1);
+  const s = protocol[type];
+  const st = findPreviewStage(type,day);
+
+  if(!s || !st){
+    box.innerHTML = '<div class="previewCard"><div class="previewText">No preview available.</div></div>';
+    return;
+  }
+
+  const label = day<=1 ? 'First 24 Hours' : 'Day ' + day;
+
+  box.innerHTML = `
+    <div class="phoneHeader">
+      <div class="phoneTitle">Dental Recovery Guide</div>
+      <div class="phoneSub">${esc(s.name)} · ${esc(label)}</div>
+    </div>
+
+    <div class="previewCard blue">
+      <div class="previewCardTitle">${esc(label)} · ${esc(st.phase || st.label || '')}</div>
+      <div class="previewText">${esc(st.reminder || '')}</div>
+    </div>
+
+    <div class="previewCard">
+      <div class="previewCardTitle">✅ Home Care / Instructions</div>
+      ${listHtml(st.normal)}
+    </div>
+
+    <div class="previewCard green">
+      <div class="previewCardTitle">🍲 Food Examples</div>
+      ${listHtml(st.foods)}
+    </div>
+
+    <div class="previewCard orange">
+      <div class="previewCardTitle">🚫 Avoid / Restrictions</div>
+      ${listHtml(st.avoid)}
+    </div>
+
+    <div class="previewCard red">
+      <div class="previewCardTitle">📞 Additional Notes / Warnings</div>
+      ${listHtml(st.warnings)}
+    </div>
+  `;
+}
+
 function renderPreview(){
   jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);
+  renderLivePreview();
 }
 </script>
 </body>

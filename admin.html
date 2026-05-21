@@ -34,7 +34,7 @@ textarea{min-height:78px;line-height:1.4}
 .upBtn{background:#dbeafe;color:#1d4ed8}
 .downBtn{background:#dcfce7;color:#166534}
 .deleteBtn{background:#fee2e2;color:#991b1b}
-.preview{background:#f8fafc;border-radius:18px;padding:12px;margin-top:10px;white-space:pre-wrap;font-size:12px;color:#475569;max-height:220px;overflow:auto}
+.preview{background:#f8fafc;border-radius:18px;padding:12px;margin-top:10px;white-space:pre-wrap;font-size:12px;color:#475569;max-height:220px;overflow:auto}.miniForm{display:grid;grid-template-columns:1fr 130px;gap:10px;margin-top:10px}.sectionTitle{font-size:18px;font-weight:950;margin:0 0 8px}.warningBox{background:#fff7ed;border:1px solid rgba(251,146,60,.35);color:#9a3412;border-radius:16px;padding:10px;font-size:13px;line-height:1.4;margin-top:10px}
 .hidden{display:none!important}
 .lockedNotice{background:#fff7ed;border:1px solid rgba(251,146,60,.35);color:#9a3412;border-radius:18px;padding:12px;margin-top:12px;font-size:14px;line-height:1.4}
 .fileInput{background:#fff}
@@ -100,7 +100,46 @@ textarea{min-height:78px;line-height:1.4}
       <div class="small">Upload a previously downloaded backup JSON, review it, then click Save to Cloudflare.</div>
     </div>
 
+    
     <div class="card">
+      <div class="sectionTitle">Surgery Type Management</div>
+      <div class="small">Add a new surgery protocol, copy the current one, or delete an unused surgery type.</div>
+
+      <label>New Surgery Type Name</label>
+      <input id="newSurgeryName" placeholder="Example: Bone Graft">
+
+      <label>New Surgery Key</label>
+      <input id="newSurgeryKey" placeholder="Example: bone_graft">
+
+      <div class="actions">
+        <button class="btn primary" onclick="addSurgeryType(false)">Add Blank Surgery Type</button>
+        <button class="btn secondary" onclick="addSurgeryType(true)">Copy Current Surgery Type</button>
+        <button class="btn danger" onclick="deleteSurgeryType()">Delete Current Surgery Type</button>
+      </div>
+
+      <div class="warningBox">
+        Use a simple key with lowercase letters, numbers, or underscore only, like <b>bone_graft</b>. After adding or deleting, click <b>Save to Cloudflare</b>.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">Week / Stage Management</div>
+      <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
+
+      <div class="actions">
+        <button class="btn primary" onclick="addStage()">Add Week / Stage</button>
+        <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Stage</button>
+        <button class="btn secondary" onclick="moveStageUp()">Move Stage Up</button>
+        <button class="btn secondary" onclick="moveStageDown()">Move Stage Down</button>
+        <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Stage</button>
+      </div>
+
+      <div class="warningBox">
+        Make sure Start Day and End Day do not overlap incorrectly. Example: Week 2 = Day 8 to Day 14.
+      </div>
+    </div>
+
+<div class="card">
       <label>Surgery Type</label>
       <select id="surgerySelect" onchange="currentStageIndex=0;renderStages()"></select>
 
@@ -420,6 +459,197 @@ function clearPasswordFields(){
   newPassword.value='';
   confirmPassword.value='';
 }
+
+
+function sanitizeKey(raw){
+  return String(raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g,'_')
+    .replace(/^_+|_+$/g,'');
+}
+
+function addSurgeryType(copyCurrent){
+  if(!requireLogin())return;
+
+  const name = newSurgeryName.value.trim();
+  let key = sanitizeKey(newSurgeryKey.value || name);
+
+  if(!name){
+    setStatus('Enter a surgery type name first.', false);
+    return;
+  }
+
+  if(!key){
+    setStatus('Enter a valid surgery key.', false);
+    return;
+  }
+
+  if(protocol[key]){
+    setStatus('That surgery key already exists. Choose another key.', false);
+    return;
+  }
+
+  if(copyCurrent && currentSurgery()){
+    protocol[key] = JSON.parse(JSON.stringify(currentSurgery()));
+    protocol[key].name = name;
+  }else{
+    protocol[key] = {
+      name: name,
+      totalDays: 56,
+      stages: [
+        {
+          id: 'first24',
+          label: 'First 24 Hours',
+          startDay: 1,
+          endDay: 1,
+          phase: 'First 24 Hours',
+          reminder: '',
+          normal: [''],
+          foods: [''],
+          avoid: [''],
+          warnings: ['']
+        },
+        {
+          id: 'week1',
+          label: 'Week 1',
+          startDay: 2,
+          endDay: 7,
+          phase: 'Week 1',
+          reminder: '',
+          normal: [''],
+          foods: [''],
+          avoid: [''],
+          warnings: ['']
+        }
+      ]
+    };
+  }
+
+  newSurgeryName.value = '';
+  newSurgeryKey.value = '';
+
+  initEditor();
+  surgerySelect.value = key;
+  currentStageIndex = 0;
+  renderStages();
+  setStatus('New surgery type added. Click Save to Cloudflare when ready.');
+}
+
+function deleteSurgeryType(){
+  if(!requireLogin())return;
+
+  const keys = Object.keys(protocol);
+  if(keys.length <= 1){
+    setStatus('At least one surgery type is required.', false);
+    return;
+  }
+
+  const key = currentSurgeryKey();
+  const name = currentSurgery().name;
+
+  if(!confirm('Delete surgery type: ' + name + '?')){
+    return;
+  }
+
+  delete protocol[key];
+
+  const nextKey = Object.keys(protocol)[0];
+  initEditor();
+  surgerySelect.value = nextKey;
+  currentStageIndex = 0;
+  renderStages();
+  setStatus('Surgery type deleted. Click Save to Cloudflare when ready.');
+}
+
+function nextStageTemplate(){
+  const s = currentSurgery();
+  const last = s.stages[s.stages.length - 1];
+  const nextStart = last ? Number(last.endDay || 0) + 1 : 1;
+  const nextEnd = nextStart === 1 ? 1 : nextStart + 6;
+  const weekNumber = nextStart === 1 ? 1 : Math.ceil(nextStart / 7);
+
+  return {
+    id: 'stage_' + Date.now(),
+    label: nextStart === 1 ? 'First 24 Hours' : 'Week ' + weekNumber,
+    startDay: nextStart,
+    endDay: nextEnd,
+    phase: nextStart === 1 ? 'First 24 Hours' : 'Week ' + weekNumber,
+    reminder: '',
+    normal: [''],
+    foods: [''],
+    avoid: [''],
+    warnings: ['']
+  };
+}
+
+function addStage(){
+  if(!requireLogin())return;
+
+  const s = currentSurgery();
+  s.stages.push(nextStageTemplate());
+  currentStageIndex = s.stages.length - 1;
+  renderStages();
+  setStatus('New week/stage added. Edit the day range and instructions, then Save.');
+}
+
+function copyCurrentStage(){
+  if(!requireLogin())return;
+
+  const s = currentSurgery();
+  const copy = JSON.parse(JSON.stringify(s.stages[currentStageIndex]));
+  copy.id = 'stage_' + Date.now();
+  copy.label = copy.label + ' Copy';
+  s.stages.splice(currentStageIndex + 1, 0, copy);
+  currentStageIndex = currentStageIndex + 1;
+  renderStages();
+  setStatus('Stage copied. Edit label/day range, then Save.');
+}
+
+function deleteCurrentStage(){
+  if(!requireLogin())return;
+
+  const s = currentSurgery();
+  if(s.stages.length <= 1){
+    setStatus('At least one stage is required.', false);
+    return;
+  }
+
+  const st = s.stages[currentStageIndex];
+  if(!confirm('Delete stage: ' + st.label + '?')){
+    return;
+  }
+
+  s.stages.splice(currentStageIndex, 1);
+  currentStageIndex = Math.max(0, currentStageIndex - 1);
+  renderStages();
+  setStatus('Stage deleted. Click Save to Cloudflare when ready.');
+}
+
+function moveStageUp(){
+  if(!requireLogin())return;
+  const s = currentSurgery();
+  if(currentStageIndex <= 0)return;
+
+  [s.stages[currentStageIndex - 1], s.stages[currentStageIndex]] =
+    [s.stages[currentStageIndex], s.stages[currentStageIndex - 1]];
+
+  currentStageIndex--;
+  renderStages();
+}
+
+function moveStageDown(){
+  if(!requireLogin())return;
+  const s = currentSurgery();
+  if(currentStageIndex >= s.stages.length - 1)return;
+
+  [s.stages[currentStageIndex + 1], s.stages[currentStageIndex]] =
+    [s.stages[currentStageIndex], s.stages[currentStageIndex + 1]];
+
+  currentStageIndex++;
+  renderStages();
+}
+
 
 function renderPreview(){
   jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);

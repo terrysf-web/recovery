@@ -99,7 +99,7 @@ textarea{min-height:78px;line-height:1.4}
 
     <div class="card">
       <div class="sectionTitle">Patient Access Codes</div>
-      <div class="small">Generate one-time recovery codes for patients. The code opens the app without a login and expires after recovery is complete.</div>
+      <div class="small">Generate one-time recovery codes for patients. The code opens the app without a login, locks to the first device that uses it, and expires after recovery is complete.</div>
 
       <label>Code Surgery Type</label>
       <select id="codeSurgery"></select>
@@ -801,7 +801,7 @@ async function loadPatientCodes(){
       <div style="border-bottom:1px solid rgba(15,23,42,.08);padding:8px 0">
         <b>${c.code}</b> · ${protocol[c.surgeryType]?.name||c.surgeryType}<br>
         Surgery date: ${c.surgeryDate}<br>
-        Expires: ${c.expiresAt} · Active: ${c.active?'Yes':'No'}<br>
+        Expires: ${c.expiresAt} · Active: ${c.active?'Yes':'No'}<br>Used: ${c.usedAt ? 'Yes · '+c.usedAt.slice(0,10) : 'No'}<br>
         <button class="btn danger" style="margin-top:6px" onclick="disablePatientCode('${c.code}')">Disable Code</button>
       </div>`).join('');
   }catch(e){

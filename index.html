@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./pwa_manifest.json?v=14">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=14">
+<link rel="manifest" href="./pwa_manifest.json?v=15">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=15">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -30,7 +30,7 @@
 <main class="content">
 <section id="homeScreen"><div class="screen-title">Select Surgery Type</div><div class="card select-card" onclick="selectSurgery('periodontal')"><div class="select-icon">🔬</div><div><div class="select-name">Periodontal Surgery / Implant</div><div class="select-sub">8 week recovery guide</div></div><div class="arrow">›</div></div><div class="card select-card" onclick="selectSurgery('graft')"><div class="select-icon">🌿</div><div><div class="select-name">Gum Grafting</div><div class="select-sub">9 week recovery guide</div></div><div class="arrow">›</div></div><div class="card select-card" onclick="selectSurgery('extraction')"><div class="select-icon">🦷</div><div><div class="select-name">Extraction</div><div class="select-sub">9 week recovery guide</div></div><div class="arrow">›</div></div></section>
 <section id="dateScreen" class="hidden"><div class="screen-title">Surgery Date</div><div class="card date-panel"><div class="card-title" id="selectedSurgeryTitle">Selected Surgery</div><div class="card-text">Choose the surgery date. The app will automatically update the recovery day based on today’s Pacific Time date.</div><input id="surgeryDateInput" type="date"><button class="primary-btn" onclick="saveSurgeryDate()">Start Recovery Guide</button><button class="ghost-btn" onclick="resetGuide()">Back / Reset</button></div></section>
-<section id="todayScreen" class="hidden"><div class="card soft-blue"><div class="day-hero"><div><div class="day-label">Today’s Recovery</div><div class="day-number" id="dayNumber">Day 1</div><div class="phase" id="phaseText">Initial Healing</div><div class="card-text" id="surgeryMeta" style="margin-top:8px"></div></div><div class="ring" id="progressRing" style="--p:5"><div class="ring-inner"><div id="progressPercent">5%</div><span>complete</span></div></div></div></div><div class="card soft-orange"><div class="row"><div class="icon-badge">🔔</div><div><div class="card-title" id="reminderTitle">Today’s Reminder</div><div class="card-text" id="reminderText"></div></div></div></div><div class="card"><div class="card-title">✅ What’s Normal Today</div><ul class="list" id="normalList"></ul></div><div class="card soft-green"><div class="card-title">🍲 Foods Allowed</div><ul class="list" id="foodList"></ul></div><div class="card soft-orange"><div class="card-title">🚫 Avoid Today</div><ul class="list" id="avoidList"></ul></div><div class="card soft-red"><div class="card-title">📞 Call Clinic If</div><ul class="list" id="warningList"></ul></div><div class="card"><div class="card-title">⏭ Next Milestone</div><div class="card-text" id="nextMilestone"></div></div><button class="ghost-btn" onclick="resetGuide()">Reset Guide</button></section>
+<section id="todayScreen" class="hidden"><div class="card soft-blue"><div class="day-hero"><div><div class="day-label">Today’s Recovery</div><div class="day-number" id="dayNumber">Day 1</div><div class="phase" id="phaseText">Initial Healing</div><div class="card-text" id="surgeryMeta" style="margin-top:8px"></div></div><div class="ring" id="progressRing" style="--p:5"><div class="ring-inner"><div id="progressPercent">5%</div><span>complete</span></div></div></div></div><div class="card soft-orange"><div class="row"><div class="icon-badge">🔔</div><div><div class="card-title" id="reminderTitle">Today’s Reminder</div><div class="card-text" id="reminderText"></div></div></div></div><div class="card"><div class="card-title">✅ What’s Normal Today</div><ul class="list" id="normalList"></ul></div><div class="card soft-green"><div class="card-title">🍲 Foods Allowed</div><ul class="list" id="foodList"></ul></div><div class="card soft-orange"><div class="card-title">🚫 Avoid Today</div><ul class="list" id="avoidList"></ul></div><div class="card soft-red"><div class="card-title">📞 Call Clinic If</div><ul class="list" id="warningList"></ul></div><div class="card"><div class="card-title">⏭ Next Milestone</div><div class="card-text" id="nextMilestone"></div></div><button class="ghost-btn" id="refreshProtocolBtn" onclick="loadClinicProtocol()">Refresh Instructions</button><button class="ghost-btn" onclick="resetGuide()">Reset Guide</button></section>
 <section id="timelineScreen" class="hidden"><div class="screen-title">Recovery Timeline</div><div class="card"><div class="card-title">Review the full recovery journey</div><div class="card-text">You can review past, current, and upcoming recovery stages. Tap Today anytime to return to your current day.</div></div><div class="card" id="timelineList"></div></section>
 </main></div>
 <div class="chat-backdrop" id="chatBackdrop" onclick="closeAssistant()"></div><div class="chat-panel" id="chatPanel"><div class="chat-head"><div><div class="chat-title">💬 Recovery Assistant</div><div class="card-text">Quick guidance based on your recovery day</div></div><button class="chat-close" onclick="closeAssistant()">×</button></div><div class="chat-grid" id="chatGrid"><button class="chat-chip" onclick="askAssistant('bleeding')">🩸 Bleeding</button><button class="chat-chip" onclick="askAssistant('swelling')">😮‍💨 Swelling</button><button class="chat-chip" onclick="askAssistant('pain')">⚡ Pain</button><button class="chat-chip" onclick="askAssistant('food')">🍲 Food</button><button class="chat-chip" onclick="askAssistant('brushing')">🪥 Brushing</button><button class="chat-chip" onclick="askAssistant('urgent')">🚨 Urgent Signs</button></div>
@@ -68,25 +68,29 @@ let selectedType=null;function pacificTodayString(){return new Intl.DateTimeForm
 function recoveryDayLabel(day){return day<=1?"First 24 Hours":`Day ${day}`}
 function recoveryDayForPrompt(day){return day<=1?"First 24 hours after surgery":`Day ${day}`}function fmtDate(dateStr){const[y,m,d]=dateStr.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}function getSaved(){return{type:localStorage.getItem("surgeryType"),date:localStorage.getItem("surgeryDate")}}function selectSurgery(type){selectedType=type;selectedSurgeryTitle.textContent=SURGERIES[type].name;homeScreen.classList.add("hidden");dateScreen.classList.remove("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden")}function saveSurgeryDate(){const date=surgeryDateInput.value;if(!selectedType||!date){alert("Please select surgery type and date.");return}localStorage.setItem("surgeryType",selectedType);localStorage.setItem("surgeryDate",date);showToday()}function resetGuide(){if(confirm("Reset this recovery guide and choose a different surgery type?")){localStorage.removeItem("surgeryType");localStorage.removeItem("surgeryDate");location.reload()}}
 function guidance(day,type){
-const proto=(OFFICIAL_PROTOCOLS[type]&&OFFICIAL_PROTOCOLS[type]["1"])||null;
-if(day<=1&&proto)return{
-phase:proto.phase,
-progress:3,
-reminder:proto.diet,
-normal:[
-proto.brush,
-proto.floss,
-proto.waterpik
-],
-foods:[
-proto.foods
-],
-avoid:[
-proto.activity
-],
-warnings:[
-proto.extra||"Follow all clinic instructions carefully during the first 24 hours."
-]};if(day<=7)return{phase:"Swelling Peak / Early Tissue Recovery",progress:15,reminder:"Swelling may peak around this stage. Keep the area protected.",normal:["Swelling or tight feeling","Mild soreness","Tenderness while eating"],foods:["Blended soft foods","Mashed potatoes, bananas, avocado","Tofu, cottage cheese, porridge, hummus"],avoid:["Spicy or hot temperature foods","Seeds and carbonated beverages","Brushing/flossing surgical site","Waterpik or electric toothbrush"],warnings:["Severe pain","Bad taste or pus","Swelling that gets worse quickly","Persistent bleeding"]};if(day<=14)return{phase:"Soft Tissue Stabilization",progress:35,reminder:"Keep the area clean, but be very gentle.",normal:["Mild tenderness","Healing sensitivity","Less swelling than the first week"],foods:["Soft cooked fish","Overcooked pasta or vegetables","Steamed rice and scrambled eggs"],avoid:["Crunchy, sharp, hard foods","Seeds","Waterpik or electric toothbrush","Forceful flossing under gums"],warnings:["New bleeding","Fever","Throbbing pain","Swelling returning after improvement"]};if(day<=21)return{phase:"Functional Healing",progress:55,reminder:"Healing should feel more stable, but the area still needs protection.",normal:["Occasional tenderness","Mild sensitivity around gums"],foods:["Soft cooked fish","Pasta","Steamed vegetables","Eggs"],avoid:["Hard crunchy foods","Seeds","Chewing directly on surgical site","Waterpik unless instructed"],warnings:["Swelling returns","Persistent pain","Drainage or bad taste"]};if(day<=42)return{phase:"Advanced Healing",progress:75,reminder:"Continue protecting the healing area while returning gradually to normal habits.",normal:["Minor sensitivity","Improving comfort"],foods:["More normal soft diet","Fish, pasta, steamed vegetables, eggs"],avoid:["Very hard, sharp, or crunchy foods","Waterpik unless instructed","Aggressive brushing around tender tissue"],warnings:["Pain worsening instead of improving","New bleeding","New swelling"]};return{phase:"Maintenance Phase",progress:100,reminder:"Continue normal routine only if the area is not tender.",normal:["Occasional minor sensitivity may occur"],foods:["Normal diet if comfortable","Crunchy foods only if the site feels healed"],avoid:["Anything that causes pain at the surgical site"],warnings:["New swelling","Persistent bleeding","Drainage","Pain returning"]}}
+  const st = protocolStage(type, day);
+  if(st){
+    return {
+      phase: st.phase || st.label || recoveryDayLabel(day),
+      progress: Math.min(100, Math.max(3, Math.round((day / ((CLINIC_PROTOCOL[type] && CLINIC_PROTOCOL[type].totalDays) || 63)) * 100))),
+      reminder: st.reminder || "",
+      normal: st.normal || [],
+      foods: st.foods || [],
+      avoid: st.avoid || [],
+      warnings: st.warnings || []
+    };
+  }
+
+  return {
+    phase: "Recovery",
+    progress: 5,
+    reminder: "Follow your clinic instructions.",
+    normal: [],
+    foods: [],
+    avoid: [],
+    warnings: ["Contact the clinic if symptoms worsen."]
+  };
+}
 function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);const next=MILESTONES.find(m=>m.day>day&&m.day<=surgery.totalDays);nextMilestone.textContent=next?`${recoveryDayLabel(next.day)}: ${next.phase} — ${next.summary}`:"You are at the final recovery stage. Continue following your clinic’s instructions."}function showToday(){setActiveNav("today");renderToday()}function nearestMilestone(day,total){const valid=MILESTONES.filter(m=>m.day<=total).map(m=>m.day);return valid.find(m=>m>=day)||valid[valid.length-1]}function showTimeline(){const saved=getSaved();if(!saved.type||!saved.date){showToday();return}setActiveNav("timeline");homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.remove("hidden");const day=displayRecoveryDay(saved.date);const surgery=SURGERIES[saved.type];timelineList.innerHTML=MILESTONES.filter(m=>m.day<=surgery.totalDays).map(m=>{const state=m.day<day?"done":m.day===day||nearestMilestone(day,surgery.totalDays)===m.day?"current":"future";const icon=m.day<day?"✓":state==="current"?"●":"○";return `<div class="timeline-item ${state}"><div class="timeline-dot">${icon}</div><div><div class="timeline-day">${recoveryDayLabel(m.day)}${m.day===day?" · Today":""}</div><div class="timeline-phase">${m.phase}</div><div class="timeline-summary">${m.summary}</div></div></div>`}).join("")}
 function openAssistant(){setActiveNav("assistant");chatBackdrop.classList.add("show");chatPanel.classList.add("show");backToAssistant()}function closeAssistant(){chatBackdrop.classList.remove("show");chatPanel.classList.remove("show");setActiveNav(todayScreen.classList.contains("hidden")?"timeline":"today")}function backToAssistant(){chatGrid.style.display="grid";assistantAnswer.classList.remove("show")}function askAssistant(topic){const saved=getSaved();const day=saved.date?displayRecoveryDay(saved.date):1;const g=guidance(day,saved.type||"periodontal");const data={bleeding:["Bleeding guidance","Light bleeding or pink saliva can be normal early after surgery. Avoid hard rinsing, spitting, straws, smoking, and heavy activity.","Call the clinic if bleeding is heavy, does not slow with gentle pressure, or fills the mouth quickly."],swelling:["Swelling guidance",day<=3?"Swelling commonly increases during the first 2–3 days and may peak around this time.":"Swelling should gradually improve. New or rapidly worsening swelling should be checked.","Call the clinic if swelling is rapidly worsening, spreading, or comes with fever."],pain:["Pain guidance",day<=7?"Soreness and tenderness can be normal, but pain should gradually improve.":"Pain should be much better by now. New throbbing pain or worsening discomfort should be checked.","Call the clinic if pain is severe, suddenly worsening, or not controlled by your instructions."],food:["Food guidance",`Today’s food guidance: ${g.foods.join(", ")}.`,"Avoid crunchy, sharp, hard foods or anything that hurts the surgical site."],brushing:["Brushing guidance",day<=7?"Do not brush or floss the surgical site yet. Keep the rest of the mouth clean carefully.":"Use a soft toothbrush gently and avoid aggressive cleaning around tender tissue.","Call the clinic if brushing causes heavy bleeding or increasing pain."],urgent:["Urgent signs","Contact the clinic promptly for heavy bleeding, fever, rapidly increasing swelling, pus/drainage, severe pain, trouble swallowing, or trouble breathing.","For breathing difficulty or emergency symptoms, seek urgent/emergency care immediately."]};const r=data[topic];assistantTitle.textContent=`${r[0]} · ${recoveryDayLabel(day)}`;assistantText.textContent=r[1];assistantWarning.textContent=r[2];chatGrid.style.display="none";assistantAnswer.classList.add("show")}
 const GEMINI_DAILY_LIMIT=10;
@@ -152,11 +156,11 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=14").catch(()=>{}))}renderToday();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=15").catch(()=>{}))}renderToday();
 updateGeminiRemaining();
 loadClinicProtocol();
 
-// KV_PROTOCOL_ENABLED_V14
+// KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 </script>
 </body>
 </html>

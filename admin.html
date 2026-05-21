@@ -623,6 +623,54 @@ body.adminActive #adminPreviewColumn{
   }
 }
 
+
+/* v48 preview toggle + mobile hide */
+.previewToggleBtn{
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:900;
+  background:#e2e8f0;
+  color:#334155;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+body.previewHidden #adminPreviewColumn{
+  display:none !important;
+}
+
+body.previewHidden.adminActive .app{
+  grid-template-columns:1080px !important;
+  width:1120px !important;
+  max-width:1120px !important;
+}
+
+@media(max-width:980px){
+  body.adminActive #adminPreviewColumn{
+    display:none !important;
+  }
+
+  body.adminActive .app{
+    max-width:460px !important;
+    width:100% !important;
+    display:block !important;
+  }
+
+  .mobilePreviewNotice{
+    display:block !important;
+  }
+}
+
+.mobilePreviewNotice{
+  display:none;
+  font-size:12px;
+  color:#64748b;
+  margin-top:6px;
+  line-height:1.4;
+}
+
 </style>
 </head>
 <body>
@@ -688,7 +736,7 @@ body.adminActive #adminPreviewColumn{
           <div class="sectionTitle">Actual App Live Preview</div>
           <div class="previewInfo">Real patient app at phone width. Save changes, then reload preview.</div>
         </div>
-        <button class="btn secondary" onclick="reloadPatientPreview()">Reload</button>
+        <button class="btn secondary" onclick="reloadPatientPreview()">Reload</button><button class="previewToggleBtn" onclick="togglePreview()">Hide Preview</button>
       </div>
       <div class="phonePreviewShell">
         <iframe id="patientAppPreview" src="https://terrysf-web.github.io/recovery/?adminPreview=1"></iframe>
@@ -697,6 +745,11 @@ body.adminActive #adminPreviewColumn{
   </div>
 
   <div id="editor" class="hidden">
+
+    <div class="card mobilePreviewNotice">
+      Mobile view: Live preview is hidden so the admin page is easier to use. Use desktop for side-by-side preview.
+    </div>
+
 
     <div class="card">
       <div class="sectionTitle">Admin Session</div>
@@ -1522,6 +1575,14 @@ async function disablePatientCode(code){
 function reloadPatientPreview(){
   const frame=document.getElementById('patientAppPreview');
   if(frame) frame.src='https://terrysf-web.github.io/recovery/?adminPreview=1&t=' + Date.now();
+}
+
+
+function togglePreview(){
+  document.body.classList.toggle('previewHidden');
+  const btns=[...document.querySelectorAll('.previewToggleBtn')];
+  const hidden=document.body.classList.contains('previewHidden');
+  btns.forEach(b=>b.textContent=hidden?'Show Preview':'Hide Preview');
 }
 
 function renderPreview(){

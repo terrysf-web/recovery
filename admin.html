@@ -708,7 +708,16 @@ body.adminActive #adminPreviewColumn{
     </div>
 
 
-    <div class="card">
+    
+    <div class="card" id="adminAccountCard">
+      <div class="sectionTitle">Admin Account</div>
+      <div class="small">Change password only when needed. If forgotten, use the Cloudflare ADMIN_PASSWORD Secret as the master recovery password.</div>
+      <div class="actions">
+        <button class="btn secondary" onclick="togglePasswordCard()">Change Password</button>
+      </div>
+    </div>
+
+<div class="card">
       <div class="sectionTitle">Patient Access Codes</div>
       <div class="small">Generate one-time random recovery codes for patients. The random code opens the app without a login, locks to the first device that uses it, and expires after recovery is complete.</div>
 
@@ -726,15 +735,6 @@ body.adminActive #adminPreviewColumn{
       <div class="status" id="codeStatus"></div>
       <div class="preview" id="generatedCodeBox"></div>
       <div class="preview" id="patientCodeList"></div>
-    </div>
-
-
-    <div class="card">
-      <div class="sectionTitle">Admin Account</div>
-      <div class="small">Change password only when needed. If forgotten, use the Cloudflare ADMIN_PASSWORD Secret as the master recovery password.</div>
-      <div class="actions">
-        <button class="btn secondary" onclick="togglePasswordCard()">Change Password</button>
-      </div>
     </div>
 
     <div class="card">

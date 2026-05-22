@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=70">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=70">
+<link rel="manifest" href="./manifest.json?v=71">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=71">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -474,7 +474,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=70").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=71").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -533,8 +533,12 @@ function enforceLocalExpiration(){
 
 function clearRecoverySession(){
   try{
-    localStorage.removeItem('patientAccessCode');
+    const savedDeviceToken = localStorage.getItem('deviceToken');
+    localStorage.clear();
     sessionStorage.clear();
+    if(savedDeviceToken){
+      localStorage.setItem('deviceToken', savedDeviceToken);
+    }
   }catch(e){}
 }
 
@@ -546,7 +550,10 @@ function showExpiredOverlay(){
 
 function closeExpiredOverlay(){
   clearRecoverySession();
-  location.href='./?v=70';
+
+  setTimeout(()=>{
+    location.href='./?v=71';
+  },300);
 }
 
 async function validateStoredRecoveryAccess(){
@@ -597,7 +604,7 @@ function returnToRecoveryLogin(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=70';
+    location.href='./?v=71';
   },300);
 }
 
@@ -650,11 +657,11 @@ window.addEventListener('load',()=>{
 
 <div id="expiredOverlay" class="expiredOverlay">
   <div class="expiredCard">
-    <div class="expiredTitle">Recovery Access Expired</div>
+    <div class="expiredTitle">Recovery Guide Completed</div>
     <div class="expiredText">
-      Your recovery access has expired and this guide is no longer available.<br><br>
-      Please remove this app from your home screen.<br>
-      Contact the clinic if you need additional access.
+      Your recovery guide period is complete.<br><br>
+      You may now close or remove this Recovery Guide.<br>
+      Contact the clinic if you need an additional guide.
     </div>
     <button class="expiredBtn" onclick="closeExpiredOverlay()">
       Return to Login

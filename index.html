@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=73">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=73">
+<link rel="manifest" href="./manifest.json?v=74">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=74">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -474,7 +474,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=73").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=74").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -552,7 +552,7 @@ function closeExpiredOverlay(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=73';
+    location.href='./?v=74';
   },300);
 }
 
@@ -608,12 +608,12 @@ function returnToRecoveryLogin(){
     const savedDeviceToken = localStorage.getItem('deviceToken');
 
     localStorage.clear();
+    sessionStorage.clear();
 
     if(savedDeviceToken){
       localStorage.setItem('deviceToken', savedDeviceToken);
     }
 
-    // Remove every recovery/access key that may trigger auto-open.
     [
       'patientAccessCode',
       'activeRecoveryCode',
@@ -628,6 +628,27 @@ function returnToRecoveryLogin(){
 
   }catch(e){}
 
+  // Clear visible login form so old code/status does not remain on screen.
+  [
+    'accessCodeInput',
+    'codeInput',
+    'patientCodeInput',
+    'recoveryCodeInput'
+  ].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+
+  [
+    'status',
+    'accessStatus',
+    'codeStatus',
+    'loginStatus'
+  ].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent='';
+  });
+
   const complete=document.getElementById('completeOverlay');
   if(complete) complete.style.display='none';
 
@@ -637,13 +658,12 @@ function returnToRecoveryLogin(){
   const accessGate=document.getElementById('accessGate');
   if(accessGate) accessGate.style.display='flex';
 
-  // If the app uses a main shell, hide it so the login card is visible.
   ['app','mainApp','mainScreen','todayScreen'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
   });
 
-  history.replaceState(null,'','./?v=73&login=1');
+  history.replaceState(null,'','./?v=74&login=1');
 
   setTimeout(()=>{
     sessionStorage.removeItem('skipCompletionCheck');
@@ -699,6 +719,36 @@ window.addEventListener('load',()=>{
   setTimeout(()=>{
     calculateRecoveryProgress();
   },1200);
+});
+
+
+function clearLoginScreenFields(){
+  [
+    'accessCodeInput',
+    'codeInput',
+    'patientCodeInput',
+    'recoveryCodeInput'
+  ].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+
+  [
+    'status',
+    'accessStatus',
+    'codeStatus',
+    'loginStatus'
+  ].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent='';
+  });
+}
+
+window.addEventListener('load',()=>{
+  const params=new URLSearchParams(location.search);
+  if(params.get('login')==='1'){
+    clearLoginScreenFields();
+  }
 });
 
 </script>

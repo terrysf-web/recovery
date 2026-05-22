@@ -824,6 +824,19 @@ body.adminActive #adminPreviewColumn{
   }
 }
 
+
+.resetLockBtn{
+  border:0 !important;
+  border-radius:9px !important;
+  padding:7px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#dbeafe !important;
+  color:#1d4ed8 !important;
+  cursor:pointer !important;
+  margin-right:6px !important;
+}
+
 </style>
 </head>
 <body>
@@ -1705,7 +1718,9 @@ async function loadPatientCodes(){
               const createdText = formatPacificDateTime(c.createdAt);
               const action = c.active === false || st.text === 'Expired'
                 ? '<span class="tableMuted">—</span>'
-                : `<button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`;
+                : (st.text === 'Used'
+                  ? `<button class="resetLockBtn" onclick="resetCodeLock('${c.code}')">Reset</button><button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`
+                  : `<button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`);
 
               return `
                 <tr>
@@ -1724,6 +1739,28 @@ async function loadPatientCodes(){
       </div>`;
   }catch(e){
     patientCodeList.innerHTML = 'Could not load codes: ' + e.message;
+  }
+}
+
+
+async function resetCodeLock(code){
+  if(!requireLogin())return;
+  if(!confirm('Reset device lock for code '+code+'? The patient can enter this code again and it will lock to the next device.'))return;
+
+  try{
+    const res=await fetch(WORKER_URL+'/access-code/reset-lock',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
+      body:JSON.stringify({code})
+    });
+
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error || 'Reset lock failed');
+
+    alert('Device lock reset. Ask the patient to enter the code again.');
+    loadPatientCodes();
+  }catch(e){
+    alert('Reset failed: '+e.message);
   }
 }
 

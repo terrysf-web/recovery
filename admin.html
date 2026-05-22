@@ -1164,18 +1164,233 @@ body.adminActive #adminPreviewColumn{
 }
 
 
-/* v81 stable staff/admin role UI */
-.staffModeNotice{
-  background:#ecfdf5;
-  color:#166534;
-  border:1px solid #bbf7d0;
+/* v83 CODE FOCUS ADMIN - stable layout only, no role/tabs/worker changes */
+
+body.codeFocusMode .header{
+  padding:12px 20px !important;
+  border-radius:0 0 18px 18px !important;
+}
+
+body.codeFocusMode .header h1{
+  font-size:22px !important;
+  margin:0 !important;
+}
+
+body.codeFocusMode .header .sub{
+  display:none !important;
+}
+
+body.codeFocusMode .app{
+  width:98vw !important;
+  max-width:1800px !important;
+  margin:0 auto !important;
+  padding:12px 10px 40px !important;
+  display:block !important;
+}
+
+body.codeFocusMode #adminPreviewColumn{
+  display:none !important;
+}
+
+.codeFocusTopBar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  background:white;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:12px;
+  box-shadow:0 6px 18px rgba(15,23,42,.05);
+}
+
+.codeFocusTitle{
+  font-size:20px;
+  font-weight:950;
+  color:#0f172a;
+}
+
+.codeFocusSub{
+  font-size:12px;
+  color:#64748b;
+  margin-top:3px;
+}
+
+.codeFocusActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.codeFocusBtn{
+  border:0;
   border-radius:12px;
   padding:10px 12px;
-  font-weight:800;
-  margin:10px 0;
+  background:#eef2f7;
+  color:#0f172a;
+  font-weight:900;
+  cursor:pointer;
 }
-body.staffMode #adminPreviewColumn{
+
+.codeFocusBtn.primary{
+  background:#123c99;
+  color:white;
+}
+
+body.codeFocusMode .sessionCardCompact{
   display:none !important;
+}
+
+body.codeFocusMode .adminAccountCompact{
+  display:none !important;
+}
+
+body.codeFocusMode .appManagementCardHidden{
+  display:none !important;
+}
+
+body.showAppManagement .appManagementCardHidden{
+  display:block !important;
+}
+
+body.codeFocusMode .patientCodeMainCard{
+  display:block !important;
+  width:100% !important;
+  max-width:none !important;
+  padding:18px !important;
+  margin:0 0 14px !important;
+}
+
+body.codeFocusMode .patientCodeMainCard .sectionTitle{
+  font-size:22px !important;
+  margin-bottom:4px !important;
+}
+
+body.codeFocusMode .patientCodeMainCard label{
+  font-size:13px !important;
+  font-weight:900 !important;
+}
+
+body.codeFocusMode .patientCodeMainCard input,
+body.codeFocusMode .patientCodeMainCard select{
+  min-height:44px !important;
+  font-size:15px !important;
+}
+
+body.codeFocusMode .patientCodeMainCard .actions{
+  margin-top:12px !important;
+}
+
+body.codeFocusMode .patientCodeMainCard .btn{
+  min-height:44px !important;
+  font-size:14px !important;
+}
+
+body.codeFocusMode .codeTableWrap{
+  height:calc(100vh - 390px) !important;
+  min-height:520px !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:auto !important;
+  padding:0 !important;
+  border:1px solid rgba(15,23,42,.10) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:14px !important;
+}
+
+body.codeFocusMode .codeTable{
+  width:100% !important;
+  min-width:1100px !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+}
+
+body.codeFocusMode .codeTable thead{
+  position:sticky !important;
+  top:0 !important;
+  z-index:10 !important;
+}
+
+body.codeFocusMode .codeTable th{
+  background:#f8fafc !important;
+  padding:12px 10px !important;
+  font-size:11px !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.10) !important;
+  box-shadow:0 2px 5px rgba(15,23,42,.05) !important;
+}
+
+body.codeFocusMode .codeTable td{
+  padding:12px 10px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:12px !important;
+  vertical-align:middle !important;
+  background:white !important;
+}
+
+body.codeFocusMode .codeTable th:nth-child(1), 
+body.codeFocusMode .codeTable td:nth-child(1){width:10% !important}
+
+body.codeFocusMode .codeTable th:nth-child(2), 
+body.codeFocusMode .codeTable td:nth-child(2){width:10% !important}
+
+body.codeFocusMode .codeTable th:nth-child(3), 
+body.codeFocusMode .codeTable td:nth-child(3){width:17% !important}
+
+body.codeFocusMode .codeTable th:nth-child(4), 
+body.codeFocusMode .codeTable td:nth-child(4){width:12% !important}
+
+body.codeFocusMode .codeTable th:nth-child(5), 
+body.codeFocusMode .codeTable td:nth-child(5){width:12% !important}
+
+body.codeFocusMode .codeTable th:nth-child(6), 
+body.codeFocusMode .codeTable td:nth-child(6){width:12% !important}
+
+body.codeFocusMode .codeTable th:nth-child(7), 
+body.codeFocusMode .codeTable td:nth-child(7){width:17% !important}
+
+body.codeFocusMode .codeTable th:nth-child(8), 
+body.codeFocusMode .codeTable td:nth-child(8){width:10% !important}
+
+body.codeFocusMode .codeCell,
+body.codeFocusMode .chartCell{
+  font-weight:950 !important;
+  color:#0f172a !important;
+}
+
+@media(max-width:980px){
+  body.codeFocusMode .app{
+    width:100% !important;
+    padding:10px !important;
+  }
+
+  .codeFocusTopBar{
+    display:block;
+  }
+
+  .codeFocusActions{
+    margin-top:10px;
+  }
+
+  .codeFocusBtn{
+    width:100%;
+  }
+
+  body.codeFocusMode .codeTableWrap{
+    height:calc(100vh - 430px) !important;
+    min-height:420px !important;
+  }
+
+  body.codeFocusMode .codeTable{
+    min-width:1050px !important;
+  }
 }
 
 </style>
@@ -1188,14 +1403,14 @@ body.staffMode #adminPreviewColumn{
 
 <div class="app">
   <div class="card" id="loginCard">
-    <label>Password</label>
-    <input id="password" type="password" placeholder="Enter staff or admin password">
+    <label>Admin Password</label>
+    <input id="password" type="password" placeholder="Enter admin password">
     <div class="actions">
-      <button class="btn primary" onclick="loginAndLoad()">Login</button>
-      <button class="btn secondary" onclick="loginAndLoadDefault()">Admin: Load Default Protocol</button>
+      <button class="btn primary" onclick="loginAndLoad()">Login & Load Current Protocol</button>
+      <button class="btn secondary" onclick="loginAndLoadDefault()">Login with Default Protocol</button>
     </div>
     <div class="lockedNotice">
-      Staff login can manage patient access codes only. Admin login can manage the full recovery app.
+      Editing, deleting, uploading, and saving are locked until the admin password is entered.
     </div>
     
     <button class="btn secondary" style="margin-top:10px" onclick="toggleForgotPassword()">Forgot password?</button>
@@ -1398,80 +1613,6 @@ function setSaveStatus(msg,good=true){
   saveStatus.style.color=good?'#15803d':'#b91c1c';
 }
 
-
-let currentRole = null;
-
-async function getLoginRole(){
-  const pass = getPass();
-  const res = await fetch(WORKER_URL + '/auth-role', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({password:pass})
-  });
-
-  const data = await res.json();
-  if(!res.ok) throw new Error(data.error || 'Unauthorized');
-
-  currentRole = data.role;
-  return currentRole;
-}
-
-function applyRoleUI(){
-  const adminOnlySelectors = [
-    '#adminAccountCard',
-    '#passwordCard'
-  ];
-
-  const adminOnlyTextBlocks = [
-    'Reload Current Protocol',
-    'Load Default Protocol',
-    'Download Backup JSON',
-    'Upload Backup JSON',
-    'Surgery Type Management',
-    'Week / Stage Management',
-    'Save to Cloudflare'
-  ];
-
-  if(currentRole === 'staff'){
-    document.body.classList.add('staffMode');
-    document.body.classList.remove('adminMode');
-
-    document.querySelectorAll('.card').forEach(card=>{
-      const txt = card.textContent || '';
-      if(adminOnlyTextBlocks.some(t=>txt.includes(t))){
-        card.style.display='none';
-      }
-    });
-
-    adminOnlySelectors.forEach(sel=>{
-      const el=document.querySelector(sel);
-      if(el) el.style.display='none';
-    });
-
-    const sessionTitle=[...document.querySelectorAll('.sectionTitle')].find(el=>el.textContent.includes('Admin Session'));
-    if(sessionTitle) sessionTitle.textContent='Staff Session';
-
-  }else{
-    document.body.classList.add('adminMode');
-    document.body.classList.remove('staffMode');
-
-    document.querySelectorAll('.card').forEach(card=>{
-      card.style.display='';
-    });
-
-    const sessionTitle=[...document.querySelectorAll('.sectionTitle')].find(el=>el.textContent.includes('Staff Session'));
-    if(sessionTitle) sessionTitle.textContent='Admin Session';
-  }
-}
-
-function requireAdmin(){
-  if(currentRole !== 'admin'){
-    alert('Admin access is required for this function.');
-    return false;
-  }
-  return true;
-}
-
 function getPass(){
   return password.value.trim();
 }
@@ -1485,59 +1626,15 @@ function requireLogin(){
 }
 
 async function loginAndLoad(){
-  if(!getPass()){setStatus('Enter password first.',false);return;}
-
-  try{
-    setStatus('Signing in...');
-    const role = await getLoginRole();
-
-    isLoggedIn=true;
-    await loadProtocol();
-
-    editor.classList.remove('hidden');
-    loginCard.classList.add('hidden');
-
-    applyRoleUI();
-
-    if(role === 'staff'){
-      await loadPatientCodes();
-      setStatus('Staff login successful.', true);
-    }else{
-      setStatus('Admin login successful.', true);
-    }
-
-  }catch(e){
-    isLoggedIn=false;
-  currentRole=null;
-  document.body.classList.remove('staffMode','adminMode');
-    currentRole=null;
-    setStatus('Login failed: '+e.message,false);
-  }
+  if(!getPass()){setStatus('Enter admin password first.',false);return;}
+  isLoggedIn=true;
+  await loadProtocol();
 }
 
-async function loginAndLoadDefault(){
-  if(!getPass()){setStatus('Enter password first.',false);return;}
-
-  try{
-    const role = await getLoginRole();
-
-    if(role !== 'admin'){
-      setStatus('Admin access is required to load default protocol.', false);
-      return;
-    }
-
-    isLoggedIn=true;
-    loadDefault();
-
-    editor.classList.remove('hidden');
-    loginCard.classList.add('hidden');
-
-    applyRoleUI();
-    setStatus('Admin default protocol loaded.', true);
-
-  }catch(e){
-    setStatus('Login failed: '+e.message,false);
-  }
+function loginAndLoadDefault(){
+  if(!getPass()){setStatus('Enter admin password first.',false);return;}
+  isLoggedIn=true;
+  loadDefault();
 }
 
 async function loadProtocol(){
@@ -1569,6 +1666,7 @@ function loadDefault(){
 
 function initEditor(){
   editor.classList.remove('hidden');
+    setTimeout(setupCodeFocusAdmin,100);
   const loginCardEl=document.getElementById('loginCard'); if(loginCardEl) loginCardEl.classList.add('hidden');
   document.body.classList.add('adminActive');
   document.getElementById('loginCard')?.classList.add('hidden');
@@ -1695,8 +1793,6 @@ function moveDown(k,i){
 }
 
 async function saveProtocol(){
-  if(!requireAdmin()) return;
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
   try{
     setSaveStatus('Saving...');
@@ -1716,7 +1812,6 @@ async function saveProtocol(){
 }
 
 function downloadJson(){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const blob=new Blob([JSON.stringify(protocol,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -1726,7 +1821,6 @@ function downloadJson(){
 }
 
 function uploadJsonFile(event){
-  if(!requireAdmin()) return;
   if(!requireLogin()){
     event.target.value='';
     return;
@@ -1778,8 +1872,6 @@ function togglePasswordCard(){
 }
 
 async function changePassword(){
-  if(!requireAdmin()) return;
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const current = currentPassword.value.trim();
@@ -1846,7 +1938,6 @@ function sanitizeKey(raw){
 }
 
 function addSurgeryType(copyCurrent){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const name = newSurgeryName.value.trim();
@@ -1914,7 +2005,6 @@ function addSurgeryType(copyCurrent){
 }
 
 function deleteSurgeryType(){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const keys = Object.keys(protocol);
@@ -2007,12 +2097,10 @@ function addWeekAfter(index){
 }
 
 function addStageAfterCurrent(){
-  if(!requireAdmin()) return;
   addWeekAfter(currentStageIndex);
 }
 
 function copyCurrentStage(){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const s = currentSurgery();
@@ -2026,7 +2114,6 @@ function copyCurrentStage(){
 }
 
 function deleteCurrentStage(){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const s = currentSurgery();
@@ -2047,7 +2134,6 @@ function deleteCurrentStage(){
 }
 
 function moveStageUp(){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s = currentSurgery();
   if(currentStageIndex <= 0)return;
@@ -2060,7 +2146,6 @@ function moveStageUp(){
 }
 
 function moveStageDown(){
-  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s = currentSurgery();
   if(currentStageIndex >= s.stages.length - 1)return;
@@ -2253,13 +2338,83 @@ function togglePreview(){
 function renderPreview(){
   jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);
 }
+
+function setupCodeFocusAdmin(){
+  document.body.classList.add('codeFocusMode');
+
+  const editor = document.getElementById('editor');
+  if(!editor) return;
+
+  if(!document.getElementById('codeFocusTopBar')){
+    const bar = document.createElement('div');
+    bar.id = 'codeFocusTopBar';
+    bar.className = 'codeFocusTopBar';
+    bar.innerHTML = `
+      <div>
+        <div class="codeFocusTitle">Patient Access Codes</div>
+        <div class="codeFocusSub">Generate and manage patient recovery access codes. App management is available below when needed.</div>
+      </div>
+      <div class="codeFocusActions">
+        <button class="codeFocusBtn primary" onclick="scrollToCodes()">Code Management</button>
+        <button class="codeFocusBtn" onclick="toggleAppManagement()">Show / Hide App Management</button>
+        <button class="codeFocusBtn" onclick="logoutAdmin()">Logout</button>
+      </div>
+    `;
+    editor.prepend(bar);
+  }
+
+  [...editor.querySelectorAll('.card')].forEach(card=>{
+    const text = card.textContent || '';
+
+    if(text.includes('Admin Session')){
+      card.classList.add('sessionCardCompact');
+      return;
+    }
+
+    if(text.includes('Admin Account')){
+      card.classList.add('adminAccountCompact');
+      return;
+    }
+
+    if(text.includes('Patient Access Codes')){
+      card.classList.add('patientCodeMainCard');
+      card.classList.remove('appManagementCardHidden');
+      return;
+    }
+
+    if(text.includes('Mobile view')){
+      card.classList.add('appManagementCardHidden');
+      return;
+    }
+
+    card.classList.add('appManagementCardHidden');
+  });
+
+  scrollToCodes();
+}
+
+function scrollToCodes(){
+  const codeCard = document.querySelector('.patientCodeMainCard');
+  if(codeCard){
+    codeCard.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+function toggleAppManagement(){
+  document.body.classList.toggle('showAppManagement');
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(setupCodeFocusAdmin,500);
+});
+
 </script>
 <!-- ADMIN_ACCESS_CODE_WITH_PREVIEW_V35 -->
 <!-- ADMIN_STABLE_RECOVERY_V42 -->
 <!-- ADMIN_CHART_TABLE_TALL_V77 -->
 <!-- ADMIN_TABLE_HEADER_HEIGHT_FIX_V78 -->
 <!-- FULL_HEIGHT_ADMIN_TABLE_V79 -->
-<!-- STABLE_ROLES_NO_TABS_V81 -->
+<!-- CODE_FOCUS_STABLE_V83 -->
 </body>
 </html>
 

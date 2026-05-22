@@ -825,16 +825,94 @@ body.adminActive #adminPreviewColumn{
 }
 
 
-.resetLockBtn{
-  border:0 !important;
-  border-radius:9px !important;
-  padding:7px 10px !important;
+/* v77 Chart # table + taller admin table */
+body.adminActive .app{
+  max-width:1680px !important;
+  width:1680px !important;
+  grid-template-columns:1160px 470px !important;
+  gap:28px !important;
+}
+body.adminActive #editor,
+body.adminActive #editor .card{
+  width:1160px !important;
+  max-width:1160px !important;
+}
+.codeTableWrap{
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  max-height:720px !important;
+  min-height:520px !important;
+  height:720px !important;
+  border:1px solid rgba(15,23,42,.08) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:12px !important;
+}
+.codeTable{
+  width:100% !important;
+  min-width:0 !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+}
+.codeTable th{
+  position:sticky !important;
+  top:0 !important;
+  z-index:3 !important;
+  background:#f8fafc !important;
+  padding:12px 10px !important;
   font-size:11px !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.08) !important;
+}
+.codeTable td{
+  padding:12px 10px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:12px !important;
+  color:#334155 !important;
+  vertical-align:middle !important;
+}
+.codeTable th:nth-child(1), .codeTable td:nth-child(1){width:11% !important}
+.codeTable th:nth-child(2), .codeTable td:nth-child(2){width:11% !important}
+.codeTable th:nth-child(3), .codeTable td:nth-child(3){width:17% !important}
+.codeTable th:nth-child(4), .codeTable td:nth-child(4){width:12% !important}
+.codeTable th:nth-child(5), .codeTable td:nth-child(5){width:13% !important}
+.codeTable th:nth-child(6), .codeTable td:nth-child(6){width:12% !important}
+.codeTable th:nth-child(7), .codeTable td:nth-child(7){width:16% !important}
+.codeTable th:nth-child(8), .codeTable td:nth-child(8){width:8% !important}
+.chartCell{
+  font-weight:900 !important;
+  color:#0f172a !important;
+}
+.codeCell{
   font-weight:950 !important;
-  background:#dbeafe !important;
-  color:#1d4ed8 !important;
-  cursor:pointer !important;
-  margin-right:6px !important;
+  color:#0f172a !important;
+  letter-spacing:.04em !important;
+  white-space:nowrap !important;
+}
+@media(max-width:980px){
+  body.adminActive .app{
+    width:100% !important;
+    max-width:460px !important;
+    display:block !important;
+  }
+  body.adminActive #editor,
+  body.adminActive #editor .card{
+    width:430px !important;
+    max-width:430px !important;
+  }
+  .codeTableWrap{
+    overflow-x:auto !important;
+    height:520px !important;
+    max-height:520px !important;
+  }
+  .codeTable{
+    min-width:980px !important;
+  }
 }
 
 </style>
@@ -945,6 +1023,10 @@ body.adminActive #adminPreviewColumn{
 
       <label>Surgery Date</label>
       <input id="codeSurgeryDate" type="date">
+
+      <label>Chart # (Optional)</label>
+      <input id="chartNumberInput" type="text" placeholder="Example: 24851">
+
 
       <div class="actions">
         <button class="btn primary" onclick="generatePatientCode()">Generate Patient Code</button>
@@ -1088,6 +1170,7 @@ async function loadProtocol(){
     setStatus('Loaded current protocol.');
     syncCodeSurgeryOptions();
     loadPatientCodes();
+    if(document.getElementById('chartNumberInput')) chartNumberInput.value='';
   }catch(e){
     protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
     initEditor();
@@ -1613,6 +1696,7 @@ async function generatePatientCode(){
   if(!requireLogin())return;
   const surgeryType=document.getElementById('codeSurgery').value;
   const surgeryDate=document.getElementById('codeSurgeryDate').value || todayYMD();
+  const chartNumber=document.getElementById('chartNumberInput')?.value.trim() || '';
   if(!surgeryType||!surgeryDate){
     codeStatus.textContent='Select surgery type and surgery date.';
     codeStatus.style.color='#b91c1c';
@@ -1624,11 +1708,11 @@ async function generatePatientCode(){
     const res=await fetch(WORKER_URL+'/access-code',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-admin-password':getPass()},
-      body:JSON.stringify({surgeryType,surgeryDate})
+      body:JSON.stringify({surgeryType,surgeryDate,chartNumber})
     });
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||'Failed to generate code');
-    generatedCodeBox.innerHTML=`<b>Random Access Code:</b> ${data.code}<br><b>Surgery:</b> ${protocol[surgeryType]?.name||surgeryType}<br><b>Date:</b> ${surgeryDate}<br><b>Expires:</b> ${data.expiresAt}<br><br><b>Patient link:</b><br>https://terrysf-web.github.io/recovery/`;
+    generatedCodeBox.innerHTML=`<b>Random Access Code:</b> ${data.code}<br><b>Surgery:</b> ${protocol[surgeryType]?.name||surgeryType}<br><b>Date:</b> ${surgeryDate}<br><b>Chart #:</b> ${chartNumber || '-'}<br><b>Expires:</b> ${data.expiresAt}<br><br><b>Patient link:</b><br>https://terrysf-web.github.io/recovery/`;
     codeStatus.textContent='Patient code generated.';
     reloadPatientPreview();
     reloadPatientPreview();
@@ -1689,7 +1773,7 @@ async function loadPatientCodes(){
     function getStatus(c){
       if(c.active === false) return {text:'Disabled', cls:'statusDisabled'};
       if(c.expiresAt && c.expiresAt < today) return {text:'Expired', cls:'statusExpired'};
-      if(c.usedAt) return {text:'Used', cls:'statusUsed'};
+      if(c.usedAt || c.firstUsedAt || c.lastUsedAt) return {text:'Used', cls:'statusUsed'};
       return {text:'Active', cls:'statusActive'};
     }
 
@@ -1700,12 +1784,12 @@ async function loadPatientCodes(){
         <table class="codeTable">
           <thead>
             <tr>
-              <th>Code</th>
-              <th>Type</th>
-              <th>Surgery Date</th>
-              <th>Expires On</th>
               <th>Status</th>
-              <th>Used</th>
+              <th>Chart #</th>
+              <th>Procedure</th>
+              <th>Code</th>
+              <th>Surgery Date</th>
+              <th>Expires</th>
               <th>Created</th>
               <th>Action</th>
             </tr>
@@ -1714,22 +1798,22 @@ async function loadPatientCodes(){
             ${codes.map(c=>{
               const st = getStatus(c);
               const typeName = protocol[c.surgeryType]?.name || c.surgeryType || '-';
-              const usedText = c.usedAt ? c.usedAt.slice(0,10) : '-';
-              const createdText = formatPacificDateTime(c.createdAt);
+              const createdText = typeof formatPacificDateTime === 'function'
+                ? formatPacificDateTime(c.createdAt)
+                : (c.createdAt ? c.createdAt.replace('T',' ').slice(0,16) : '-');
+
               const action = c.active === false || st.text === 'Expired'
                 ? '<span class="tableMuted">—</span>'
-                : (st.text === 'Used'
-                  ? `<button class="resetLockBtn" onclick="resetCodeLock('${c.code}')">Reset</button><button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`
-                  : `<button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`);
+                : `<button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`;
 
               return `
                 <tr>
-                  <td class="codeCell">${c.code}</td>
+                  <td><span class="statusBadge ${st.cls}">${st.text}</span></td>
+                  <td class="chartCell">${c.chartNumber || '-'}</td>
                   <td>${typeName}</td>
+                  <td class="codeCell">${c.code}</td>
                   <td>${c.surgeryDate || '-'}</td>
                   <td>${c.expiresAt || '-'}</td>
-                  <td><span class="statusBadge ${st.cls}">${st.text}</span></td>
-                  <td>${usedText}</td>
                   <td>${createdText}</td>
                   <td>${action}</td>
                 </tr>`;
@@ -1739,28 +1823,6 @@ async function loadPatientCodes(){
       </div>`;
   }catch(e){
     patientCodeList.innerHTML = 'Could not load codes: ' + e.message;
-  }
-}
-
-
-async function resetCodeLock(code){
-  if(!requireLogin())return;
-  if(!confirm('Reset device lock for code '+code+'? The patient can enter this code again and it will lock to the next device.'))return;
-
-  try{
-    const res=await fetch(WORKER_URL+'/access-code/reset-lock',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
-      body:JSON.stringify({code})
-    });
-
-    const data=await res.json();
-    if(!res.ok) throw new Error(data.error || 'Reset lock failed');
-
-    alert('Device lock reset. Ask the patient to enter the code again.');
-    loadPatientCodes();
-  }catch(e){
-    alert('Reset failed: '+e.message);
   }
 }
 
@@ -1800,5 +1862,8 @@ function renderPreview(){
 </script>
 <!-- ADMIN_ACCESS_CODE_WITH_PREVIEW_V35 -->
 <!-- ADMIN_STABLE_RECOVERY_V42 -->
+<!-- ADMIN_CHART_TABLE_TALL_V77 -->
 </body>
 </html>
+
+<!-- CHART_NUMBER_OPTIONAL_V76 -->

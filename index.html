@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=66">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=66">
+<link rel="manifest" href="./manifest.json?v=69">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=69">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -159,6 +159,50 @@
   font-weight:900;
 }
 
+
+/* v69 recovery complete overlay */
+.completeOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.96);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  z-index:9999;
+}
+.completeCard{
+  width:100%;
+  max-width:420px;
+  background:white;
+  border-radius:28px;
+  padding:34px 24px;
+  box-shadow:0 20px 60px rgba(15,23,42,.12);
+  text-align:center;
+}
+.completeTitle{
+  font-size:30px;
+  font-weight:950;
+  color:#15803d;
+  margin-bottom:16px;
+}
+.completeText{
+  font-size:15px;
+  line-height:1.65;
+  color:#475569;
+}
+.completeBtn{
+  margin-top:24px;
+  width:100%;
+  border:0;
+  border-radius:18px;
+  padding:16px;
+  background:#13379b;
+  color:white;
+  font-size:16px;
+  font-weight:900;
+}
+
 </style>
 </head>
 <body>
@@ -214,7 +258,7 @@ async function loadClinicProtocol(){
   try{
     const res=await fetch(PROTOCOL_API_URL+"?t="+Date.now(),{cache:"no-store"});
     const data=await res.json();
-    if(data&&data.periodontal){CLINIC_PROTOCOL=data;if(typeof renderToday==="function")renderToday();}
+    if(data&&data.periodontal){CLINIC_PROTOCOL=data;if(typeof renderToday==="function")if(!enforceLocalExpiration()) renderToday();}
   }catch(e){}
 }
 function protocolStage(type,day){
@@ -308,8 +352,9 @@ async function verifyAccessCode(codeFromStorage){
     }
 
     ACCESS_READY=true;
+    if(enforceLocalExpiration()) return;
     hideAccessGate();
-    renderToday();
+    if(!enforceLocalExpiration()) renderToday();
     updateGeminiRemaining();
     loadClinicProtocol();
     return true;
@@ -429,13 +474,62 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=66").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=69").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
   const input=document.getElementById("accessCodeInput");
   if(input) input.addEventListener("keydown",e=>{if(e.key==="Enter")verifyAccessCode();});
 });
+
+
+function getPacificDateOnly(dateObj){
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone:'America/Los_Angeles',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).format(dateObj);
+}
+
+function daysBetweenPacific(startYMD, endYMD){
+  const start = new Date(startYMD + 'T00:00:00');
+  const end = new Date(endYMD + 'T00:00:00');
+  return Math.floor((end - start) / 86400000) + 1;
+}
+
+function getSelectedSurgeryType(){
+  return localStorage.getItem('surgeryType') || localStorage.getItem('selectedSurgery') || 'periodontal';
+}
+
+function getProtocolTotalDays(type){
+  try{
+    if(window.CLINIC_PROTOCOL && CLINIC_PROTOCOL[type] && CLINIC_PROTOCOL[type].totalDays){
+      return Number(CLINIC_PROTOCOL[type].totalDays);
+    }
+    if(window.SURGERIES && SURGERIES[type] && SURGERIES[type].totalDays){
+      return Number(SURGERIES[type].totalDays);
+    }
+  }catch(e){}
+  return 56;
+}
+
+function enforceLocalExpiration(){
+  const surgeryDate = localStorage.getItem('surgeryDate');
+  if(!surgeryDate) return false;
+
+  const today = getPacificDateOnly(new Date());
+  const type = getSelectedSurgeryType();
+  const totalDays = getProtocolTotalDays(type);
+  const currentDay = daysBetweenPacific(surgeryDate, today);
+
+  if(currentDay > totalDays){
+    showExpiredOverlay();
+    return true;
+  }
+
+  return false;
+}
 
 function clearRecoverySession(){
   try{
@@ -452,10 +546,11 @@ function showExpiredOverlay(){
 
 function closeExpiredOverlay(){
   clearRecoverySession();
-  location.href='./?v=66';
+  location.href='./?v=69';
 }
 
 async function validateStoredRecoveryAccess(){
+  if(enforceLocalExpiration()) return;
   const savedCode=localStorage.getItem('patientAccessCode');
   if(!savedCode) return;
 
@@ -479,6 +574,75 @@ window.addEventListener('load',()=>{
   setTimeout(validateStoredRecoveryAccess,800);
 });
 
+
+function clearRecoverySession(){
+  try{
+    localStorage.removeItem('patientAccessCode');
+    localStorage.removeItem('surgeryDate');
+    localStorage.removeItem('surgeryType');
+    sessionStorage.clear();
+  }catch(e){}
+}
+
+function showRecoveryComplete(){
+  clearRecoverySession();
+
+  const el=document.getElementById('completeOverlay');
+  if(el){
+    el.style.display='flex';
+  }
+}
+
+function returnToRecoveryLogin(){
+  clearRecoverySession();
+  location.href='./?v=69';
+}
+
+function calculateRecoveryProgress(){
+  try{
+    const surgeryDate = localStorage.getItem('surgeryDate');
+    const surgeryType = localStorage.getItem('surgeryType');
+
+    if(!surgeryDate) return false;
+
+    const today = new Intl.DateTimeFormat('en-CA',{
+      timeZone:'America/Los_Angeles',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit'
+    }).format(new Date());
+
+    const start = new Date(surgeryDate + 'T00:00:00');
+    const end = new Date(today + 'T00:00:00');
+
+    const currentDay = Math.floor((end-start)/86400000)+1;
+
+    let totalDays = 56;
+
+    try{
+      if(window.CLINIC_PROTOCOL && surgeryType && CLINIC_PROTOCOL[surgeryType]?.totalDays){
+        totalDays = Number(CLINIC_PROTOCOL[surgeryType].totalDays);
+      }
+    }catch(e){}
+
+    const percent = Math.min(100, Math.floor((currentDay/totalDays)*100));
+
+    if(percent >= 100 && currentDay > totalDays){
+      showRecoveryComplete();
+      return true;
+    }
+
+  }catch(e){}
+
+  return false;
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    calculateRecoveryProgress();
+  },1200);
+});
+
 </script>
 
 <div id="expiredOverlay" class="expiredOverlay">
@@ -490,6 +654,25 @@ window.addEventListener('load',()=>{
       Contact the clinic if you need additional access.
     </div>
     <button class="expiredBtn" onclick="closeExpiredOverlay()">
+      Return to Login
+    </button>
+  </div>
+</div>
+
+
+<div id="completeOverlay" class="completeOverlay">
+  <div class="completeCard">
+    <div class="completeTitle">
+      Recovery Complete
+    </div>
+
+    <div class="completeText">
+      Your recovery guide period is complete.<br><br>
+      Please remove this app from your home screen.<br>
+      Contact the clinic if you need additional access.
+    </div>
+
+    <button class="completeBtn" onclick="returnToRecoveryLogin()">
       Return to Login
     </button>
   </div>

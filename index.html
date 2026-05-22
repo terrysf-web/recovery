@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=71">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=71">
+<link rel="manifest" href="./manifest.json?v=72">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=72">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -474,7 +474,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=71").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=72").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -552,7 +552,7 @@ function closeExpiredOverlay(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=71';
+    location.href='./?v=72';
   },300);
 }
 
@@ -600,13 +600,33 @@ function showRecoveryComplete(){
   }
 }
 
+
 function returnToRecoveryLogin(){
-  clearRecoverySession();
+  try{
+    const savedDeviceToken = localStorage.getItem('deviceToken');
+
+    localStorage.clear();
+    sessionStorage.clear();
+
+    if(savedDeviceToken){
+      localStorage.setItem('deviceToken', savedDeviceToken);
+    }
+
+    // prevent auto reopen loop
+    localStorage.removeItem('patientAccessCode');
+    localStorage.removeItem('activeRecoveryCode');
+    localStorage.removeItem('recoveryCode');
+    localStorage.removeItem('surgeryDate');
+    localStorage.removeItem('surgeryType');
+    localStorage.removeItem('recoveryCompleted');
+
+  }catch(e){}
 
   setTimeout(()=>{
-    location.href='./?v=71';
-  },300);
+    window.location.replace('./?v=72');
+  },400);
 }
+
 
 function calculateRecoveryProgress(){
   try{

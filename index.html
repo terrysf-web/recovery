@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=69">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=69">
+<link rel="manifest" href="./manifest.json?v=70">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=70">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -474,7 +474,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=69").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=70").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -546,7 +546,7 @@ function showExpiredOverlay(){
 
 function closeExpiredOverlay(){
   clearRecoverySession();
-  location.href='./?v=69';
+  location.href='./?v=70';
 }
 
 async function validateStoredRecoveryAccess(){
@@ -595,7 +595,10 @@ function showRecoveryComplete(){
 
 function returnToRecoveryLogin(){
   clearRecoverySession();
-  location.href='./?v=69';
+
+  setTimeout(()=>{
+    location.href='./?v=70';
+  },300);
 }
 
 function calculateRecoveryProgress(){
@@ -663,13 +666,13 @@ window.addEventListener('load',()=>{
 <div id="completeOverlay" class="completeOverlay">
   <div class="completeCard">
     <div class="completeTitle">
-      Recovery Complete
+      Recovery Guide Completed
     </div>
 
     <div class="completeText">
       Your recovery guide period is complete.<br><br>
-      Please remove this app from your home screen.<br>
-      Contact the clinic if you need additional access.
+      You may now close or remove this Recovery Guide.<br>
+      Contact the clinic if you need an additional guide.
     </div>
 
     <button class="completeBtn" onclick="returnToRecoveryLogin()">

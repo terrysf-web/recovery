@@ -1163,24 +1163,106 @@ body.adminActive #adminPreviewColumn{
   }
 }
 
+
+/* v80 role-based tabs */
+.adminRoleBar{
+  background:white;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  box-shadow:0 6px 18px rgba(15,23,42,.05);
+}
+
+.roleTitle{
+  font-size:18px;
+  font-weight:950;
+  color:#0f172a;
+}
+
+.roleSub{
+  font-size:12px;
+  color:#64748b;
+  margin-top:3px;
+}
+
+.tabButtons{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.roleTab{
+  border:1px solid rgba(15,23,42,.10);
+  background:#f8fafc;
+  color:#334155;
+  border-radius:12px;
+  padding:11px 14px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.roleTab.active{
+  background:#123c99;
+  color:white;
+  border-color:#123c99;
+}
+
+.roleTab.hidden{
+  display:none !important;
+}
+
+body.staffRole #adminPreviewColumn{
+  display:none !important;
+}
+
+body.staffRole .adminOnly{
+  display:none !important;
+}
+
+body.staffRole .appOnly{
+  display:none !important;
+}
+
+body.adminRole .codeOnly.hiddenByTab,
+body.adminRole .appOnly.hiddenByTab{
+  display:none !important;
+}
+
+@media(max-width:980px){
+  .adminRoleBar{
+    display:block;
+  }
+  .tabButtons{
+    margin-top:12px;
+  }
+  .roleTab{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>Recovery Guide Admin</h1>
+  <h1>Recovery Guide Admin <span style='font-size:13px;background:white;color:#123c99;border-radius:999px;padding:4px 9px;margin-left:8px'>v80</span></h1>
   <div class="sub">Doctor-friendly editor for post-op recovery instructions.</div>
 </div>
 
 <div class="app">
   <div class="card" id="loginCard">
-    <label>Admin Password</label>
-    <input id="password" type="password" placeholder="Enter admin password">
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Enter staff or admin password">
     <div class="actions">
-      <button class="btn primary" onclick="loginAndLoad()">Login & Load Current Protocol</button>
-      <button class="btn secondary" onclick="loginAndLoadDefault()">Login with Default Protocol</button>
+      <button class="btn primary" onclick="loginAndLoad()">Login</button>
+      <button class="btn secondary" onclick="loginAndLoadDefault()">Load Default as Admin</button>
     </div>
     <div class="lockedNotice">
-      Editing, deleting, uploading, and saving are locked until the admin password is entered.
+      Staff access opens Patient Access Codes only. Admin access opens full Recovery App Management.
     </div>
     
     <button class="btn secondary" style="margin-top:10px" onclick="toggleForgotPassword()">Forgot password?</button>
@@ -1237,6 +1319,18 @@ body.adminActive #adminPreviewColumn{
   </div>
 
   <div id="editor" class="hidden">
+
+    <div class="adminRoleBar">
+      <div>
+        <div class="roleTitle">Recovery Guide Admin</div>
+        <div class="roleSub" id="roleSubText">Signed in</div>
+      </div>
+      <div class="tabButtons">
+        <button id="tabCodesBtn" class="roleTab active" onclick="showAdminTab('codes')">1 Patient Access Codes</button>
+        <button id="tabAppBtn" class="roleTab" onclick="showAdminTab('app')">2 Recovery App Management</button>
+      </div>
+    </div>
+
 
     <div class="card mobilePreviewNotice">
       Mobile view: Live preview is hidden so the admin page is easier to use. Use desktop for side-by-side preview.
@@ -1383,6 +1477,104 @@ function setSaveStatus(msg,good=true){
   saveStatus.style.color=good?'#15803d':'#b91c1c';
 }
 
+
+let currentRole = null;
+let currentAdminTab = 'codes';
+
+async function getLoginRole(){
+  const pass = getPass();
+  const res = await fetch(WORKER_URL + '/auth-role', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:pass})
+  });
+
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error || 'Unauthorized');
+
+  currentRole = data.role;
+  document.body.classList.remove('staffRole','adminRole');
+  document.body.classList.add(currentRole === 'admin' ? 'adminRole' : 'staffRole');
+
+  return currentRole;
+}
+
+function markAdminSections(){
+  const editor = document.getElementById('editor');
+  if(!editor) return;
+
+  [...editor.querySelectorAll('.card')].forEach(card=>{
+    const text = card.textContent || '';
+
+    if(text.includes('Patient Access Codes')){
+      card.classList.add('codeOnly');
+      return;
+    }
+
+    if(text.includes('Admin Session')){
+      card.classList.add('sessionCard');
+      return;
+    }
+
+    if(text.includes('Mobile view')){
+      card.classList.add('adminOnly');
+      return;
+    }
+
+    // All other cards are app management / admin-only.
+    card.classList.add('appOnly','adminOnly');
+  });
+}
+
+function applyRoleUI(){
+  markAdminSections();
+
+  const roleText = document.getElementById('roleSubText');
+  const appBtn = document.getElementById('tabAppBtn');
+
+  if(currentRole === 'staff'){
+    if(roleText) roleText.textContent = 'Staff role: Patient Access Codes only';
+    if(appBtn) appBtn.classList.add('hidden');
+    showAdminTab('codes');
+  }else{
+    if(roleText) roleText.textContent = 'Admin role: Full access';
+    if(appBtn) appBtn.classList.remove('hidden');
+    showAdminTab(currentAdminTab || 'codes');
+  }
+}
+
+function showAdminTab(tab){
+  currentAdminTab = tab;
+
+  const codesBtn = document.getElementById('tabCodesBtn');
+  const appBtn = document.getElementById('tabAppBtn');
+
+  if(codesBtn) codesBtn.classList.toggle('active', tab === 'codes');
+  if(appBtn) appBtn.classList.toggle('active', tab === 'app');
+
+  document.querySelectorAll('.codeOnly').forEach(el=>{
+    el.classList.toggle('hiddenByTab', tab !== 'codes');
+  });
+
+  document.querySelectorAll('.appOnly').forEach(el=>{
+    el.classList.toggle('hiddenByTab', tab !== 'app');
+  });
+
+  // Session card remains visible.
+  document.querySelectorAll('.sessionCard').forEach(el=>{
+    el.classList.remove('hiddenByTab');
+  });
+}
+
+function requireAdmin(){
+  if(currentRole !== 'admin'){
+    setStatus('Admin access is required for Recovery App Management.', false);
+    return false;
+  }
+  return true;
+}
+
+
 function getPass(){
   return password.value.trim();
 }
@@ -1396,15 +1588,43 @@ function requireLogin(){
 }
 
 async function loginAndLoad(){
-  if(!getPass()){setStatus('Enter admin password first.',false);return;}
-  isLoggedIn=true;
-  await loadProtocol();
+  if(!getPass()){setStatus('Enter password first.',false);return;}
+  try{
+    setStatus('Signing in...');
+    const role = await getLoginRole();
+    isLoggedIn=true;
+    await loadProtocol();
+    editor.classList.remove('hidden');
+    loginCard.classList.add('hidden');
+    applyRoleUI();
+    if(role === 'staff'){
+      await loadPatientCodes();
+    }
+    setStatus('Logged in.', true);
+  }catch(e){
+    isLoggedIn=false;
+  currentRole=null;
+  document.body.classList.remove('staffRole','adminRole');
+    setStatus('Login failed: '+e.message,false);
+  }
 }
 
-function loginAndLoadDefault(){
-  if(!getPass()){setStatus('Enter admin password first.',false);return;}
-  isLoggedIn=true;
-  loadDefault();
+async function loginAndLoadDefault(){
+  if(!getPass()){setStatus('Enter password first.',false);return;}
+  try{
+    const role = await getLoginRole();
+    if(role !== 'admin'){
+      setStatus('Admin access is required to load default protocol.', false);
+      return;
+    }
+    isLoggedIn=true;
+    loadDefault();
+    editor.classList.remove('hidden');
+    loginCard.classList.add('hidden');
+    applyRoleUI();
+  }catch(e){
+    setStatus('Login failed: '+e.message,false);
+  }
 }
 
 async function loadProtocol(){
@@ -1458,6 +1678,7 @@ function currentSurgery(){
 }
 
 function saveSurgeryMeta(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s=currentSurgery();
   s.name=surgeryName.value;
@@ -1562,6 +1783,8 @@ function moveDown(k,i){
 }
 
 async function saveProtocol(){
+  if(!requireAdmin()) return;
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   try{
     setSaveStatus('Saving...');
@@ -1581,6 +1804,7 @@ async function saveProtocol(){
 }
 
 function downloadJson(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const blob=new Blob([JSON.stringify(protocol,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -1590,6 +1814,7 @@ function downloadJson(){
 }
 
 function uploadJsonFile(event){
+  if(!requireAdmin()) return;
   if(!requireLogin()){
     event.target.value='';
     return;
@@ -1641,6 +1866,8 @@ function togglePasswordCard(){
 }
 
 async function changePassword(){
+  if(!requireAdmin()) return;
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const current = currentPassword.value.trim();
@@ -1707,6 +1934,7 @@ function sanitizeKey(raw){
 }
 
 function addSurgeryType(copyCurrent){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const name = newSurgeryName.value.trim();
@@ -1774,6 +2002,7 @@ function addSurgeryType(copyCurrent){
 }
 
 function deleteSurgeryType(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const keys = Object.keys(protocol);
@@ -1866,10 +2095,12 @@ function addWeekAfter(index){
 }
 
 function addStageAfterCurrent(){
+  if(!requireAdmin()) return;
   addWeekAfter(currentStageIndex);
 }
 
 function copyCurrentStage(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const s = currentSurgery();
@@ -1883,6 +2114,7 @@ function copyCurrentStage(){
 }
 
 function deleteCurrentStage(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const s = currentSurgery();
@@ -1903,6 +2135,7 @@ function deleteCurrentStage(){
 }
 
 function moveStageUp(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s = currentSurgery();
   if(currentStageIndex <= 0)return;
@@ -1915,6 +2148,7 @@ function moveStageUp(){
 }
 
 function moveStageDown(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s = currentSurgery();
   if(currentStageIndex >= s.stages.length - 1)return;

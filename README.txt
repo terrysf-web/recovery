@@ -1,16 +1,20 @@
-Upload to GitHub:
-1. index_recovery_completed_final_v71.html -> index.html
-2. manifest_v71.json -> manifest.json
-3. sw_v71.js -> sw.js
 
-Open:
-https://terrysf-web.github.io/recovery/?v=71
+v76 - Chart # support
 
-This version replaces BOTH:
-- Recovery Access Expired
-- Recovery Complete
+Add a new field in Admin:
+Chart #
 
-with:
-- Recovery Guide Completed
+Store with generated codes:
+{
+  code,
+  surgeryType,
+  surgeryDate,
+  chartNumber,
+  status
+}
 
-It also clears localStorage/sessionStorage more strongly when Return to Login is clicked.
+Display Chart # column in Admin code list.
+
+Also update:
+manifest.json -> ?v=76
+sw.js cache -> recovery-v76

@@ -1,0 +1,1774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Recovery Guide Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#111827}
+.header{background:linear-gradient(135deg,#021b57,#0b2e8a);color:white;padding:20px;border-radius:0 0 28px 28px}
+.app{max-width:900px;margin:0 auto;padding:16px 14px 80px}
+.card{background:white;border-radius:24px;padding:16px;margin:14px 0;box-shadow:0 8px 24px rgba(15,23,42,.07);border:1px solid rgba(15,23,42,.05)}
+h1{margin:0 0 6px;font-size:26px}
+.sub{font-size:14px;opacity:.9;line-height:1.4}
+label{display:block;font-size:13px;font-weight:900;color:#334155;margin:12px 0 6px}
+input,select,textarea{width:100%;border:1px solid rgba(15,23,42,.14);border-radius:14px;padding:11px;font-size:14px;background:#f8fafc}
+textarea{min-height:78px;line-height:1.4}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{border:0;border-radius:16px;padding:12px 15px;font-weight:900;font-size:14px;cursor:pointer}
+.primary{background:#0b2e8a;color:white}
+.secondary{background:#f1f5f9;color:#334155}
+.danger{background:#fee2e2;color:#991b1b}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.status{margin-top:10px;font-size:14px;font-weight:800}
+.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}
+.tab{white-space:nowrap;border:0;border-radius:999px;padding:10px 14px;background:#e2e8f0;font-weight:900;color:#334155}
+.tab.active{background:#0b2e8a;color:white}
+.stageTitle{font-size:19px;font-weight:950;margin-bottom:4px}
+.small{font-size:12px;color:#64748b;line-height:1.4}
+.arrayBox{display:grid;gap:10px}
+.arrayRow{display:grid;grid-template-columns:1fr 118px;gap:8px;align-items:start}
+.arrayActions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.miniBtn{border:0;border-radius:12px;font-weight:950;font-size:16px;min-height:38px;cursor:pointer}
+.upBtn{background:#dbeafe;color:#1d4ed8}
+.downBtn{background:#dcfce7;color:#166534}
+.deleteBtn{background:#fee2e2;color:#991b1b}
+.preview{background:#f8fafc;border-radius:18px;padding:12px;margin-top:10px;white-space:pre-wrap;font-size:12px;color:#475569;max-height:220px;overflow:auto}.miniForm{display:grid;grid-template-columns:1fr 130px;gap:10px;margin-top:10px}.sectionTitle{font-size:18px;font-weight:950;margin:0 0 8px}.warningBox{background:#fff7ed;border:1px solid rgba(251,146,60,.35);color:#9a3412;border-radius:16px;padding:10px;font-size:13px;line-height:1.4;margin-top:10px}
+.hidden{display:none!important}
+.lockedNotice{background:#fff7ed;border:1px solid rgba(251,146,60,.35);color:#9a3412;border-radius:18px;padding:12px;margin-top:12px;font-size:14px;line-height:1.4}
+.fileInput{background:#fff}
+
+/* v35 merge: access codes + actual app live preview */
+body.adminActive .app{
+  max-width:960px !important;
+  width:960px !important;
+  display:grid !important;
+  grid-template-columns:430px 430px !important;
+  gap:44px !important;
+  align-items:start !important;
+  justify-content:center !important;
+  margin:0 auto !important;
+  padding:16px 14px 80px !important;
+}
+body.adminActive #editor{
+  grid-column:1 !important;
+  width:430px !important;
+  max-width:430px !important;
+}
+body.adminActive #editor .card{
+  width:430px !important;
+  max-width:430px !important;
+}
+#adminPreviewColumn{
+  display:none;
+}
+body.adminActive #adminPreviewColumn{
+  display:block !important;
+  grid-column:2 !important;
+  grid-row:1 !important;
+  width:430px !important;
+  max-width:430px !important;
+  position:sticky !important;
+  top:14px !important;
+}
+.previewHeaderRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+.previewInfo{
+  font-size:12px;
+  color:#64748b;
+  line-height:1.4;
+  margin-top:4px;
+}
+.phonePreviewShell{
+  background:#111827;
+  border-radius:42px;
+  padding:14px 10px;
+  box-shadow:0 25px 70px rgba(15,23,42,.35);
+  width:430px;
+  box-sizing:border-box;
+}
+.phonePreviewShell iframe{
+  width:410px;
+  height:760px;
+  border:0;
+  border-radius:32px;
+  background:#eef2f7;
+  display:block;
+}
+body.adminActive .actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
+}
+body.adminActive .actions .btn{
+  width:auto !important;
+  min-width:0 !important;
+  flex:1 1 calc(50% - 10px) !important;
+  white-space:normal !important;
+  line-height:1.2 !important;
+}
+@media(max-width:980px){
+  body.adminActive .app{
+    max-width:460px !important;
+    width:100% !important;
+    display:block !important;
+  }
+  body.adminActive #editor,
+  body.adminActive #editor .card,
+  body.adminActive #adminPreviewColumn{
+    width:430px !important;
+    max-width:430px !important;
+    margin:0 auto 16px auto !important;
+  }
+  body.adminActive #adminPreviewColumn{
+    position:relative !important;
+    top:0 !important;
+  }
+}
+@media(max-width:460px){
+  body.adminActive #editor,
+  body.adminActive #editor .card,
+  body.adminActive #adminPreviewColumn,
+  .phonePreviewShell{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .phonePreviewShell iframe{
+    width:100% !important;
+    height:680px !important;
+  }
+}
+
+
+.codeTableWrap{
+  overflow-x:auto;
+  margin-top:12px;
+  border:1px solid rgba(15,23,42,.08);
+  border-radius:18px;
+}
+
+.codeTable{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+  background:white;
+}
+
+.codeTable th{
+  background:#f8fafc;
+  padding:12px;
+  font-size:12px;
+  text-align:left;
+  border-bottom:1px solid rgba(15,23,42,.08);
+}
+
+.codeTable td{
+  padding:12px;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:13px;
+}
+
+.codeCell{
+  font-weight:900;
+  letter-spacing:.04em;
+}
+
+.statusBadge{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:12px;
+  font-weight:900;
+}
+
+.statusActive{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.statusUsed{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.statusDisabled{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.statusExpired{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.tableDisableBtn{
+  border:0;
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:900;
+  background:#fee2e2;
+  color:#991b1b;
+  cursor:pointer;
+}
+
+
+/* v45 Wide desktop admin dashboard */
+body.adminActive{
+  background:#eef2f7 !important;
+  overflow-x:auto !important;
+}
+
+body.adminActive .app{
+  max-width:1480px !important;
+  width:1480px !important;
+  margin:0 auto !important;
+  padding:14px 16px 60px !important;
+  display:grid !important;
+  grid-template-columns:920px 470px !important;
+  gap:22px !important;
+  align-items:start !important;
+}
+
+body.adminActive #editor{
+  grid-column:1 !important;
+  width:920px !important;
+  max-width:920px !important;
+}
+
+body.adminActive #editor .card{
+  max-width:920px !important;
+  width:100% !important;
+  border-radius:14px !important;
+  box-shadow:0 6px 20px rgba(15,23,42,.06) !important;
+}
+
+body.adminActive #adminPreviewColumn{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  width:470px !important;
+  max-width:470px !important;
+  position:sticky !important;
+  top:14px !important;
+  display:block !important;
+}
+
+#adminPreviewColumn{
+  display:none;
+}
+
+.dashboardHeader{
+  display:flex;
+  align-items:center;
+  gap:26px;
+  background:white;
+  border:1px solid rgba(15,23,42,.06);
+  border-radius:12px;
+  padding:16px 20px;
+  margin-bottom:14px;
+  box-shadow:0 4px 16px rgba(15,23,42,.05);
+}
+
+.dashboardLogo{
+  width:150px;
+  height:54px;
+  object-fit:contain;
+  border-right:1px solid rgba(15,23,42,.10);
+  padding-right:24px;
+}
+
+.dashboardTitle{
+  font-size:24px;
+  line-height:1.1;
+  font-weight:950;
+  color:#0f172a;
+}
+
+.dashboardSub{
+  margin-top:4px;
+  font-size:13px;
+  color:#64748b;
+}
+
+/* Top cards become cleaner dashboard blocks */
+body.adminActive .actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:12px !important;
+}
+
+body.adminActive .actions .btn{
+  width:auto !important;
+  min-width:160px !important;
+  flex:1 1 0 !important;
+  white-space:normal !important;
+  line-height:1.2 !important;
+}
+
+body.adminActive .row{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:16px !important;
+}
+
+/* Patient code table - full width desktop table */
+.codeTableWrap{
+  overflow-x:auto !important;
+  overflow-y:auto !important;
+  max-height:410px !important;
+  border:1px solid rgba(15,23,42,.08) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:12px !important;
+  scrollbar-gutter:stable both-edges !important;
+}
+
+.codeTableWrap::-webkit-scrollbar{height:12px;width:12px}
+.codeTableWrap::-webkit-scrollbar-thumb{background:#64748b;border-radius:999px;border:3px solid #f8fafc}
+.codeTableWrap::-webkit-scrollbar-track{background:#f1f5f9;border-radius:999px}
+
+.codeTable{
+  width:100% !important;
+  min-width:850px !important;
+  table-layout:auto !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+  font-size:13px !important;
+}
+
+.codeTable th{
+  position:sticky !important;
+  top:0 !important;
+  background:#f8fafc !important;
+  padding:11px 10px !important;
+  font-size:11px !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.08) !important;
+  z-index:2 !important;
+}
+
+.codeTable td{
+  padding:11px 10px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:12px !important;
+  color:#334155 !important;
+  vertical-align:middle !important;
+}
+
+.codeCell{
+  font-weight:950 !important;
+  color:#0f172a !important;
+  letter-spacing:.04em !important;
+  white-space:nowrap !important;
+}
+
+.statusBadge{
+  display:inline-flex !important;
+  align-items:center !important;
+  border-radius:999px !important;
+  padding:4px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+}
+
+.statusActive{background:#dcfce7 !important;color:#166534 !important}
+.statusUsed{background:#dbeafe !important;color:#1d4ed8 !important}
+.statusDisabled{background:#fee2e2 !important;color:#991b1b !important}
+.statusExpired{background:#fef3c7 !important;color:#92400e !important}
+
+.tableDisableBtn{
+  border:0 !important;
+  border-radius:9px !important;
+  padding:7px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#ef4444 !important;
+  color:white !important;
+  cursor:pointer !important;
+}
+
+.tableMuted{
+  color:#94a3b8 !important;
+}
+
+/* Actual phone preview */
+.previewHeaderRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.previewInfo{
+  font-size:12px;
+  color:#64748b;
+  line-height:1.4;
+  margin-top:4px;
+}
+
+.phonePreviewShell{
+  background:#111827;
+  border-radius:38px;
+  padding:10px;
+  box-shadow:0 25px 70px rgba(15,23,42,.35);
+  width:430px;
+  height:780px;
+  box-sizing:border-box;
+  margin:10px auto 0;
+}
+
+.phonePreviewShell iframe{
+  width:410px;
+  height:760px;
+  border:0;
+  border-radius:30px;
+  background:#eef2f7;
+  display:block;
+}
+
+@media(max-width:980px){
+  body.adminActive .app{
+    width:100% !important;
+    max-width:460px !important;
+    display:block !important;
+  }
+
+  body.adminActive #editor,
+  body.adminActive #editor .card,
+  body.adminActive #adminPreviewColumn{
+    width:430px !important;
+    max-width:430px !important;
+    margin:0 auto 16px !important;
+  }
+
+  body.adminActive #adminPreviewColumn{
+    position:relative !important;
+    top:0 !important;
+  }
+
+  .dashboardHeader{
+    display:none;
+  }
+}
+
+
+/* v46 wider table layout - no horizontal table scroll */
+body.adminActive .app{
+  max-width:1620px !important;
+  width:1620px !important;
+  display:grid !important;
+  grid-template-columns:1080px 470px !important;
+  gap:26px !important;
+  align-items:start !important;
+  justify-content:center !important;
+  margin:0 auto !important;
+  padding:14px 16px 60px !important;
+}
+
+body.adminActive #editor{
+  grid-column:1 !important;
+  width:1080px !important;
+  max-width:1080px !important;
+}
+
+body.adminActive #editor .card{
+  max-width:1080px !important;
+  width:100% !important;
+}
+
+body.adminActive #adminPreviewColumn{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  width:470px !important;
+  max-width:470px !important;
+  position:sticky !important;
+  top:14px !important;
+  display:block !important;
+}
+
+.codeTableWrap{
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  max-height:560px !important;
+  height:560px !important;
+  border:1px solid rgba(15,23,42,.08) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:12px !important;
+  scrollbar-gutter:stable !important;
+}
+
+.codeTableWrap::-webkit-scrollbar{
+  width:12px !important;
+  height:0 !important;
+}
+
+.codeTableWrap::-webkit-scrollbar-thumb{
+  background:#64748b !important;
+  border-radius:999px !important;
+  border:3px solid #f8fafc !important;
+}
+
+.codeTableWrap::-webkit-scrollbar-track{
+  background:#f1f5f9 !important;
+  border-radius:999px !important;
+}
+
+.codeTable{
+  width:100% !important;
+  min-width:0 !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+  font-size:13px !important;
+}
+
+.codeTable th{
+  position:sticky !important;
+  top:0 !important;
+  background:#f8fafc !important;
+  padding:11px 10px !important;
+  font-size:11px !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.08) !important;
+  z-index:2 !important;
+}
+
+.codeTable td{
+  padding:11px 10px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:12px !important;
+  color:#334155 !important;
+  vertical-align:middle !important;
+  word-break:normal !important;
+}
+
+.codeTable th:nth-child(1), .codeTable td:nth-child(1){width:13% !important}
+.codeTable th:nth-child(2), .codeTable td:nth-child(2){width:18% !important}
+.codeTable th:nth-child(3), .codeTable td:nth-child(3){width:13% !important}
+.codeTable th:nth-child(4), .codeTable td:nth-child(4){width:13% !important}
+.codeTable th:nth-child(5), .codeTable td:nth-child(5){width:12% !important}
+.codeTable th:nth-child(6), .codeTable td:nth-child(6){width:10% !important}
+.codeTable th:nth-child(7), .codeTable td:nth-child(7){width:13% !important}
+.codeTable th:nth-child(8), .codeTable td:nth-child(8){width:8% !important}
+
+.codeCell{
+  font-weight:950 !important;
+  color:#0f172a !important;
+  letter-spacing:.04em !important;
+  white-space:nowrap !important;
+}
+
+.statusBadge{
+  display:inline-flex !important;
+  align-items:center !important;
+  border-radius:999px !important;
+  padding:4px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+}
+
+.tableDisableBtn{
+  border:0 !important;
+  border-radius:9px !important;
+  padding:7px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#ef4444 !important;
+  color:white !important;
+  cursor:pointer !important;
+}
+
+@media(max-width:980px){
+  body.adminActive .app{
+    max-width:460px !important;
+    width:100% !important;
+    display:block !important;
+  }
+
+  body.adminActive #editor,
+  body.adminActive #editor .card,
+  body.adminActive #adminPreviewColumn{
+    width:430px !important;
+    max-width:430px !important;
+    margin:0 auto 16px !important;
+  }
+
+  .codeTableWrap{
+    overflow-x:auto !important;
+    height:420px !important;
+    max-height:420px !important;
+  }
+
+  .codeTable{
+    min-width:760px !important;
+  }
+}
+
+
+/* v48 preview toggle + mobile hide */
+.previewToggleBtn{
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:900;
+  background:#e2e8f0;
+  color:#334155;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+body.previewHidden #adminPreviewColumn{
+  display:none !important;
+}
+
+body.previewHidden.adminActive .app{
+  grid-template-columns:1080px !important;
+  width:1120px !important;
+  max-width:1120px !important;
+}
+
+@media(max-width:980px){
+  body.adminActive #adminPreviewColumn{
+    display:none !important;
+  }
+
+  body.adminActive .app{
+    max-width:460px !important;
+    width:100% !important;
+    display:block !important;
+  }
+
+  .mobilePreviewNotice{
+    display:block !important;
+  }
+}
+
+.mobilePreviewNotice{
+  display:none;
+  font-size:12px;
+  color:#64748b;
+  margin-top:6px;
+  line-height:1.4;
+}
+
+
+/* v50 single-scroll admin layout */
+body.adminActive{
+  overflow-y:auto !important;
+  overflow-x:auto !important;
+}
+
+body.adminActive .app{
+  max-width:1620px !important;
+  width:1620px !important;
+  display:grid !important;
+  grid-template-columns:1080px 470px !important;
+  gap:26px !important;
+  align-items:start !important;
+  justify-content:center !important;
+  margin:0 auto !important;
+  padding:14px 16px 80px !important;
+}
+
+body.adminActive #editor{
+  grid-column:1 !important;
+  width:1080px !important;
+  max-width:1080px !important;
+}
+
+body.adminActive #editor .card{
+  max-width:1080px !important;
+  width:100% !important;
+}
+
+body.adminActive #adminPreviewColumn{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  width:470px !important;
+  max-width:470px !important;
+  position:sticky !important;
+  top:14px !important;
+  display:block !important;
+}
+
+/* remove nested scroll inside code table */
+.codeTableWrap{
+  overflow:visible !important;
+  max-height:none !important;
+  height:auto !important;
+  border:1px solid rgba(15,23,42,.08) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:12px !important;
+}
+
+.codeTableWrap::-webkit-scrollbar{
+  display:none !important;
+}
+
+.codeTable{
+  width:100% !important;
+  min-width:0 !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+}
+
+.codeTable th{
+  position:static !important;
+  background:#f8fafc !important;
+  padding:11px 10px !important;
+  font-size:11px !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.08) !important;
+}
+
+.codeTable td{
+  padding:11px 10px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:12px !important;
+  color:#334155 !important;
+  vertical-align:middle !important;
+}
+
+.codeTable th:nth-child(1), .codeTable td:nth-child(1){width:13% !important}
+.codeTable th:nth-child(2), .codeTable td:nth-child(2){width:18% !important}
+.codeTable th:nth-child(3), .codeTable td:nth-child(3){width:13% !important}
+.codeTable th:nth-child(4), .codeTable td:nth-child(4){width:13% !important}
+.codeTable th:nth-child(5), .codeTable td:nth-child(5){width:12% !important}
+.codeTable th:nth-child(6), .codeTable td:nth-child(6){width:10% !important}
+.codeTable th:nth-child(7), .codeTable td:nth-child(7){width:13% !important}
+.codeTable th:nth-child(8), .codeTable td:nth-child(8){width:8% !important}
+
+.codeCell{
+  font-weight:950 !important;
+  color:#0f172a !important;
+  letter-spacing:.04em !important;
+  white-space:nowrap !important;
+}
+
+.statusBadge{
+  display:inline-flex !important;
+  align-items:center !important;
+  border-radius:999px !important;
+  padding:4px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  white-space:nowrap !important;
+}
+
+.statusActive{background:#dcfce7 !important;color:#166534 !important}
+.statusUsed{background:#dbeafe !important;color:#1d4ed8 !important}
+.statusDisabled{background:#fee2e2 !important;color:#991b1b !important}
+.statusExpired{background:#fef3c7 !important;color:#92400e !important}
+
+.tableDisableBtn{
+  border:0 !important;
+  border-radius:9px !important;
+  padding:7px 10px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#ef4444 !important;
+  color:white !important;
+  cursor:pointer !important;
+}
+
+@media(max-width:980px){
+  body.adminActive .app{
+    max-width:460px !important;
+    width:100% !important;
+    display:block !important;
+  }
+
+  body.adminActive #editor,
+  body.adminActive #editor .card{
+    width:430px !important;
+    max-width:430px !important;
+    margin:0 auto 16px !important;
+  }
+
+  body.adminActive #adminPreviewColumn{
+    display:none !important;
+  }
+
+  .codeTableWrap{
+    overflow-x:auto !important;
+  }
+
+  .codeTable{
+    min-width:760px !important;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Recovery Guide Admin</h1>
+  <div class="sub">Doctor-friendly editor for post-op recovery instructions.</div>
+</div>
+
+<div class="app">
+  <div class="card" id="loginCard">
+    <label>Admin Password</label>
+    <input id="password" type="password" placeholder="Enter admin password">
+    <div class="actions">
+      <button class="btn primary" onclick="loginAndLoad()">Login & Load Current Protocol</button>
+      <button class="btn secondary" onclick="loginAndLoadDefault()">Login with Default Protocol</button>
+    </div>
+    <div class="lockedNotice">
+      Editing, deleting, uploading, and saving are locked until the admin password is entered.
+    </div>
+    
+    <button class="btn secondary" style="margin-top:10px" onclick="toggleForgotPassword()">Forgot password?</button>
+    <div class="lockedNotice hidden" id="forgotPasswordBox">
+      <b>Password recovery:</b><br>
+      If the admin password is forgotten, open Cloudflare Worker settings and update the Secret named <b>ADMIN_PASSWORD</b>.
+      That secret is the master recovery password. After using it to login, you can set a new admin password from this page.
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  
+  <div class="card hidden" id="passwordCard">
+    <h2 style="margin:0 0 8px;font-size:20px">Change Admin Password</h2>
+    <div class="small">Use the current admin password or the Cloudflare master recovery password to change it.</div>
+
+    <label>Current Password</label>
+    <input id="currentPassword" type="password" placeholder="Current password">
+
+    <label>New Password</label>
+    <input id="newPassword" type="password" placeholder="New password">
+
+    <label>Confirm New Password</label>
+    <input id="confirmPassword" type="password" placeholder="Confirm new password">
+
+    <div class="actions">
+      <button class="btn primary" onclick="changePassword()">Change Password</button>
+      <button class="btn secondary" onclick="clearPasswordFields()">Clear</button><button class="btn secondary" onclick="passwordCard.classList.add(\'hidden\')">Hide Password Panel</button>
+    </div>
+
+    <div class="lockedNotice">
+      If the password is forgotten, reset the Cloudflare Worker Secret named <b>ADMIN_PASSWORD</b>. That secret works as the master recovery password.
+    </div>
+
+    <div class="status" id="passwordStatus"></div>
+  </div>
+
+
+  
+  <div id="adminPreviewColumn">
+    <div class="card">
+      <div class="previewHeaderRow">
+        <div>
+          <div class="sectionTitle">Actual App Live Preview</div>
+          <div class="previewInfo">Real patient app at phone width. Save changes, then reload preview.</div>
+        </div>
+        <button class="btn secondary" onclick="reloadPatientPreview()">Reload</button><button class="previewToggleBtn" onclick="togglePreview()">Hide Preview</button>
+      </div>
+      <div class="phonePreviewShell">
+        <iframe id="patientAppPreview" src="https://terrysf-web.github.io/recovery/?adminPreview=1"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="editor" class="hidden">
+
+    <div class="card mobilePreviewNotice">
+      Mobile view: Live preview is hidden so the admin page is easier to use. Use desktop for side-by-side preview.
+    </div>
+
+
+    <div class="card">
+      <div class="sectionTitle">Admin Session</div>
+      <div class="small">You are logged in. Use logout when finished editing.</div>
+      <div class="actions">
+        <button class="btn secondary" onclick="logoutAdmin()">Logout</button>
+        <button class="btn secondary" onclick="togglePasswordCard()">Change Password</button>
+      </div>
+    </div>
+
+
+    
+    <div class="card" id="adminAccountCard">
+      <div class="sectionTitle">Admin Account</div>
+      <div class="small">Change password only when needed. If forgotten, use the Cloudflare ADMIN_PASSWORD Secret as the master recovery password.</div>
+      <div class="actions">
+        <button class="btn secondary" onclick="togglePasswordCard()">Change Password</button>
+      </div>
+    </div>
+
+<div class="card">
+      <div class="sectionTitle">Patient Access Codes</div><div class="small">Times are shown in Pacific Time.</div>
+      <div class="small">Generate one-time random recovery codes for patients. The random code opens the app without a login, locks to the first device that uses it, and expires after recovery is complete.</div>
+
+      <label>Code Surgery Type</label>
+      <select id="codeSurgery"></select>
+
+      <label>Surgery Date</label>
+      <input id="codeSurgeryDate" type="date">
+
+      <label>Chart # (Optional)</label>
+      <input id="chartNumberInput" type="text" placeholder="Example: 24851">
+
+
+      <div class="actions">
+        <button class="btn primary" onclick="generatePatientCode()">Generate Patient Code</button>
+        <button class="btn secondary" onclick="loadPatientCodes()">Refresh Code List</button>
+      </div>
+
+      <div class="status" id="codeStatus"></div>
+      <div class="preview" id="generatedCodeBox"></div>
+      <div class="preview" id="patientCodeList"></div>
+    </div>
+
+    <div class="card">
+      <div class="actions">
+        <button class="btn secondary" onclick="loadProtocol()">Reload Current Protocol</button>
+        <button class="btn secondary" onclick="loadDefault()">Load Default Protocol</button>
+        <button class="btn secondary" onclick="downloadJson()">Download Backup JSON</button>
+      </div>
+
+      <label>Upload Backup JSON</label>
+      <input class="fileInput" id="jsonUpload" type="file" accept=".json,application/json" onchange="uploadJsonFile(event)">
+      <div class="small">Upload a previously downloaded backup JSON, review it, then click Save to Cloudflare.</div>
+    </div>
+
+    
+    <div class="card">
+      <div class="sectionTitle">Surgery Type Management</div>
+      <div class="small">Add a new surgery protocol, copy the current one, or delete an unused surgery type.</div>
+
+      <label>New Surgery Type Name</label>
+      <input id="newSurgeryName" placeholder="Example: Bone Graft">
+
+      <label>New Surgery Key</label>
+      <input id="newSurgeryKey" placeholder="Example: bone_graft">
+
+      <div class="actions">
+        <button class="btn primary" onclick="addSurgeryType(false)">Add Blank Surgery Type</button>
+        <button class="btn secondary" onclick="addSurgeryType(true)">Copy Current Surgery Type</button>
+        <button class="btn danger" onclick="deleteSurgeryType()">Delete Current Surgery Type</button>
+      </div>
+
+      <div class="warningBox">
+        Use a simple key with lowercase letters, numbers, or underscore only, like <b>bone_graft</b>. After adding or deleting, click <b>Save to Cloudflare</b>.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle">Week / Stage Management</div>
+      <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
+
+      <div class="actions">
+        <button class="btn primary" onclick="addStageAfterCurrent()">Add Week After Current</button>
+        <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Stage</button>
+        <button class="btn secondary" onclick="moveStageUp()">Move Stage Up</button>
+        <button class="btn secondary" onclick="moveStageDown()">Move Stage Down</button>
+        <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Stage</button>
+      </div>
+
+      <div class="warningBox">
+        Make sure Start Day and End Day do not overlap incorrectly. Example: Week 2 = Day 8 to Day 14.
+      </div>
+    </div>
+
+<div class="card">
+      <label>Surgery Type</label>
+      <select id="surgerySelect" onchange="currentStageIndex=0;renderStages()"></select>
+
+      <label>Surgery Name</label>
+      <input id="surgeryName" oninput="saveSurgeryMeta()">
+
+      <label>Total Days</label>
+      <input id="totalDays" type="number" oninput="saveSurgeryMeta()">
+    </div>
+
+    <div class="tabs" id="stageTabs"></div>
+    <div id="stageEditor"></div>
+
+    <div class="card">
+      <div class="actions">
+        <button class="btn primary" onclick="saveProtocol()">Save to Cloudflare</button>
+        <button class="btn secondary" onclick="downloadJson()">Download Backup JSON</button>
+      </div>
+      <div class="status" id="saveStatus"></div>
+      <div class="preview" id="jsonPreview"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const WORKER_URL = "https://shrill-union-34e3.terryjseo.workers.dev";
+const DEFAULT_PROTOCOL = {"periodontal": {"name": "Periodontal Surgery", "totalDays": 56, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, Overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more regularly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "More normal diet, but still avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Still avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Normal diet", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing", "Normal flossing", "Use etb/waterpik on low setting"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "You may resume etb/waterpik normally if it is not tender."], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}]}, "implant": {"name": "Implant", "totalDays": 56, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, Overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more regularly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "More normal diet, but still avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Still avoid crunchy, sharp and hard foods"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Normal diet", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing", "Normal flossing", "Use etb/waterpik on low setting"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "You may resume etb/waterpik normally if it is not tender."], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}]}, "graft": {"name": "Gum Grafting", "totalDays": 63, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Wear as much as possible, only remove to clean or eat", "Keep wearing it without interruption. Just make sure the retainer does not press against your gums at the surgery site", "Use the Stella Life Kit as directed on the box and video"]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine"], "warnings": ["Wear as much as possible, only remove to clean or eat", "Keep wearing it without interruption. Just make sure the retainer does not press against your gums at the surgery site", "Use the Stella Life Kit as directed on the box and video"]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Cottage cheese, Porridge, hummus"], "avoid": ["Avoid spicy foods, hot temperature, seeds, carbonated beverages"], "warnings": ["Most patients stop wearing the stent after one week. If you still have pain or bleeding and find it helpful, keep wearing it.", "Keep wearing it without interruption. Just make sure the retainer does not press against your gums at the surgery site", "Use the Stella Life Kit as directed on the box and video", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, Soft bread, overcooked vegetables, steamed rice, scrambled eggs, pastas"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Please save the stent for next surgery", "Keep wearing it without interruption.", "Use the Stella Life Kit as directed on the box and video", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently", "You may continue flossing lightly.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, Soft bread, overcooked vegetables, steamed rice, scrambled eggs, pastas"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "Use the Stella Life Kit as directed on the box and video", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently, but more thoroughly", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft manual tooth brush to brush teeth and gums gently, but more thoroughly", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Soft diet. Avoid: Crunchy and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums very thoroughly like normal brushing.", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy and hard foods and seeds"], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}, {"id": "week9", "label": "Week 9", "startDay": 57, "endDay": 63, "phase": "Week 9", "reminder": "Go back to normal routine", "normal": ["Go back to normal routine", "Go back to normal routine", "Go back to normal routine"], "foods": ["Go back to normal routine"], "avoid": [], "warnings": ["Keep wearing it without interruption.", "No restrictions"]}]}, "extraction": {"name": "Extraction", "totalDays": 63, "stages": [{"id": "first24", "label": "First 24 Hours", "startDay": 1, "endDay": 1, "phase": "First 24 Hours", "reminder": "Liquid diet with cold to room temperature food items", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Ensure, Smoothie, Shake, Jello, Ice cream, yogurt, broths"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine", "No straws", "No sucking on the socket", "No forceful spitting", "No vigorous rinsing"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week1", "label": "Week 1", "startDay": 2, "endDay": 7, "phase": "Week 1", "reminder": "Baby foods. Blend everything. Avoid: spicy foods and hot temperature, seeds, carbonated beverages.", "normal": ["Do not brush teeth at surgical site", "Do not floss at the surgical site", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Mashed potatoes/bananas/avocados, Tofu, Cottage cheese, Porridge, hummus"], "avoid": ["No strenuous activities, bending over, or heavy lifting. Light walking is fine", "No straws", "No sucking on the socket", "No forceful spitting", "No vigorous rinsing"], "warnings": ["Continue to wear. Do not stop wearing them."]}, {"id": "week2", "label": "Week 2", "startDay": 8, "endDay": 14, "phase": "Week 2", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth but not gums", "You may start flossing if you can control the force not to go under the gums. If it is difficult, do not floss yet.", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, Overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds", "No straws", "No sucking on the socket", "No forceful spitting", "No vigorous rinsing"], "warnings": ["Continue to wear. Do not stop wearing them.", "Light activity is permitted if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week3", "label": "Week 3", "startDay": 15, "endDay": 21, "phase": "Week 3", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods and seeds", "normal": ["Use a soft tooth brush to brush teeth and gums gently", "Gentle flossing under the gums", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Soft cooked fish, overcooked vegetables, overcooked pasta, steamed rice, scrambled eggs"], "avoid": ["Avoid crunchy, sharp and hard foods and seeds"], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week4", "label": "Week 4", "startDay": 22, "endDay": 28, "phase": "Week 4", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more regularly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods", "Week 4-5: Socket may have been closed by now. If socket is completely closed, you may go back to normal routine for home care and diet."], "warnings": ["Continue to wear. Do not stop wearing them.", "Normal activity if you have no symptoms (bleeding, throbbing, etc.)"]}, {"id": "week5", "label": "Week 5", "startDay": 29, "endDay": 35, "phase": "Week 5", "reminder": "Soft diet. Avoid: Crunchy, sharp and hard foods", "normal": ["Use a soft tooth brush to brush teeth and gums more thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["Fish, Pasta, Steamed vegetables, Eggs"], "avoid": ["Avoid crunchy, sharp and hard foods", "Week 4-5: Socket may have been closed by now. If socket is completely closed, you may go back to normal routine for home care and diet."], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week6", "label": "Week 6", "startDay": 36, "endDay": 42, "phase": "Week 6", "reminder": "More normal diet, but still avoid: Crunchy, sharp and hard foods on the extraction site", "normal": ["Use a soft tooth brush to brush teeth and gums thoroughly", "More normal flossing", "Do not use electric toothbrush or waterpik at surgical site"], "foods": ["More solid foods"], "avoid": ["Still avoid crunchy, sharp and hard foods on the extraction site"], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week7", "label": "Week 7", "startDay": 43, "endDay": 49, "phase": "Week 7", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "Use etb/waterpik on low setting"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week8", "label": "Week 8", "startDay": 50, "endDay": 56, "phase": "Week 8", "reminder": "Normal diet", "normal": ["Normal brushing", "Normal flossing", "Normal use of etb/waterpik"], "foods": ["Crunchy foods are okay"], "avoid": [], "warnings": ["Continue to wear. Do not stop wearing them.", "No restrictions"]}, {"id": "week9", "label": "Week 9", "startDay": 57, "endDay": 63, "phase": "Week 9", "reminder": "Go back to normal routine", "normal": ["Go back to normal routine", "Go back to normal routine", "Go back to normal routine"], "foods": ["Go back to normal routine"], "avoid": [], "warnings": []}]}};
+let protocol = JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
+let currentStageIndex = 0;
+let isLoggedIn = false;
+
+function esc(v){
+  return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+}
+
+function setStatus(msg,good=true){
+  status.textContent=msg;
+  status.style.color=good?'#15803d':'#b91c1c';
+}
+
+function setSaveStatus(msg,good=true){
+  saveStatus.textContent=msg;
+  saveStatus.style.color=good?'#15803d':'#b91c1c';
+}
+
+function getPass(){
+  return password.value.trim();
+}
+
+function requireLogin(){
+  if(!isLoggedIn || !getPass()){
+    setStatus('Please enter admin password and login first.', false);
+    return false;
+  }
+  return true;
+}
+
+async function loginAndLoad(){
+  if(!getPass()){setStatus('Enter admin password first.',false);return;}
+  isLoggedIn=true;
+  await loadProtocol();
+}
+
+function loginAndLoadDefault(){
+  if(!getPass()){setStatus('Enter admin password first.',false);return;}
+  isLoggedIn=true;
+  loadDefault();
+}
+
+async function loadProtocol(){
+  if(!requireLogin())return;
+  try{
+    setStatus('Loading...');
+    const res=await fetch(WORKER_URL+'/protocol?t='+Date.now(),{cache:'no-store'});
+    const data=await res.json();
+    protocol=data&&data.periodontal?data:JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
+    initEditor();
+    setStatus('Loaded current protocol.');
+    syncCodeSurgeryOptions();
+    loadPatientCodes();
+    if(document.getElementById('chartNumberInput')) chartNumberInput.value='';
+  }catch(e){
+    protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
+    initEditor();
+    setStatus('Could not load remote protocol. Loaded default.',false);
+  }
+}
+
+function loadDefault(){
+  if(!requireLogin())return;
+  protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
+  initEditor();
+  setStatus('Loaded default protocol.');
+  syncCodeSurgeryOptions();
+}
+
+function initEditor(){
+  editor.classList.remove('hidden');
+  const loginCardEl=document.getElementById('loginCard'); if(loginCardEl) loginCardEl.classList.add('hidden');
+  document.body.classList.add('adminActive');
+  document.getElementById('loginCard')?.classList.add('hidden');
+  document.body.classList.add('adminActive');
+  const ap=document.getElementById('adminPreviewColumn'); if(ap) ap.style.display='block';
+  /* passwordCard remains hidden until Change Password is clicked */
+  surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
+  currentStageIndex=0;
+  renderStages();
+  syncCodeSurgeryOptions();
+  if(document.getElementById('codeSurgeryDate')&&!codeSurgeryDate.value) codeSurgeryDate.value=todayYMD();
+}
+
+function currentSurgeryKey(){
+  return surgerySelect.value;
+}
+
+function currentSurgery(){
+  return protocol[currentSurgeryKey()];
+}
+
+function saveSurgeryMeta(){
+  if(!requireLogin())return;
+  const s=currentSurgery();
+  s.name=surgeryName.value;
+  s.totalDays=Number(totalDays.value||0);
+  renderPreview();
+}
+
+function renderStages(){
+  const s=currentSurgery();
+  surgeryName.value=s.name;
+  totalDays.value=s.totalDays;
+  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new week at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
+  renderStageEditor();
+  renderPreview();
+}
+
+function renderStageEditor(){
+  const st=currentSurgery().stages[currentStageIndex];
+  stageEditor.innerHTML=`<div class="card">
+    <div class="stageTitle">${st.label}</div>
+    <div class="small">Use ↑ / ↓ to change card order. Delete and add are locked behind admin login.</div>
+
+    <div class="row">
+      <div><label>Label</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
+      <div><label>Phase</label><input value="${esc(st.phase)}" oninput="updateStage('phase',this.value)"></div>
+    </div>
+
+    <div class="row">
+      <div><label>Start Day</label><input type="number" value="${st.startDay}" oninput="updateStage('startDay',Number(this.value))"></div>
+      <div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div>
+    </div>
+
+    <label>Reminder / Diet Instruction</label>
+    <textarea oninput="updateStage('reminder',this.value)">${esc(st.reminder)}</textarea>
+
+    ${arrayEditor('normal','Home Care / Instructions')}
+    ${arrayEditor('foods','Food Examples')}
+    ${arrayEditor('avoid','Avoid / Restrictions')}
+    ${arrayEditor('warnings','Additional Notes / Warnings')}
+  </div>`;
+}
+
+function arrayEditor(key,title){
+  const arr=currentSurgery().stages[currentStageIndex][key]||[];
+  return `<label>${title}</label>
+  <div class="arrayBox">
+    ${arr.map((v,i)=>`<div class="arrayRow">
+      <textarea oninput="updateArray('${key}',${i},this.value)">${esc(v)}</textarea>
+      <div class="arrayActions">
+        <button class="miniBtn upBtn" title="Move up" onclick="moveUp('${key}',${i})">↑</button>
+        <button class="miniBtn downBtn" title="Move down" onclick="moveDown('${key}',${i})">↓</button>
+        <button class="miniBtn deleteBtn" title="Delete" onclick="removeArray('${key}',${i})">×</button>
+      </div>
+    </div>`).join('')}
+  </div>
+  <button class="btn secondary" onclick="addArray('${key}')">+ Add ${title}</button>`;
+}
+
+function updateStage(k,v){
+  if(!requireLogin())return;
+  currentSurgery().stages[currentStageIndex][k]=v;
+  renderPreview();
+}
+
+function updateArray(k,i,v){
+  if(!requireLogin())return;
+  currentSurgery().stages[currentStageIndex][k][i]=v;
+  renderPreview();
+}
+
+function addArray(k){
+  if(!requireLogin())return;
+  currentSurgery().stages[currentStageIndex][k].push('');
+  renderStageEditor();
+  renderPreview();
+}
+
+function removeArray(k,i){
+  if(!requireLogin())return;
+  if(!confirm('Delete this instruction card?'))return;
+  currentSurgery().stages[currentStageIndex][k].splice(i,1);
+  renderStageEditor();
+  renderPreview();
+}
+
+function moveUp(k,i){
+  if(!requireLogin())return;
+  if(i<=0)return;
+  const arr=currentSurgery().stages[currentStageIndex][k];
+  [arr[i-1],arr[i]]=[arr[i],arr[i-1]];
+  renderStageEditor();
+  renderPreview();
+}
+
+function moveDown(k,i){
+  if(!requireLogin())return;
+  const arr=currentSurgery().stages[currentStageIndex][k];
+  if(i>=arr.length-1)return;
+  [arr[i+1],arr[i]]=[arr[i],arr[i+1]];
+  renderStageEditor();
+  renderPreview();
+}
+
+async function saveProtocol(){
+  if(!requireLogin())return;
+  try{
+    setSaveStatus('Saving...');
+    const res=await fetch(WORKER_URL+'/protocol',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
+      body:JSON.stringify(protocol)
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Save failed');
+    setSaveStatus('Saved successfully.');
+    reloadPatientPreview();
+    reloadPatientPreview();
+  }catch(e){
+    setSaveStatus('Save failed: '+e.message,false);
+  }
+}
+
+function downloadJson(){
+  if(!requireLogin())return;
+  const blob=new Blob([JSON.stringify(protocol,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='recovery-protocol-backup.json';
+  a.click();
+}
+
+function uploadJsonFile(event){
+  if(!requireLogin()){
+    event.target.value='';
+    return;
+  }
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(){
+    try{
+      const data=JSON.parse(reader.result);
+      if(!data.periodontal || !data.graft || !data.extraction){
+        throw new Error('Invalid protocol JSON format.');
+      }
+      protocol=data;
+      initEditor();
+      setStatus('Backup JSON loaded. Review it, then click Save to Cloudflare.');
+    }catch(e){
+      setStatus('Upload failed: '+e.message,false);
+    }
+  };
+  reader.readAsText(file);
+}
+
+
+
+function toggleForgotPassword(){
+  const box = document.getElementById('forgotPasswordBox');
+  if(box) box.classList.toggle('hidden');
+}
+
+
+function logoutAdmin(){
+  isLoggedIn=false;
+  const editorEl=document.getElementById('editor');
+  const loginEl=document.getElementById('loginCard');
+  const previewEl=document.getElementById('adminPreviewColumn');
+  if(editorEl) editorEl.classList.add('hidden');
+  if(loginEl) loginEl.classList.remove('hidden');
+  if(previewEl) previewEl.style.display='none';
+  document.body.classList.remove('adminActive');
+  password.value='';
+  setStatus('Logged out.');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function togglePasswordCard(){
+  if(!requireLogin())return;
+  passwordCard.classList.toggle('hidden');
+}
+
+async function changePassword(){
+  if(!requireLogin())return;
+
+  const current = currentPassword.value.trim();
+  const next = newPassword.value.trim();
+  const confirm = confirmPassword.value.trim();
+
+  if(!current || !next || !confirm){
+    passwordStatus.textContent='Please complete all password fields.';
+    passwordStatus.style.color='#b91c1c';
+    return;
+  }
+
+  if(next.length < 8){
+    passwordStatus.textContent='New password should be at least 8 characters.';
+    passwordStatus.style.color='#b91c1c';
+    return;
+  }
+
+  if(next !== confirm){
+    passwordStatus.textContent='New passwords do not match.';
+    passwordStatus.style.color='#b91c1c';
+    return;
+  }
+
+  try{
+    passwordStatus.textContent='Changing password...';
+    passwordStatus.style.color='#334155';
+
+    const res = await fetch(WORKER_URL + '/change-password', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        currentPassword: current,
+        newPassword: next
+      })
+    });
+
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'Password change failed');
+
+    password.value = next;
+    clearPasswordFields();
+    passwordStatus.textContent='Password changed successfully.';
+    passwordStatus.style.color='#15803d';
+  }catch(e){
+    passwordStatus.textContent='Password change failed: ' + e.message;
+    passwordStatus.style.color='#b91c1c';
+  }
+}
+
+function clearPasswordFields(){
+  currentPassword.value='';
+  newPassword.value='';
+  confirmPassword.value='';
+}
+
+
+function sanitizeKey(raw){
+  return String(raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g,'_')
+    .replace(/^_+|_+$/g,'');
+}
+
+function addSurgeryType(copyCurrent){
+  if(!requireLogin())return;
+
+  const name = newSurgeryName.value.trim();
+  let key = sanitizeKey(newSurgeryKey.value || name);
+
+  if(!name){
+    setStatus('Enter a surgery type name first.', false);
+    return;
+  }
+
+  if(!key){
+    setStatus('Enter a valid surgery key.', false);
+    return;
+  }
+
+  if(protocol[key]){
+    setStatus('That surgery key already exists. Choose another key.', false);
+    return;
+  }
+
+  if(copyCurrent && currentSurgery()){
+    protocol[key] = JSON.parse(JSON.stringify(currentSurgery()));
+    protocol[key].name = name;
+  }else{
+    protocol[key] = {
+      name: name,
+      totalDays: 56,
+      stages: [
+        {
+          id: 'first24',
+          label: 'First 24 Hours',
+          startDay: 1,
+          endDay: 1,
+          phase: 'First 24 Hours',
+          reminder: '',
+          normal: [''],
+          foods: [''],
+          avoid: [''],
+          warnings: ['']
+        },
+        {
+          id: 'week1',
+          label: 'Week 1',
+          startDay: 2,
+          endDay: 7,
+          phase: 'Week 1',
+          reminder: '',
+          normal: [''],
+          foods: [''],
+          avoid: [''],
+          warnings: ['']
+        }
+      ]
+    };
+  }
+
+  newSurgeryName.value = '';
+  newSurgeryKey.value = '';
+
+  initEditor();
+  surgerySelect.value = key;
+  currentStageIndex = 0;
+  renderStages();
+  setStatus('New surgery type added. Click Save to Cloudflare when ready.');
+}
+
+function deleteSurgeryType(){
+  if(!requireLogin())return;
+
+  const keys = Object.keys(protocol);
+  if(keys.length <= 1){
+    setStatus('At least one surgery type is required.', false);
+    return;
+  }
+
+  const key = currentSurgeryKey();
+  const name = currentSurgery().name;
+
+  if(!confirm('Delete surgery type: ' + name + '?')){
+    return;
+  }
+
+  delete protocol[key];
+
+  const nextKey = Object.keys(protocol)[0];
+  initEditor();
+  surgerySelect.value = nextKey;
+  currentStageIndex = 0;
+  renderStages();
+  setStatus('Surgery type deleted. Click Save to Cloudflare when ready.');
+}
+
+
+function parseWeekNumber(label){
+  const m = String(label || '').match(/week\s*(\d+)/i);
+  return m ? Number(m[1]) : null;
+}
+
+function renumberWeeks(){
+  const s = currentSurgery();
+  let weekCounter = 1;
+
+  s.stages.forEach((st,index)=>{
+    if(index===0 && /first 24/i.test(st.label)){
+      st.label='First 24 Hours';
+      st.phase='First 24 Hours';
+      st.startDay=1;
+      st.endDay=1;
+      return;
+    }
+
+    st.label='Week ' + weekCounter;
+    st.phase='Week ' + weekCounter;
+
+    if(index===1){
+      st.startDay=2;
+      st.endDay=7;
+    }else{
+      const prev=s.stages[index-1];
+      st.startDay=Number(prev.endDay)+1;
+      st.endDay=st.startDay+6;
+    }
+
+    weekCounter++;
+  });
+}
+
+function blankStage(){
+  return {
+    id:'stage_'+Date.now(),
+    label:'Week',
+    phase:'Week',
+    startDay:1,
+    endDay:7,
+    reminder:'',
+    normal:[''],
+    foods:[''],
+    avoid:[''],
+    warnings:['']
+  };
+}
+
+function addWeekAfter(index){
+  if(!requireLogin())return;
+
+  const s=currentSurgery();
+  const stage=blankStage();
+
+  s.stages.splice(index+1,0,stage);
+
+  renumberWeeks();
+
+  currentStageIndex=index+1;
+  renderStages();
+
+  setStatus('New week added after current stage. Auto-numbering updated.');
+}
+
+function addStageAfterCurrent(){
+  addWeekAfter(currentStageIndex);
+}
+
+function copyCurrentStage(){
+  if(!requireLogin())return;
+
+  const s = currentSurgery();
+  const copy = JSON.parse(JSON.stringify(s.stages[currentStageIndex]));
+  copy.id = 'stage_' + Date.now();
+  copy.label = copy.label + ' Copy';
+  s.stages.splice(currentStageIndex + 1, 0, copy);
+  currentStageIndex = currentStageIndex + 1;
+  renderStages();
+  setStatus('Stage copied. Edit label/day range, then Save.');
+}
+
+function deleteCurrentStage(){
+  if(!requireLogin())return;
+
+  const s = currentSurgery();
+  if(s.stages.length <= 1){
+    setStatus('At least one stage is required.', false);
+    return;
+  }
+
+  const st = s.stages[currentStageIndex];
+  if(!confirm('Delete stage: ' + st.label + '?')){
+    return;
+  }
+
+  s.stages.splice(currentStageIndex, 1);
+  currentStageIndex = Math.max(0, currentStageIndex - 1);
+  renderStages();
+  setStatus('Stage deleted. Click Save to Cloudflare when ready.');
+}
+
+function moveStageUp(){
+  if(!requireLogin())return;
+  const s = currentSurgery();
+  if(currentStageIndex <= 0)return;
+
+  [s.stages[currentStageIndex - 1], s.stages[currentStageIndex]] =
+    [s.stages[currentStageIndex], s.stages[currentStageIndex - 1]];
+
+  currentStageIndex--;
+  renderStages();
+}
+
+function moveStageDown(){
+  if(!requireLogin())return;
+  const s = currentSurgery();
+  if(currentStageIndex >= s.stages.length - 1)return;
+
+  [s.stages[currentStageIndex + 1], s.stages[currentStageIndex]] =
+    [s.stages[currentStageIndex], s.stages[currentStageIndex + 1]];
+
+  currentStageIndex++;
+  renderStages();
+}
+
+
+
+function syncCodeSurgeryOptions(){
+  const sel=document.getElementById('codeSurgery');
+  if(!sel||!protocol)return;
+  const current=sel.value;
+  sel.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
+  if(current&&protocol[current]) sel.value=current;
+}
+
+function todayYMD(){
+  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+}
+
+async function generatePatientCode(){
+  if(!requireLogin())return;
+  const surgeryType=document.getElementById('codeSurgery').value;
+  const surgeryDate=document.getElementById('codeSurgeryDate').value || todayYMD();
+  const chartNumber=document.getElementById('chartNumberInput')?.value.trim() || '';
+  if(!surgeryType||!surgeryDate){
+    codeStatus.textContent='Select surgery type and surgery date.';
+    codeStatus.style.color='#b91c1c';
+    return;
+  }
+  try{
+    codeStatus.textContent='Generating code...';
+    codeStatus.style.color='#334155';
+    const res=await fetch(WORKER_URL+'/access-code',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
+      body:JSON.stringify({surgeryType,surgeryDate,chartNumber})
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Failed to generate code');
+    generatedCodeBox.innerHTML=`<b>Random Access Code:</b> ${data.code}<br><b>Surgery:</b> ${protocol[surgeryType]?.name||surgeryType}<br><b>Date:</b> ${surgeryDate}<br><b>Chart #:</b> ${chartNumber || '-'}<br><b>Expires:</b> ${data.expiresAt}<br><br><b>Patient link:</b><br>https://terrysf-web.github.io/recovery/`;
+    codeStatus.textContent='Patient code generated.';
+    reloadPatientPreview();
+    reloadPatientPreview();
+    codeStatus.style.color='#15803d';
+    loadPatientCodes();
+  }catch(e){
+    codeStatus.textContent='Generate failed: '+e.message;
+    codeStatus.style.color='#b91c1c';
+  }
+}
+
+
+function formatPacificDateTime(iso){
+  if(!iso) return '-';
+  try{
+    const d = new Date(iso);
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone:'America/Los_Angeles',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit',
+      hour:'numeric',
+      minute:'2-digit',
+      hour12:true
+    }).format(d);
+  }catch(e){
+    return String(iso).replace('T',' ').slice(0,16);
+  }
+}
+
+async function loadPatientCodes(){
+  if(!requireLogin()) return;
+
+  try{
+    const res = await fetch(
+      WORKER_URL + '/access-codes',
+      {
+        headers:{ 'x-admin-password': getPass() },
+        cache:'no-store'
+      }
+    );
+
+    const data = await res.json();
+
+    if(!res.ok){
+      throw new Error(data.error || 'Failed to load codes');
+    }
+
+    const codes = data.codes || [];
+
+    if(!codes.length){
+      patientCodeList.innerHTML = 'No patient access codes found.';
+      return;
+    }
+
+    const today = new Date().toISOString().slice(0,10);
+
+    function getStatus(c){
+      if(c.active === false) return {text:'Disabled', cls:'statusDisabled'};
+      if(c.expiresAt && c.expiresAt < today) return {text:'Expired', cls:'statusExpired'};
+      if(c.usedAt || c.firstUsedAt || c.lastUsedAt) return {text:'Used', cls:'statusUsed'};
+      return {text:'Active', cls:'statusActive'};
+    }
+
+    codes.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+
+    patientCodeList.innerHTML = `
+      <div class="codeTableWrap">
+        <table class="codeTable">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Chart #</th>
+              <th>Procedure</th>
+              <th>Code</th>
+              <th>Surgery Date</th>
+              <th>Expires</th>
+              <th>Created</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${codes.map(c=>{
+              const st = getStatus(c);
+              const typeName = protocol[c.surgeryType]?.name || c.surgeryType || '-';
+              const createdText = formatPacificDateTime(c.createdAt);
+              const action = c.active === false || st.text === 'Expired'
+                ? '<span class="tableMuted">—</span>'
+                : `<button class="tableDisableBtn" onclick="disablePatientCode('${c.code}')">Disable</button>`;
+
+              return `
+                <tr>
+                  <td><span class="statusBadge ${st.cls}">${st.text}</span></td>
+                  <td>${c.chartNumber || '-'}</td>
+                  <td>${typeName}</td>
+                  <td class="codeCell">${c.code}</td>
+                  <td>${c.surgeryDate || '-'}</td>
+                  <td>${c.expiresAt || '-'}</td>
+                  <td>${createdText}</td>
+                  <td>${action}</td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }catch(e){
+    patientCodeList.innerHTML = 'Could not load codes: ' + e.message;
+  }
+}
+
+async function disablePatientCode(code){
+  if(!requireLogin())return;
+  if(!confirm('Disable code '+code+'?'))return;
+  try{
+    const res=await fetch(WORKER_URL+'/access-code/disable',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
+      body:JSON.stringify({code})
+    });
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Disable failed');
+    loadPatientCodes();
+  }catch(e){
+    alert('Disable failed: '+e.message);
+  }
+}
+
+function reloadPatientPreview(){
+  const frame=document.getElementById('patientAppPreview');
+  if(frame) frame.src='https://terrysf-web.github.io/recovery/?adminPreview=1&t=' + Date.now();
+}
+
+
+function togglePreview(){
+  document.body.classList.toggle('previewHidden');
+  const btns=[...document.querySelectorAll('.previewToggleBtn')];
+  const hidden=document.body.classList.contains('previewHidden');
+  btns.forEach(b=>b.textContent=hidden?'Show Preview':'Hide Preview');
+}
+
+function renderPreview(){
+  jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);
+}
+</script>
+<!-- ADMIN_ACCESS_CODE_WITH_PREVIEW_V35 -->
+<!-- ADMIN_STABLE_RECOVERY_V42 -->
+</body>
+</html>
+
+<!-- CHART_NUMBER_OPTIONAL_V76 -->

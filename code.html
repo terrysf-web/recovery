@@ -47,6 +47,9 @@ button{width:100%;border:0;border-radius:16px;padding:14px 16px;font-size:16px;f
     <label>Surgery Date</label>
     <input id="surgeryDate" type="date">
 
+    <label>Chart # (Optional)</label>
+    <input id="chartNumber" type="text" placeholder="Example: 24851">
+
     <button class="primary" onclick="generateCode()">Generate Patient Code</button>
     <button class="secondary" onclick="openFullAdmin()">Open Full Admin</button>
 
@@ -77,6 +80,7 @@ async function generateCode(){
   const password=document.getElementById('password').value.trim();
   const surgeryType=document.getElementById('surgeryType').value;
   const surgeryDate=document.getElementById('surgeryDate').value;
+  const chartNumber=document.getElementById('chartNumber')?.value.trim() || '';
   const status=document.getElementById('status');
 
   if(!password){
@@ -92,14 +96,14 @@ async function generateCode(){
     const res=await fetch(WORKER_URL+'/access-code',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-admin-password':password},
-      body:JSON.stringify({surgeryType,surgeryDate})
+      body:JSON.stringify({surgeryType,surgeryDate,chartNumber})
     });
 
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||'Failed to generate code');
 
     document.getElementById('codeText').textContent=data.code;
-    document.getElementById('codeMeta').innerHTML='Surgery date: '+data.surgeryDate+'<br>Expires: '+data.expiresAt;
+    document.getElementById('codeMeta').innerHTML='Chart #: '+(data.chartNumber || '-')+'<br>Surgery date: '+data.surgeryDate+'<br>Expires: '+data.expiresAt;
     document.getElementById('codeBox').style.display='block';
     document.getElementById('copyStatus').textContent='';
     status.textContent='Code generated.';

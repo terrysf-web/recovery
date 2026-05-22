@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=61">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=61">
+<link rel="manifest" href="./manifest.json?v=63">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=63">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -163,6 +163,19 @@ function hideAccessGate(){
 }
 
 
+
+function getDeviceFingerprint(){
+  const parts=[
+    navigator.userAgent || '',
+    navigator.platform || '',
+    String(navigator.maxTouchPoints || 0),
+    String(screen.width || 0) + 'x' + String(screen.height || 0),
+    String(window.devicePixelRatio || 1),
+    Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+  ];
+  return btoa(unescape(encodeURIComponent(parts.join('|')))).slice(0,160);
+}
+
 function getDeviceToken(){
   let token=localStorage.getItem("recoveryDeviceToken");
   if(!token){
@@ -197,7 +210,7 @@ async function verifyAccessCode(codeFromStorage){
   if(msg) msg.textContent="Checking code...";
 
   try{
-    const res=await fetch(ACCESS_API_URL+"/access-code?code="+encodeURIComponent(code)+"&deviceToken="+encodeURIComponent(getDeviceToken()),{cache:"no-store"});
+    const res=await fetch(ACCESS_API_URL+"/access-code?code="+encodeURIComponent(code)+"&deviceToken="+encodeURIComponent(getDeviceToken())+"&deviceFingerprint="+encodeURIComponent(getDeviceFingerprint()),{cache:"no-store"});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error || "Invalid access code");
 
@@ -332,7 +345,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=61").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=63").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{

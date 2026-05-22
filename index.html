@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=72">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=72">
+<link rel="manifest" href="./manifest.json?v=73">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=73">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -474,7 +474,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=72").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=73").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -552,11 +552,12 @@ function closeExpiredOverlay(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=72';
+    location.href='./?v=73';
   },300);
 }
 
 async function validateStoredRecoveryAccess(){
+  if(shouldSkipCompletionCheck()) return;
   if(enforceLocalExpiration()) return;
   const savedCode=localStorage.getItem('patientAccessCode');
   if(!savedCode) return;
@@ -600,35 +601,62 @@ function showRecoveryComplete(){
   }
 }
 
-
 function returnToRecoveryLogin(){
   try{
+    sessionStorage.setItem('skipCompletionCheck','1');
+
     const savedDeviceToken = localStorage.getItem('deviceToken');
 
     localStorage.clear();
-    sessionStorage.clear();
 
     if(savedDeviceToken){
       localStorage.setItem('deviceToken', savedDeviceToken);
     }
 
-    // prevent auto reopen loop
-    localStorage.removeItem('patientAccessCode');
-    localStorage.removeItem('activeRecoveryCode');
-    localStorage.removeItem('recoveryCode');
-    localStorage.removeItem('surgeryDate');
-    localStorage.removeItem('surgeryType');
-    localStorage.removeItem('recoveryCompleted');
+    // Remove every recovery/access key that may trigger auto-open.
+    [
+      'patientAccessCode',
+      'activeRecoveryCode',
+      'recoveryCode',
+      'accessCode',
+      'savedCode',
+      'surgeryDate',
+      'surgeryType',
+      'selectedSurgery',
+      'recoveryCompleted'
+    ].forEach(k=>localStorage.removeItem(k));
 
   }catch(e){}
 
+  const complete=document.getElementById('completeOverlay');
+  if(complete) complete.style.display='none';
+
+  const expired=document.getElementById('expiredOverlay');
+  if(expired) expired.style.display='none';
+
+  const accessGate=document.getElementById('accessGate');
+  if(accessGate) accessGate.style.display='flex';
+
+  // If the app uses a main shell, hide it so the login card is visible.
+  ['app','mainApp','mainScreen','todayScreen'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+
+  history.replaceState(null,'','./?v=73&login=1');
+
   setTimeout(()=>{
-    window.location.replace('./?v=72');
-  },400);
+    sessionStorage.removeItem('skipCompletionCheck');
+  },2500);
 }
 
 
+function shouldSkipCompletionCheck(){
+  return sessionStorage.getItem('skipCompletionCheck') === '1';
+}
+
 function calculateRecoveryProgress(){
+  if(shouldSkipCompletionCheck()) return false;
   try{
     const surgeryDate = localStorage.getItem('surgeryDate');
     const surgeryType = localStorage.getItem('surgeryType');
@@ -683,7 +711,7 @@ window.addEventListener('load',()=>{
       You may now close or remove this Recovery Guide.<br>
       Contact the clinic if you need an additional guide.
     </div>
-    <button class="expiredBtn" onclick="closeExpiredOverlay()">
+    <button class="expiredBtn" onclick="returnToRecoveryLogin()">
       Return to Login
     </button>
   </div>

@@ -915,6 +915,131 @@ body.adminActive #editor .card{
   }
 }
 
+
+/* v78 admin table layout fix: header no longer blocks rows, taller list */
+body.adminActive .app{
+  max-width:1860px !important;
+  width:1860px !important;
+  grid-template-columns:1380px 420px !important;
+  gap:24px !important;
+}
+
+body.adminActive #editor,
+body.adminActive #editor .card{
+  width:1380px !important;
+  max-width:1380px !important;
+}
+
+body.adminActive #adminPreviewColumn{
+  width:420px !important;
+  max-width:420px !important;
+}
+
+.codeTableWrap{
+  position:relative !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  height:calc(100vh - 245px) !important;
+  min-height:680px !important;
+  max-height:none !important;
+  padding:0 !important;
+  border:1px solid rgba(15,23,42,.08) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:12px !important;
+}
+
+.codeTable{
+  width:100% !important;
+  min-width:0 !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+}
+
+.codeTable thead{
+  position:sticky !important;
+  top:0 !important;
+  z-index:20 !important;
+}
+
+.codeTable th{
+  position:static !important;
+  background:#f8fafc !important;
+  padding:12px 10px !important;
+  font-size:11px !important;
+  line-height:1.2 !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.10) !important;
+  box-shadow:0 2px 5px rgba(15,23,42,.05) !important;
+}
+
+.codeTable tbody tr:first-child td{
+  border-top:0 !important;
+}
+
+.codeTable td{
+  padding:13px 10px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:12px !important;
+  color:#334155 !important;
+  vertical-align:middle !important;
+  background:white !important;
+}
+
+.codeTable th:nth-child(1), .codeTable td:nth-child(1){width:10% !important}
+.codeTable th:nth-child(2), .codeTable td:nth-child(2){width:10% !important}
+.codeTable th:nth-child(3), .codeTable td:nth-child(3){width:18% !important}
+.codeTable th:nth-child(4), .codeTable td:nth-child(4){width:11% !important}
+.codeTable th:nth-child(5), .codeTable td:nth-child(5){width:12% !important}
+.codeTable th:nth-child(6), .codeTable td:nth-child(6){width:11% !important}
+.codeTable th:nth-child(7), .codeTable td:nth-child(7){width:18% !important}
+.codeTable th:nth-child(8), .codeTable td:nth-child(8){width:10% !important}
+
+.chartCell{
+  font-weight:900 !important;
+  color:#0f172a !important;
+}
+
+.codeCell{
+  font-weight:950 !important;
+  color:#0f172a !important;
+  letter-spacing:.04em !important;
+  white-space:nowrap !important;
+}
+
+@media(max-width:980px){
+  body.adminActive .app{
+    width:100% !important;
+    max-width:460px !important;
+    display:block !important;
+  }
+
+  body.adminActive #editor,
+  body.adminActive #editor .card{
+    width:430px !important;
+    max-width:430px !important;
+  }
+
+  body.adminActive #adminPreviewColumn{
+    display:none !important;
+  }
+
+  .codeTableWrap{
+    overflow-x:auto !important;
+    height:calc(100vh - 240px) !important;
+    min-height:520px !important;
+  }
+
+  .codeTable{
+    min-width:1050px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1863,6 +1988,7 @@ function renderPreview(){
 <!-- ADMIN_ACCESS_CODE_WITH_PREVIEW_V35 -->
 <!-- ADMIN_STABLE_RECOVERY_V42 -->
 <!-- ADMIN_CHART_TABLE_TALL_V77 -->
+<!-- ADMIN_TABLE_HEADER_HEIGHT_FIX_V78 -->
 </body>
 </html>
 

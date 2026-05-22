@@ -1040,6 +1040,129 @@ body.adminActive #adminPreviewColumn{
   }
 }
 
+
+/* v79 full-height admin code table layout */
+
+html, body{
+  height:auto !important;
+  overflow-y:auto !important;
+}
+
+body.adminActive{
+  overflow-y:auto !important;
+}
+
+body.adminActive .app{
+  width:96vw !important;
+  max-width:1920px !important;
+  margin:0 auto !important;
+  grid-template-columns:minmax(0, 1fr) 360px !important;
+  gap:20px !important;
+  align-items:start !important;
+}
+
+body.adminActive #editor{
+  width:100% !important;
+  max-width:none !important;
+}
+
+body.adminActive #editor .card{
+  width:100% !important;
+  max-width:none !important;
+}
+
+body.adminActive #adminPreviewColumn{
+  width:360px !important;
+  max-width:360px !important;
+}
+
+.codeTableWrap{
+  overflow-y:visible !important;
+  overflow-x:auto !important;
+  height:auto !important;
+  max-height:none !important;
+  min-height:0 !important;
+  padding:0 !important;
+  border:1px solid rgba(15,23,42,.08) !important;
+  border-radius:14px !important;
+  background:white !important;
+  margin-top:16px !important;
+}
+
+.codeTable{
+  width:100% !important;
+  min-width:1200px !important;
+  table-layout:auto !important;
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  background:white !important;
+}
+
+.codeTable thead{
+  position:sticky !important;
+  top:0 !important;
+  z-index:20 !important;
+}
+
+.codeTable th{
+  background:#f8fafc !important;
+  padding:14px 12px !important;
+  font-size:11px !important;
+  color:#334155 !important;
+  text-align:left !important;
+  text-transform:uppercase !important;
+  letter-spacing:.04em !important;
+  border-bottom:1px solid rgba(15,23,42,.10) !important;
+  white-space:nowrap !important;
+}
+
+.codeTable td{
+  padding:14px 12px !important;
+  border-bottom:1px solid rgba(15,23,42,.06) !important;
+  font-size:13px !important;
+  color:#334155 !important;
+  vertical-align:middle !important;
+  background:white !important;
+  white-space:nowrap !important;
+}
+
+.chartCell{
+  font-weight:900 !important;
+  color:#0f172a !important;
+}
+
+.codeCell{
+  font-weight:950 !important;
+  color:#0f172a !important;
+  letter-spacing:.04em !important;
+}
+
+.statusBadge{
+  white-space:nowrap !important;
+}
+
+@media(max-width:1100px){
+
+  body.adminActive .app{
+    width:100% !important;
+    max-width:100% !important;
+    display:block !important;
+    padding:10px !important;
+  }
+
+  body.adminActive #adminPreviewColumn{
+    display:none !important;
+  }
+
+  .codeTableWrap{
+    overflow-x:auto !important;
+  }
+
+  .codeTable{
+    min-width:1100px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1989,6 +2112,7 @@ function renderPreview(){
 <!-- ADMIN_STABLE_RECOVERY_V42 -->
 <!-- ADMIN_CHART_TABLE_TALL_V77 -->
 <!-- ADMIN_TABLE_HEADER_HEIGHT_FIX_V78 -->
+<!-- FULL_HEIGHT_ADMIN_TABLE_V79 -->
 </body>
 </html>
 

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=63">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=63">
+<link rel="manifest" href="./manifest.json?v=66">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=66">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -113,6 +113,50 @@
 }
 .accessCard{
   position:relative !important;
+}
+
+
+/* v66 expired access handling */
+.expiredOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.96);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  z-index:9999;
+}
+.expiredCard{
+  width:100%;
+  max-width:420px;
+  background:white;
+  border-radius:28px;
+  padding:32px 24px;
+  box-shadow:0 20px 60px rgba(15,23,42,.12);
+  text-align:center;
+}
+.expiredTitle{
+  font-size:28px;
+  font-weight:950;
+  color:#991b1b;
+  margin-bottom:14px;
+}
+.expiredText{
+  font-size:15px;
+  line-height:1.6;
+  color:#475569;
+}
+.expiredBtn{
+  margin-top:22px;
+  width:100%;
+  border:0;
+  border-radius:18px;
+  padding:16px;
+  background:#13379b;
+  color:white;
+  font-size:16px;
+  font-weight:900;
 }
 
 </style>
@@ -385,13 +429,71 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=63").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=66").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
   const input=document.getElementById("accessCodeInput");
   if(input) input.addEventListener("keydown",e=>{if(e.key==="Enter")verifyAccessCode();});
 });
+
+function clearRecoverySession(){
+  try{
+    localStorage.removeItem('patientAccessCode');
+    sessionStorage.clear();
+  }catch(e){}
+}
+
+function showExpiredOverlay(){
+  clearRecoverySession();
+  const el=document.getElementById('expiredOverlay');
+  if(el) el.style.display='flex';
+}
+
+function closeExpiredOverlay(){
+  clearRecoverySession();
+  location.href='./?v=66';
+}
+
+async function validateStoredRecoveryAccess(){
+  const savedCode=localStorage.getItem('patientAccessCode');
+  if(!savedCode) return;
+
+  try{
+    const url=WORKER_URL+'/access-code?code='+encodeURIComponent(savedCode)+'&deviceToken='+encodeURIComponent(getDeviceToken())+'&deviceFingerprint='+encodeURIComponent(getDeviceFingerprint());
+
+    const res=await fetch(url);
+
+    if(res.status===410){
+      showExpiredOverlay();
+      return;
+    }
+
+    if(res.status===404 || res.status===409){
+      clearRecoverySession();
+    }
+  }catch(e){}
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(validateStoredRecoveryAccess,800);
+});
+
 </script>
+
+<div id="expiredOverlay" class="expiredOverlay">
+  <div class="expiredCard">
+    <div class="expiredTitle">Recovery Access Expired</div>
+    <div class="expiredText">
+      Your recovery access has expired and this guide is no longer available.<br><br>
+      Please remove this app from your home screen.<br>
+      Contact the clinic if you need additional access.
+    </div>
+    <button class="expiredBtn" onclick="closeExpiredOverlay()">
+      Return to Login
+    </button>
+  </div>
+</div>
+
 </body>
 </html>

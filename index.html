@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=74">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=74">
+<link rel="manifest" href="./manifest.json?v=75">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=75">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -474,7 +474,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=74").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=75").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -552,7 +552,7 @@ function closeExpiredOverlay(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=74';
+    location.href='./?v=75';
   },300);
 }
 
@@ -628,27 +628,6 @@ function returnToRecoveryLogin(){
 
   }catch(e){}
 
-  // Clear visible login form so old code/status does not remain on screen.
-  [
-    'accessCodeInput',
-    'codeInput',
-    'patientCodeInput',
-    'recoveryCodeInput'
-  ].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.value='';
-  });
-
-  [
-    'status',
-    'accessStatus',
-    'codeStatus',
-    'loginStatus'
-  ].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.textContent='';
-  });
-
   const complete=document.getElementById('completeOverlay');
   if(complete) complete.style.display='none';
 
@@ -663,7 +642,13 @@ function returnToRecoveryLogin(){
     if(el) el.style.display='none';
   });
 
-  history.replaceState(null,'','./?v=74&login=1');
+  clearAllLoginMessagesAndInputs();
+
+  history.replaceState(null,'','./?v=75&login=1');
+
+  setTimeout(clearAllLoginMessagesAndInputs,100);
+  setTimeout(clearAllLoginMessagesAndInputs,500);
+  setTimeout(clearAllLoginMessagesAndInputs,1200);
 
   setTimeout(()=>{
     sessionStorage.removeItem('skipCompletionCheck');
@@ -722,32 +707,58 @@ window.addEventListener('load',()=>{
 });
 
 
-function clearLoginScreenFields(){
-  [
-    'accessCodeInput',
-    'codeInput',
-    'patientCodeInput',
-    'recoveryCodeInput'
-  ].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.value='';
+function clearAllLoginMessagesAndInputs(){
+  // Clear all likely input fields
+  document.querySelectorAll('input').forEach(input=>{
+    const ph=(input.getAttribute('placeholder')||'').toLowerCase();
+    const id=(input.id||'').toLowerCase();
+    if(ph.includes('code') || id.includes('code') || id.includes('access')){
+      input.value='';
+      input.blur();
+    }
   });
 
+  // Clear known status containers
   [
     'status',
     'accessStatus',
     'codeStatus',
-    'loginStatus'
+    'loginStatus',
+    'accessMessage',
+    'message'
   ].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.textContent='';
+    if(el){
+      el.textContent='';
+      el.innerHTML='';
+      el.style.display='none';
+    }
+  });
+
+  // Clear any visible text that looks like a login status message
+  document.querySelectorAll('div,p,span').forEach(el=>{
+    const txt=(el.textContent||'').trim().toLowerCase();
+    if(
+      txt.includes('code accepted') ||
+      txt.includes('opening guide') ||
+      txt.includes('access granted') ||
+      txt.includes('invalid access code') ||
+      txt.includes('question is required')
+    ){
+      el.textContent='';
+      el.innerHTML='';
+      el.style.display='none';
+    }
   });
 }
+
 
 window.addEventListener('load',()=>{
   const params=new URLSearchParams(location.search);
   if(params.get('login')==='1'){
-    clearLoginScreenFields();
+    setTimeout(clearAllLoginMessagesAndInputs,50);
+    setTimeout(clearAllLoginMessagesAndInputs,300);
+    setTimeout(clearAllLoginMessagesAndInputs,1000);
   }
 });
 

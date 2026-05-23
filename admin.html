@@ -1416,6 +1416,13 @@ button.danger{
   }
 }
 
+
+/* v98 login safety */
+.loginError{
+  color:#b91c1c !important;
+  font-weight:900;
+}
+
 </style>
 </head>
 <body>
@@ -1651,8 +1658,7 @@ function todayPacificYMD(){
 
 function normalizeList(value){
   if(Array.isArray(value)) return value.filter(Boolean);
-  if(typeof value === 'string' && value.trim()) return value.split('
-').map(x=>x.trim()).filter(Boolean);
+  if(typeof value === 'string' && value.trim()) return value.split('\\n').map(x=>x.trim()).filter(Boolean);
   return [];
 }
 
@@ -2499,3 +2505,5 @@ function renderPreview(){
 <!-- SOFT_BLUE_ADMIN_PREVIEW_V96 -->
 
 <!-- ADMIN_DASHBOARD_INLINE_PREVIEW_V97 -->
+
+<!-- LOGIN_FIX_V98 -->

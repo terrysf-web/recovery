@@ -3,75 +3,131 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Patient Code Generator</title>
+<title>Patient Code Management</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#0f172a}
-.wrap{max-width:560px;margin:0 auto;padding:18px 14px 70px}
-.card{background:white;border-radius:26px;padding:20px;margin:12px 0;box-shadow:0 10px 32px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
-.logo{width:128px;height:auto;margin-bottom:10px}
-h1{font-size:26px;margin:0 0 6px;font-weight:950;line-height:1.1}
-.sub{font-size:14px;color:#64748b;line-height:1.45}
-label{display:block;margin:15px 0 6px;font-size:13px;color:#334155;font-weight:900}
-input,select{width:100%;border:1px solid rgba(15,23,42,.14);background:#f8fafc;border-radius:16px;padding:13px 14px;font-size:16px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{width:100%;border:0;border-radius:17px;padding:15px;font-size:16px;font-weight:950;margin-top:14px;cursor:pointer}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 70px}
+.header{background:linear-gradient(135deg,#021b57,#123c99);color:white;border-radius:0 0 28px 28px;padding:20px;margin:-18px -14px 18px}
+.headerInner{max-width:1100px;margin:0 auto}
+.logo{width:128px;height:auto;background:white;border-radius:12px;padding:4px;margin-bottom:10px}
+h1{font-size:28px;margin:0 0 6px;font-weight:950;line-height:1.1}
+.sub{font-size:14px;color:#dbeafe;line-height:1.45}
+.card{background:white;border-radius:24px;padding:18px;margin:14px 0;box-shadow:0 10px 32px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
+.grid{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:12px}
+label{display:block;margin:0 0 6px;font-size:12px;color:#334155;font-weight:950;text-transform:uppercase;letter-spacing:.03em}
+input,select{width:100%;border:1px solid rgba(15,23,42,.14);background:#f8fafc;border-radius:14px;padding:12px 13px;font-size:15px}
+button{border:0;border-radius:14px;padding:12px 14px;font-size:14px;font-weight:950;cursor:pointer}
 .primary{background:#123c99;color:white}
 .secondary{background:#eef2f7;color:#334155}
+.danger{background:#fee2e2;color:#991b1b}
 .status{margin-top:12px;font-size:14px;font-weight:850;line-height:1.45}
-.codeBox{display:none;margin-top:18px;background:#eff6ff;border:1px solid rgba(37,99,235,.2);border-radius:22px;padding:16px;text-align:left}
-.codeList{display:grid;gap:8px;margin-top:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.codeBox{display:none;margin-top:14px;background:#eff6ff;border:1px solid rgba(37,99,235,.2);border-radius:18px;padding:14px}
+.codeList{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:10px}
 .codeItem{display:flex;align-items:center;justify-content:space-between;gap:8px;background:white;border-radius:14px;padding:12px;border:1px solid rgba(15,23,42,.08)}
-.code{font-size:22px;letter-spacing:.10em;font-weight:950;color:#0f172a}
-.copyBtn{width:auto;margin:0;padding:9px 12px;border-radius:10px;font-size:13px;background:#eef2f7;color:#334155}
-.meta{font-size:13px;color:#475569;line-height:1.5;margin-top:10px}
+.code{font-size:20px;letter-spacing:.10em;font-weight:950;color:#0f172a}
+.copyBtn{padding:8px 10px;border-radius:10px;font-size:12px;background:#eef2f7;color:#334155}
+.meta{font-size:12px;color:#64748b;line-height:1.45}
 .copyOk{color:#15803d;font-weight:900;margin-top:8px;font-size:13px}
-.small{font-size:12px;color:#64748b;line-height:1.45;margin-top:12px}
-.warning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;margin-top:12px}
-@media(max-width:520px){.row{grid-template-columns:1fr}}
+.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;margin-top:12px}
+.tableWrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:16px;margin-top:12px;max-height:560px;background:white}
+table{width:100%;min-width:980px;border-collapse:separate;border-spacing:0}
+th{position:sticky;top:0;background:#f8fafc;z-index:2;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#334155;padding:12px 10px;border-bottom:1px solid rgba(15,23,42,.08)}
+td{font-size:13px;color:#334155;padding:12px 10px;border-bottom:1px solid rgba(15,23,42,.06);vertical-align:middle}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:950}
+.ready{background:#fef3c7;color:#92400e}
+.used{background:#dbeafe;color:#1d4ed8}
+.expired{background:#fee2e2;color:#991b1b}
+.disabled{background:#e5e7eb;color:#374151}
+.active{background:#dcfce7;color:#166534}
+.codeCell{font-weight:950;color:#0f172a;letter-spacing:.04em}
+.topRow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.searchBox{max-width:320px}
+.small{font-size:12px;color:#64748b;line-height:1.45}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:14px 10px 60px}.header{margin:-14px -10px 14px}.tableWrap{max-height:520px}}
 </style>
 </head>
 <body>
+<div class="header">
+  <div class="headerInner">
+    <img class="logo" src="./logo.png" alt="SPARK logo">
+    <h1>Patient Code Management</h1>
+    <div class="sub">Staff page for generating and managing Recovery Guide access codes.</div>
+  </div>
+</div>
+
 <div class="wrap">
   <div class="card">
-    <img class="logo" src="./logo.png" alt="SPARK logo">
-    <h1>Patient Code Generator</h1>
-    <div class="sub">Generate batches of recovery access codes by procedure. The patient enters the surgery date when opening the app.</div>
-
-    <label>Staff Password</label>
-    <input id="staffPassword" type="password" placeholder="Enter staff password">
-
-    <label>Procedure</label>
-    <select id="surgeryType"></select>
-
-    <div class="row">
+    <div class="grid">
+      <div>
+        <label>Staff Password</label>
+        <input id="staffPassword" type="password" placeholder="Enter staff password">
+      </div>
+      <div>
+        <label>Procedure</label>
+        <select id="surgeryType"></select>
+      </div>
       <div>
         <label>Quantity</label>
         <input id="quantity" type="number" min="1" max="50" value="5">
       </div>
       <div>
-        <label>Batch Note / Chart # (Optional)</label>
+        <label>Batch Note / Chart #</label>
         <input id="chartNumber" type="text" placeholder="Optional">
       </div>
     </div>
 
-    <button class="primary" onclick="generateCodes()">Generate Code Batch</button>
+    <div class="actions">
+      <button class="primary" onclick="generateCodes()">Generate Code Batch</button>
+      <button class="secondary" onclick="loadCodes()">Refresh Code List</button>
+      <button class="secondary" onclick="copyAllCodes()">Copy New Codes</button>
+    </div>
 
-    <div class="warning">
-      Staff can prepare codes by procedure in advance. The recovery timeline starts only after the patient enters the code and surgery date in the app.
+    <div class="notice">
+      Staff can prepare codes by procedure in advance. Patient enters code + surgery date in the app after surgery. The timeline starts only then.
     </div>
 
     <div id="status" class="status"></div>
 
     <div id="codeBox" class="codeBox">
-      <b>Generated Codes</b>
+      <b>Newly Generated Codes</b>
       <div id="codeList" class="codeList"></div>
-      <button class="secondary" onclick="copyAllCodes()">Copy All Codes</button>
       <div id="copyStatus" class="copyOk"></div>
       <div id="codeMeta" class="meta"></div>
     </div>
+  </div>
 
-    <div class="small">Do not enter patient names or PHI. Chart # or internal reference only.</div>
+  <div class="card">
+    <div class="topRow">
+      <div>
+        <h2 style="margin:0;font-size:22px">Code List</h2>
+        <div class="small">Ready = not assigned/activated yet. Used = patient entered surgery date and opened guide.</div>
+      </div>
+      <input id="searchInput" class="searchBox" placeholder="Search code, chart #, procedure..." oninput="renderCodes()">
+    </div>
+
+    <div id="tableStatus" class="status"></div>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Code</th>
+            <th>Chart # / Note</th>
+            <th>Procedure</th>
+            <th>Surgery Date</th>
+            <th>Expires</th>
+            <th>Created</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="codeTableBody">
+          <tr><td colspan="8">Enter staff password and click Refresh Code List.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -79,6 +135,33 @@ button{width:100%;border:0;border-radius:17px;padding:15px;font-size:16px;font-w
 const WORKER_URL='https://shrill-union-34e3.terryjseo.workers.dev';
 let protocol={};
 let latestCodes=[];
+let allCodes=[];
+
+function getPass(){return document.getElementById('staffPassword').value.trim();}
+
+function formatDateTime(iso){
+  if(!iso)return '-';
+  try{
+    return new Intl.DateTimeFormat('en-US',{
+      timeZone:'America/Los_Angeles',
+      month:'2-digit',
+      day:'2-digit',
+      year:'numeric',
+      hour:'numeric',
+      minute:'2-digit',
+      hour12:true
+    }).format(new Date(iso));
+  }catch(e){return String(iso).slice(0,16);}
+}
+
+function statusFor(c){
+  const today=new Date().toISOString().slice(0,10);
+  if(c.active===false)return ['Disabled','disabled'];
+  if(c.expiresAt && c.expiresAt < today)return ['Expired','expired'];
+  if(c.usedAt || c.firstUsedAt || c.lastUsedAt)return ['Used','used'];
+  if(c.surgeryDate)return ['Active','active'];
+  return ['Ready','ready'];
+}
 
 async function loadProtocol(){
   const status=document.getElementById('status');
@@ -100,7 +183,7 @@ async function loadProtocol(){
 }
 
 async function generateCodes(){
-  const password=document.getElementById('staffPassword').value.trim();
+  const password=getPass();
   const chartNumber=document.getElementById('chartNumber').value.trim();
   const surgeryType=document.getElementById('surgeryType').value;
   const quantity=Math.max(1,Math.min(50,Number(document.getElementById('quantity').value||1)));
@@ -108,12 +191,6 @@ async function generateCodes(){
 
   if(!password){
     status.textContent='Enter staff password first.';
-    status.style.color='#b91c1c';
-    return;
-  }
-
-  if(!surgeryType){
-    status.textContent='Select procedure.';
     status.style.color='#b91c1c';
     return;
   }
@@ -133,8 +210,7 @@ async function generateCodes(){
 
     latestCodes=data.codes || [data];
 
-    const list=document.getElementById('codeList');
-    list.innerHTML=latestCodes.map(c=>`
+    document.getElementById('codeList').innerHTML=latestCodes.map(c=>`
       <div class="codeItem">
         <div>
           <div class="code">${c.code}</div>
@@ -154,9 +230,100 @@ async function generateCodes(){
     status.textContent='Code batch generated.';
     status.style.color='#15803d';
 
+    await loadCodes();
+
   }catch(e){
     status.textContent='Generate failed: '+e.message;
     status.style.color='#b91c1c';
+  }
+}
+
+async function loadCodes(){
+  const password=getPass();
+  const tableStatus=document.getElementById('tableStatus');
+
+  if(!password){
+    tableStatus.textContent='Enter staff password first.';
+    tableStatus.style.color='#b91c1c';
+    return;
+  }
+
+  try{
+    tableStatus.textContent='Loading codes...';
+    tableStatus.style.color='#334155';
+
+    const res=await fetch(WORKER_URL+'/access-codes',{
+      headers:{'x-admin-password':password},
+      cache:'no-store'
+    });
+
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error || 'Failed to load codes');
+
+    allCodes=data.codes || [];
+    renderCodes();
+
+    tableStatus.textContent='Loaded '+allCodes.length+' codes.';
+    tableStatus.style.color='#15803d';
+
+  }catch(e){
+    tableStatus.textContent='Load failed: '+e.message;
+    tableStatus.style.color='#b91c1c';
+  }
+}
+
+function renderCodes(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase().trim();
+  const rows=allCodes.filter(c=>{
+    const typeName=protocol[c.surgeryType]?.name || c.surgeryType || '';
+    const text=[c.code,c.chartNumber,typeName,c.surgeryDate,c.expiresAt].join(' ').toLowerCase();
+    return !q || text.includes(q);
+  });
+
+  const body=document.getElementById('codeTableBody');
+
+  if(!rows.length){
+    body.innerHTML='<tr><td colspan="8">No matching codes.</td></tr>';
+    return;
+  }
+
+  body.innerHTML=rows.map(c=>{
+    const [label,cls]=statusFor(c);
+    const typeName=protocol[c.surgeryType]?.name || c.surgeryType || '-';
+    const action=c.active===false
+      ? '—'
+      : `<button class="danger" onclick="disableCode('${c.code}')">Disable</button>`;
+
+    return `
+      <tr>
+        <td><span class="badge ${cls}">${label}</span></td>
+        <td class="codeCell">${c.code}</td>
+        <td>${c.chartNumber || '-'}</td>
+        <td>${typeName}</td>
+        <td>${c.surgeryDate || '-'}</td>
+        <td>${c.expiresAt || '-'}</td>
+        <td>${formatDateTime(c.createdAt)}</td>
+        <td>${action}</td>
+      </tr>`;
+  }).join('');
+}
+
+async function disableCode(code){
+  if(!confirm('Disable code '+code+'?'))return;
+
+  try{
+    const res=await fetch(WORKER_URL+'/access-code/disable',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
+      body:JSON.stringify({code})
+    });
+
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error || 'Disable failed');
+
+    await loadCodes();
+  }catch(e){
+    alert('Disable failed: '+e.message);
   }
 }
 
@@ -167,9 +334,8 @@ async function copyOne(code){
 
 async function copyAllCodes(){
   if(!latestCodes.length)return;
-  const text=latestCodes.map(c=>c.code).join('\n');
-  await navigator.clipboard.writeText(text);
-  document.getElementById('copyStatus').textContent='All codes copied.';
+  await navigator.clipboard.writeText(latestCodes.map(c=>c.code).join('\n'));
+  document.getElementById('copyStatus').textContent='All new codes copied.';
 }
 
 loadProtocol();

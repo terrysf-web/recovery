@@ -1164,35 +1164,29 @@ body.adminActive #adminPreviewColumn{
 }
 
 
-/* v83 CODE FOCUS ADMIN - stable layout only, no role/tabs/worker changes */
-
-body.codeFocusMode .header{
+/* v84: Code Management default + Admin unlock for App Management */
+body.codeDefaultMode .header{
   padding:12px 20px !important;
   border-radius:0 0 18px 18px !important;
 }
-
-body.codeFocusMode .header h1{
+body.codeDefaultMode .header h1{
   font-size:22px !important;
   margin:0 !important;
 }
-
-body.codeFocusMode .header .sub{
+body.codeDefaultMode .header .sub{
   display:none !important;
 }
-
-body.codeFocusMode .app{
+body.codeDefaultMode .app{
   width:98vw !important;
   max-width:1800px !important;
   margin:0 auto !important;
   padding:12px 10px 40px !important;
   display:block !important;
 }
-
-body.codeFocusMode #adminPreviewColumn{
+body.codeDefaultMode #adminPreviewColumn{
   display:none !important;
 }
-
-.codeFocusTopBar{
+.unlockTopBar{
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -1204,90 +1198,79 @@ body.codeFocusMode #adminPreviewColumn{
   margin-bottom:12px;
   box-shadow:0 6px 18px rgba(15,23,42,.05);
 }
-
-.codeFocusTitle{
+.unlockTitle{
   font-size:20px;
   font-weight:950;
   color:#0f172a;
 }
-
-.codeFocusSub{
+.unlockSub{
   font-size:12px;
   color:#64748b;
   margin-top:3px;
 }
-
-.codeFocusActions{
+.unlockActions{
   display:flex;
+  align-items:center;
   gap:8px;
   flex-wrap:wrap;
 }
-
-.codeFocusBtn{
+.unlockInput{
+  min-height:38px;
+  border:1px solid #d7dce5;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:13px;
+}
+.unlockBtn{
   border:0;
-  border-radius:12px;
-  padding:10px 12px;
-  background:#eef2f7;
-  color:#0f172a;
+  border-radius:10px;
+  min-height:38px;
+  padding:8px 12px;
+  background:#123c99;
+  color:white;
   font-weight:900;
   cursor:pointer;
 }
-
-.codeFocusBtn.primary{
-  background:#123c99;
-  color:white;
+.unlockBtn.secondary{
+  background:#eef2f7;
+  color:#0f172a;
 }
-
-body.codeFocusMode .sessionCardCompact{
+.unlockStatus{
+  font-size:12px;
+  font-weight:800;
+  color:#64748b;
+}
+body.codeDefaultMode .sessionCardCompact,
+body.codeDefaultMode .adminAccountCompact{
   display:none !important;
 }
-
-body.codeFocusMode .adminAccountCompact{
+body.codeDefaultMode .appManagementSection{
   display:none !important;
 }
-
-body.codeFocusMode .appManagementCardHidden{
-  display:none !important;
-}
-
-body.showAppManagement .appManagementCardHidden{
+body.appManagementUnlocked .appManagementSection{
   display:block !important;
 }
-
-body.codeFocusMode .patientCodeMainCard{
+body.codeDefaultMode .patientCodeMainCard{
   display:block !important;
   width:100% !important;
   max-width:none !important;
   padding:18px !important;
   margin:0 0 14px !important;
 }
-
-body.codeFocusMode .patientCodeMainCard .sectionTitle{
+body.codeDefaultMode .patientCodeMainCard .sectionTitle{
   font-size:22px !important;
   margin-bottom:4px !important;
 }
-
-body.codeFocusMode .patientCodeMainCard label{
-  font-size:13px !important;
-  font-weight:900 !important;
-}
-
-body.codeFocusMode .patientCodeMainCard input,
-body.codeFocusMode .patientCodeMainCard select{
+body.codeDefaultMode .patientCodeMainCard input,
+body.codeDefaultMode .patientCodeMainCard select{
   min-height:44px !important;
   font-size:15px !important;
 }
-
-body.codeFocusMode .patientCodeMainCard .actions{
-  margin-top:12px !important;
-}
-
-body.codeFocusMode .patientCodeMainCard .btn{
+body.codeDefaultMode .patientCodeMainCard .btn{
   min-height:44px !important;
   font-size:14px !important;
 }
-
-body.codeFocusMode .codeTableWrap{
+body.codeDefaultMode .codeTableWrap{
   height:calc(100vh - 390px) !important;
   min-height:520px !important;
   max-height:none !important;
@@ -1299,98 +1282,42 @@ body.codeFocusMode .codeTableWrap{
   background:white !important;
   margin-top:14px !important;
 }
-
-body.codeFocusMode .codeTable{
+body.codeDefaultMode .codeTable{
   width:100% !important;
   min-width:1100px !important;
   table-layout:fixed !important;
   border-collapse:separate !important;
   border-spacing:0 !important;
-  background:white !important;
 }
-
-body.codeFocusMode .codeTable thead{
+body.codeDefaultMode .codeTable thead{
   position:sticky !important;
   top:0 !important;
   z-index:10 !important;
 }
-
-body.codeFocusMode .codeTable th{
+body.codeDefaultMode .codeTable th{
   background:#f8fafc !important;
   padding:12px 10px !important;
   font-size:11px !important;
-  color:#334155 !important;
-  text-align:left !important;
-  text-transform:uppercase !important;
-  letter-spacing:.04em !important;
   border-bottom:1px solid rgba(15,23,42,.10) !important;
   box-shadow:0 2px 5px rgba(15,23,42,.05) !important;
 }
-
-body.codeFocusMode .codeTable td{
+body.codeDefaultMode .codeTable td{
   padding:12px 10px !important;
-  border-bottom:1px solid rgba(15,23,42,.06) !important;
   font-size:12px !important;
-  vertical-align:middle !important;
   background:white !important;
 }
-
-body.codeFocusMode .codeTable th:nth-child(1), 
-body.codeFocusMode .codeTable td:nth-child(1){width:10% !important}
-
-body.codeFocusMode .codeTable th:nth-child(2), 
-body.codeFocusMode .codeTable td:nth-child(2){width:10% !important}
-
-body.codeFocusMode .codeTable th:nth-child(3), 
-body.codeFocusMode .codeTable td:nth-child(3){width:17% !important}
-
-body.codeFocusMode .codeTable th:nth-child(4), 
-body.codeFocusMode .codeTable td:nth-child(4){width:12% !important}
-
-body.codeFocusMode .codeTable th:nth-child(5), 
-body.codeFocusMode .codeTable td:nth-child(5){width:12% !important}
-
-body.codeFocusMode .codeTable th:nth-child(6), 
-body.codeFocusMode .codeTable td:nth-child(6){width:12% !important}
-
-body.codeFocusMode .codeTable th:nth-child(7), 
-body.codeFocusMode .codeTable td:nth-child(7){width:17% !important}
-
-body.codeFocusMode .codeTable th:nth-child(8), 
-body.codeFocusMode .codeTable td:nth-child(8){width:10% !important}
-
-body.codeFocusMode .codeCell,
-body.codeFocusMode .chartCell{
+body.codeDefaultMode .codeCell,
+body.codeDefaultMode .chartCell{
   font-weight:950 !important;
   color:#0f172a !important;
 }
-
 @media(max-width:980px){
-  body.codeFocusMode .app{
-    width:100% !important;
-    padding:10px !important;
-  }
-
-  .codeFocusTopBar{
-    display:block;
-  }
-
-  .codeFocusActions{
-    margin-top:10px;
-  }
-
-  .codeFocusBtn{
-    width:100%;
-  }
-
-  body.codeFocusMode .codeTableWrap{
-    height:calc(100vh - 430px) !important;
-    min-height:420px !important;
-  }
-
-  body.codeFocusMode .codeTable{
-    min-width:1050px !important;
-  }
+  body.codeDefaultMode .app{width:100% !important;padding:10px !important;}
+  .unlockTopBar{display:block;}
+  .unlockActions{margin-top:10px;}
+  .unlockInput,.unlockBtn{width:100%;}
+  body.codeDefaultMode .codeTableWrap{height:calc(100vh - 430px) !important;min-height:420px !important;}
+  body.codeDefaultMode .codeTable{min-width:1050px !important;}
 }
 
 </style>
@@ -1403,14 +1330,14 @@ body.codeFocusMode .chartCell{
 
 <div class="app">
   <div class="card" id="loginCard">
-    <label>Admin Password</label>
-    <input id="password" type="password" placeholder="Enter admin password">
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Enter staff or admin password">
     <div class="actions">
-      <button class="btn primary" onclick="loginAndLoad()">Login & Load Current Protocol</button>
-      <button class="btn secondary" onclick="loginAndLoadDefault()">Login with Default Protocol</button>
+      <button class="btn primary" onclick="loginAndLoad()">Login to Code Management</button>
+      <button class="btn secondary" onclick="loginAndLoadDefault()">Admin: Load Default Protocol</button>
     </div>
     <div class="lockedNotice">
-      Editing, deleting, uploading, and saving are locked until the admin password is entered.
+      Default view is Code Management. App Management requires Admin unlock.
     </div>
     
     <button class="btn secondary" style="margin-top:10px" onclick="toggleForgotPassword()">Forgot password?</button>
@@ -1613,6 +1540,128 @@ function setSaveStatus(msg,good=true){
   saveStatus.style.color=good?'#15803d':'#b91c1c';
 }
 
+
+let currentRole = null;
+let appManagementUnlocked = false;
+
+async function getLoginRoleFromWorker(passwordValue){
+  const res = await fetch(WORKER_URL + '/auth-role', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:passwordValue})
+  });
+
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error || 'Unauthorized');
+
+  return data.role;
+}
+
+function setupCodeDefaultLayout(){
+  document.body.classList.add('codeDefaultMode');
+
+  const editorEl = document.getElementById('editor');
+  if(!editorEl) return;
+
+  if(!document.getElementById('unlockTopBar')){
+    const bar = document.createElement('div');
+    bar.id = 'unlockTopBar';
+    bar.className = 'unlockTopBar';
+    bar.innerHTML = `
+      <div>
+        <div class="unlockTitle">Patient Access Codes</div>
+        <div class="unlockSub">Default staff screen. App Management requires Admin password.</div>
+      </div>
+      <div class="unlockActions">
+        <input id="unlockAdminPassword" class="unlockInput" type="password" placeholder="Admin password to unlock app management">
+        <button class="unlockBtn" onclick="unlockAppManagement()">Unlock App Management</button>
+        <button class="unlockBtn secondary" onclick="toggleAppManagementView()">Show / Hide App Management</button>
+        <button class="unlockBtn secondary" onclick="logoutAdmin()">Logout</button>
+        <span id="unlockStatus" class="unlockStatus"></span>
+      </div>
+    `;
+    editorEl.prepend(bar);
+  }
+
+  [...editorEl.querySelectorAll('.card')].forEach(card=>{
+    const text = card.textContent || '';
+
+    if(text.includes('Admin Session')){
+      card.classList.add('sessionCardCompact');
+      return;
+    }
+
+    if(text.includes('Admin Account')){
+      card.classList.add('adminAccountCompact');
+      return;
+    }
+
+    if(text.includes('Patient Access Codes')){
+      card.classList.add('patientCodeMainCard');
+      card.classList.remove('appManagementSection');
+      return;
+    }
+
+    if(text.includes('Mobile view')){
+      card.classList.add('appManagementSection');
+      return;
+    }
+
+    card.classList.add('appManagementSection');
+  });
+
+  document.body.classList.toggle('appManagementUnlocked', appManagementUnlocked);
+
+  const codeCard = document.querySelector('.patientCodeMainCard');
+  if(codeCard) codeCard.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+async function unlockAppManagement(){
+  const unlockStatus = document.getElementById('unlockStatus');
+  const adminPass = document.getElementById('unlockAdminPassword')?.value.trim() || '';
+
+  if(!adminPass){
+    if(unlockStatus) unlockStatus.textContent='Enter Admin password.';
+    return;
+  }
+
+  try{
+    if(unlockStatus) unlockStatus.textContent='Checking...';
+
+    const role = await getLoginRoleFromWorker(adminPass);
+
+    if(role !== 'admin'){
+      if(unlockStatus) unlockStatus.textContent='Admin password required.';
+      return;
+    }
+
+    appManagementUnlocked = true;
+    document.body.classList.add('appManagementUnlocked');
+
+    if(unlockStatus) unlockStatus.textContent='App Management unlocked.';
+  }catch(e){
+    if(unlockStatus) unlockStatus.textContent='Unlock failed.';
+  }
+}
+
+function toggleAppManagementView(){
+  if(!appManagementUnlocked){
+    const unlockStatus = document.getElementById('unlockStatus');
+    if(unlockStatus) unlockStatus.textContent='Unlock with Admin password first.';
+    return;
+  }
+
+  document.body.classList.toggle('appManagementUnlocked');
+}
+
+function requireAdmin(){
+  if(!appManagementUnlocked && currentRole !== 'admin'){
+    alert('Admin unlock is required for App Management.');
+    return false;
+  }
+  return true;
+}
+
 function getPass(){
   return password.value.trim();
 }
@@ -1626,15 +1675,56 @@ function requireLogin(){
 }
 
 async function loginAndLoad(){
-  if(!getPass()){setStatus('Enter admin password first.',false);return;}
-  isLoggedIn=true;
-  await loadProtocol();
+  if(!getPass()){setStatus('Enter password first.',false);return;}
+
+  try{
+    setStatus('Signing in...');
+    currentRole = await getLoginRoleFromWorker(getPass());
+
+    isLoggedIn=true;
+    await loadProtocol();
+
+    editor.classList.remove('hidden');
+    loginCard.classList.add('hidden');
+
+    appManagementUnlocked = currentRole === 'admin';
+    setupCodeDefaultLayout();
+    await loadPatientCodes();
+
+    setStatus((currentRole === 'admin' ? 'Admin' : 'Staff') + ' login successful.', true);
+  }catch(e){
+    isLoggedIn=false;
+  currentRole=null;
+  appManagementUnlocked=false;
+  document.body.classList.remove('codeDefaultMode','appManagementUnlocked');
+    currentRole=null;
+    setStatus('Login failed: '+e.message,false);
+  }
 }
 
-function loginAndLoadDefault(){
-  if(!getPass()){setStatus('Enter admin password first.',false);return;}
-  isLoggedIn=true;
-  loadDefault();
+async function loginAndLoadDefault(){
+  if(!getPass()){setStatus('Enter password first.',false);return;}
+
+  try{
+    currentRole = await getLoginRoleFromWorker(getPass());
+
+    if(currentRole !== 'admin'){
+      setStatus('Admin access is required to load default protocol.', false);
+      return;
+    }
+
+    isLoggedIn=true;
+    appManagementUnlocked=true;
+    loadDefault();
+
+    editor.classList.remove('hidden');
+    loginCard.classList.add('hidden');
+
+    setupCodeDefaultLayout();
+    setStatus('Admin default protocol loaded.', true);
+  }catch(e){
+    setStatus('Login failed: '+e.message,false);
+  }
 }
 
 async function loadProtocol(){
@@ -1666,7 +1756,6 @@ function loadDefault(){
 
 function initEditor(){
   editor.classList.remove('hidden');
-    setTimeout(setupCodeFocusAdmin,100);
   const loginCardEl=document.getElementById('loginCard'); if(loginCardEl) loginCardEl.classList.add('hidden');
   document.body.classList.add('adminActive');
   document.getElementById('loginCard')?.classList.add('hidden');
@@ -1689,6 +1778,7 @@ function currentSurgery(){
 }
 
 function saveSurgeryMeta(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s=currentSurgery();
   s.name=surgeryName.value;
@@ -1793,6 +1883,7 @@ function moveDown(k,i){
 }
 
 async function saveProtocol(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   try{
     setSaveStatus('Saving...');
@@ -1812,6 +1903,7 @@ async function saveProtocol(){
 }
 
 function downloadJson(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const blob=new Blob([JSON.stringify(protocol,null,2)],{type:'application/json'});
   const a=document.createElement('a');
@@ -1821,6 +1913,7 @@ function downloadJson(){
 }
 
 function uploadJsonFile(event){
+  if(!requireAdmin()) return;
   if(!requireLogin()){
     event.target.value='';
     return;
@@ -1872,6 +1965,7 @@ function togglePasswordCard(){
 }
 
 async function changePassword(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const current = currentPassword.value.trim();
@@ -1938,6 +2032,7 @@ function sanitizeKey(raw){
 }
 
 function addSurgeryType(copyCurrent){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const name = newSurgeryName.value.trim();
@@ -2005,6 +2100,7 @@ function addSurgeryType(copyCurrent){
 }
 
 function deleteSurgeryType(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const keys = Object.keys(protocol);
@@ -2097,10 +2193,12 @@ function addWeekAfter(index){
 }
 
 function addStageAfterCurrent(){
+  if(!requireAdmin()) return;
   addWeekAfter(currentStageIndex);
 }
 
 function copyCurrentStage(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const s = currentSurgery();
@@ -2114,6 +2212,7 @@ function copyCurrentStage(){
 }
 
 function deleteCurrentStage(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
 
   const s = currentSurgery();
@@ -2134,6 +2233,7 @@ function deleteCurrentStage(){
 }
 
 function moveStageUp(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s = currentSurgery();
   if(currentStageIndex <= 0)return;
@@ -2146,6 +2246,7 @@ function moveStageUp(){
 }
 
 function moveStageDown(){
+  if(!requireAdmin()) return;
   if(!requireLogin())return;
   const s = currentSurgery();
   if(currentStageIndex >= s.stages.length - 1)return;
@@ -2338,83 +2439,13 @@ function togglePreview(){
 function renderPreview(){
   jsonPreview.textContent=JSON.stringify(protocol,null,2).slice(0,6000);
 }
-
-function setupCodeFocusAdmin(){
-  document.body.classList.add('codeFocusMode');
-
-  const editor = document.getElementById('editor');
-  if(!editor) return;
-
-  if(!document.getElementById('codeFocusTopBar')){
-    const bar = document.createElement('div');
-    bar.id = 'codeFocusTopBar';
-    bar.className = 'codeFocusTopBar';
-    bar.innerHTML = `
-      <div>
-        <div class="codeFocusTitle">Patient Access Codes</div>
-        <div class="codeFocusSub">Generate and manage patient recovery access codes. App management is available below when needed.</div>
-      </div>
-      <div class="codeFocusActions">
-        <button class="codeFocusBtn primary" onclick="scrollToCodes()">Code Management</button>
-        <button class="codeFocusBtn" onclick="toggleAppManagement()">Show / Hide App Management</button>
-        <button class="codeFocusBtn" onclick="logoutAdmin()">Logout</button>
-      </div>
-    `;
-    editor.prepend(bar);
-  }
-
-  [...editor.querySelectorAll('.card')].forEach(card=>{
-    const text = card.textContent || '';
-
-    if(text.includes('Admin Session')){
-      card.classList.add('sessionCardCompact');
-      return;
-    }
-
-    if(text.includes('Admin Account')){
-      card.classList.add('adminAccountCompact');
-      return;
-    }
-
-    if(text.includes('Patient Access Codes')){
-      card.classList.add('patientCodeMainCard');
-      card.classList.remove('appManagementCardHidden');
-      return;
-    }
-
-    if(text.includes('Mobile view')){
-      card.classList.add('appManagementCardHidden');
-      return;
-    }
-
-    card.classList.add('appManagementCardHidden');
-  });
-
-  scrollToCodes();
-}
-
-function scrollToCodes(){
-  const codeCard = document.querySelector('.patientCodeMainCard');
-  if(codeCard){
-    codeCard.scrollIntoView({behavior:'smooth', block:'start'});
-  }
-}
-
-function toggleAppManagement(){
-  document.body.classList.toggle('showAppManagement');
-}
-
-window.addEventListener('load',()=>{
-  setTimeout(setupCodeFocusAdmin,500);
-});
-
 </script>
 <!-- ADMIN_ACCESS_CODE_WITH_PREVIEW_V35 -->
 <!-- ADMIN_STABLE_RECOVERY_V42 -->
 <!-- ADMIN_CHART_TABLE_TALL_V77 -->
 <!-- ADMIN_TABLE_HEADER_HEIGHT_FIX_V78 -->
 <!-- FULL_HEIGHT_ADMIN_TABLE_V79 -->
-<!-- CODE_FOCUS_STABLE_V83 -->
+<!-- CODE_DEFAULT_ADMIN_UNLOCK_V84 -->
 </body>
 </html>
 

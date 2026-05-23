@@ -3,72 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Recovery Code Generator</title>
+<title>Patient Code Generator</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#0f172a}
-.wrap{max-width:430px;margin:0 auto;padding:18px 14px 70px}
-.card{background:#fff;border-radius:24px;padding:18px;margin:12px 0;box-shadow:0 8px 26px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
-.logo{width:110px;height:auto;margin-bottom:8px;opacity:.9}
-h1{font-size:24px;line-height:1.1;margin:4px 0 6px;font-weight:950}
-.sub{font-size:14px;line-height:1.42;color:#64748b}
-label{display:block;font-size:13px;font-weight:900;color:#334155;margin:14px 0 6px}
-input,select{width:100%;border:1px solid rgba(15,23,42,.14);background:#f8fafc;border-radius:16px;padding:13px;font-size:16px}
-button{width:100%;border:0;border-radius:16px;padding:14px 16px;font-size:16px;font-weight:950;margin-top:14px;cursor:pointer}
+.wrap{max-width:480px;margin:0 auto;padding:18px 14px 70px}
+.card{background:white;border-radius:26px;padding:20px;margin:12px 0;box-shadow:0 10px 32px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
+.logo{width:128px;height:auto;margin-bottom:10px}
+h1{font-size:26px;margin:0 0 6px;font-weight:950;line-height:1.1}
+.sub{font-size:14px;color:#64748b;line-height:1.45}
+label{display:block;margin:15px 0 6px;font-size:13px;color:#334155;font-weight:900}
+input,select{width:100%;border:1px solid rgba(15,23,42,.14);background:#f8fafc;border-radius:16px;padding:13px 14px;font-size:16px}
+button{width:100%;border:0;border-radius:17px;padding:15px;font-size:16px;font-weight:950;margin-top:14px;cursor:pointer}
 .primary{background:#123c99;color:white}
-.secondary{background:#f1f5f9;color:#334155}
-.status{font-size:14px;font-weight:850;line-height:1.4;margin-top:12px}
-.codeBox{display:none;text-align:center;background:#eff6ff;border:1px solid rgba(37,99,235,.20);border-radius:22px;padding:18px;margin-top:16px}
-.code{font-size:34px;letter-spacing:.12em;font-weight:950;color:#0f172a;margin:6px 0}
-.meta{font-size:13px;color:#475569;line-height:1.45}
+.secondary{background:#eef2f7;color:#334155}
+.status{margin-top:12px;font-size:14px;font-weight:850;line-height:1.45}
+.codeBox{display:none;margin-top:18px;background:#eff6ff;border:1px solid rgba(37,99,235,.2);border-radius:22px;padding:18px;text-align:center}
+.codeLabel{font-size:13px;color:#475569;font-weight:900}
+.code{font-size:36px;letter-spacing:.12em;font-weight:950;color:#0f172a;margin:8px 0 4px}
+.meta{font-size:13px;color:#475569;line-height:1.5}
 .copyOk{color:#15803d;font-weight:900;margin-top:8px;font-size:13px}
-.small{font-size:12px;color:#64748b;line-height:1.4;margin-top:12px}
-.hidden{display:none}
+.small{font-size:12px;color:#64748b;line-height:1.45;margin-top:12px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <img class="logo" src="./logo.png" alt="SPARK logo">
-    <h1>Recovery Code Generator</h1>
-    <div class="sub">Quick mobile page for generating patient access codes.</div>
+    <h1>Patient Code Generator</h1>
+    <div class="sub">Staff-only page for generating patient Recovery Guide access codes.</div>
 
-    <label>Admin Password</label>
-    <input id="password" type="password" placeholder="Admin password">
-
-    <label>Surgery Type</label>
-    <select id="surgeryType">
-      <option value="periodontal">Periodontal Surgery</option>
-      <option value="implant">Implant</option>
-      <option value="graft">Gum Grafting</option>
-      <option value="extraction">Extraction</option>
-    </select>
-
-    <label>Surgery Date</label>
-    <input id="surgeryDate" type="date">
+    <label>Staff Password</label>
+    <input id="staffPassword" type="password" placeholder="Enter staff password">
 
     <label>Chart # (Optional)</label>
     <input id="chartNumber" type="text" placeholder="Example: 24851">
 
+    <label>Procedure</label>
+    <select id="surgeryType"></select>
+
+    <label>Surgery Date</label>
+    <input id="surgeryDate" type="date">
+
     <button class="primary" onclick="generateCode()">Generate Patient Code</button>
-    <button class="secondary" onclick="openFullAdmin()">Open Full Admin</button>
 
     <div id="status" class="status"></div>
 
     <div id="codeBox" class="codeBox">
-      <div class="meta">Patient Access Code</div>
+      <div class="codeLabel">Patient Access Code</div>
       <div id="codeText" class="code"></div>
       <button class="secondary" onclick="copyCode()">Copy Code</button>
       <div id="copyStatus" class="copyOk"></div>
       <div id="codeMeta" class="meta"></div>
     </div>
 
-    <div class="small">The code locks to the first device that uses it and expires after the recovery period.</div>
+    <div class="small">Do not enter patient names or PHI. Use Chart # only.</div>
   </div>
 </div>
 
 <script>
-const WORKER_URL="https://shrill-union-34e3.terryjseo.workers.dev";
+const WORKER_URL='https://shrill-union-34e3.terryjseo.workers.dev';
+let protocol={};
 
 function todayYMD(){
   return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -76,15 +71,40 @@ function todayYMD(){
 
 document.getElementById('surgeryDate').value=todayYMD();
 
+async function loadProtocol(){
+  const status=document.getElementById('status');
+  try{
+    const res=await fetch(WORKER_URL+'/protocol?t='+Date.now(),{cache:'no-store'});
+    protocol=await res.json();
+    const select=document.getElementById('surgeryType');
+    select.innerHTML='';
+    Object.keys(protocol).forEach(key=>{
+      const opt=document.createElement('option');
+      opt.value=key;
+      opt.textContent=protocol[key].name || key;
+      select.appendChild(opt);
+    });
+  }catch(e){
+    status.textContent='Could not load procedure list.';
+    status.style.color='#b91c1c';
+  }
+}
+
 async function generateCode(){
-  const password=document.getElementById('password').value.trim();
+  const password=document.getElementById('staffPassword').value.trim();
+  const chartNumber=document.getElementById('chartNumber').value.trim();
   const surgeryType=document.getElementById('surgeryType').value;
   const surgeryDate=document.getElementById('surgeryDate').value;
-  const chartNumber=document.getElementById('chartNumber')?.value.trim() || '';
   const status=document.getElementById('status');
 
   if(!password){
-    status.textContent='Enter admin password first.';
+    status.textContent='Enter staff password first.';
+    status.style.color='#b91c1c';
+    return;
+  }
+
+  if(!surgeryType || !surgeryDate){
+    status.textContent='Select procedure and surgery date.';
     status.style.color='#b91c1c';
     return;
   }
@@ -100,10 +120,15 @@ async function generateCode(){
     });
 
     const data=await res.json();
-    if(!res.ok) throw new Error(data.error||'Failed to generate code');
+    if(!res.ok) throw new Error(data.error || 'Failed to generate code');
 
     document.getElementById('codeText').textContent=data.code;
-    document.getElementById('codeMeta').innerHTML='Chart #: '+(data.chartNumber || '-')+'<br>Surgery date: '+data.surgeryDate+'<br>Expires: '+data.expiresAt;
+    document.getElementById('codeMeta').innerHTML=
+      'Chart #: '+(data.chartNumber || '-')+
+      '<br>Procedure: '+(protocol[surgeryType]?.name || surgeryType)+
+      '<br>Surgery date: '+data.surgeryDate+
+      '<br>Expires: '+data.expiresAt;
+
     document.getElementById('codeBox').style.display='block';
     document.getElementById('copyStatus').textContent='';
     status.textContent='Code generated.';
@@ -121,9 +146,7 @@ async function copyCode(){
   document.getElementById('copyStatus').textContent='Copied.';
 }
 
-function openFullAdmin(){
-  location.href='./admin.html';
-}
+loadProtocol();
 </script>
 </body>
 </html>

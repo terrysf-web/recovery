@@ -2495,6 +2495,176 @@ function renderPreview(){
 <!-- ADMIN_CHART_TABLE_TALL_V77 -->
 <!-- ADMIN_TABLE_HEADER_HEIGHT_FIX_V78 -->
 <!-- FULL_HEIGHT_ADMIN_TABLE_V79 -->
+
+<script>
+/* v99 robust inline preview override */
+(function(){
+  function esc(s){
+    return String(s ?? '').replace(/[&<>"']/g, ch => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[ch]));
+  }
+
+  function listHtml(value){
+    let list=[];
+    if(Array.isArray(value)){
+      list=value.filter(Boolean);
+    }else if(typeof value==='string' && value.trim()){
+      list=value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);
+    }
+
+    if(!list.length){
+      return '<ul><li>No content entered.</li></ul>';
+    }
+
+    return '<ul>'+list.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+  }
+
+  function todayYMD(){
+    return new Intl.DateTimeFormat('en-CA',{
+      timeZone:'America/Los_Angeles',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit'
+    }).format(new Date());
+  }
+
+  window.populateAdminPreviewControls = function(){
+    const typeSelect=document.getElementById('adminPreviewSurgeryType');
+    if(typeSelect && window.protocol){
+      const current=typeSelect.value;
+      typeSelect.innerHTML='';
+
+      Object.keys(window.protocol).forEach(key=>{
+        const opt=document.createElement('option');
+        opt.value=key;
+        opt.textContent=window.protocol[key]?.name || key;
+        typeSelect.appendChild(opt);
+      });
+
+      if(current && window.protocol[current]){
+        typeSelect.value=current;
+      }
+    }
+
+    const dateInput=document.getElementById('adminPreviewSurgeryDate');
+    if(dateInput && !dateInput.value){
+      dateInput.value=todayYMD();
+    }
+
+    window.populateAdminPreviewStages();
+  };
+
+  window.populateAdminPreviewStages = function(){
+    const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(window.protocol||{})[0];
+    let stageSelect=document.getElementById('adminPreviewStage');
+
+    if(!stageSelect){
+      const box=document.querySelector('.previewControlGrid');
+      if(box){
+        const wrap=document.createElement('div');
+        wrap.innerHTML='<label>Preview Stage / Week</label><select id="adminPreviewStage" onchange="renderAdminInlinePreview()"></select>';
+        box.insertBefore(wrap, box.children[1] || null);
+        stageSelect=document.getElementById('adminPreviewStage');
+      }
+    }
+
+    if(!stageSelect || !window.protocol || !window.protocol[type]) return;
+
+    const current=stageSelect.value;
+    const stages=window.protocol[type].stages || [];
+    stageSelect.innerHTML='';
+
+    stages.forEach((stage,idx)=>{
+      const opt=document.createElement('option');
+      opt.value=String(idx);
+      opt.textContent=stage.label || stage.phase || ('Stage '+(idx+1));
+      stageSelect.appendChild(opt);
+    });
+
+    if(current && stages[Number(current)]){
+      stageSelect.value=current;
+    }
+  };
+
+  window.renderAdminInlinePreview = function(){
+    const target=document.getElementById('adminPreviewContent');
+    if(!target) return;
+
+    if(!window.protocol || !Object.keys(window.protocol).length){
+      target.innerHTML='<div class="previewEmptyIcon">▣</div><div class="previewEmptyText">Protocol is not loaded yet. Click Reload Current Protocol first.</div>';
+      return;
+    }
+
+    const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(window.protocol)[0];
+    const surgery=window.protocol[type];
+
+    if(!surgery){
+      target.innerHTML='<div class="previewEmptyIcon">▣</div><div class="previewEmptyText">Select a surgery type to preview.</div>';
+      return;
+    }
+
+    window.populateAdminPreviewStages();
+
+    const stages=surgery.stages || [];
+    const idx=Number(document.getElementById('adminPreviewStage')?.value || 0);
+    const stage=stages[idx] || stages[0] || {};
+    const date=document.getElementById('adminPreviewSurgeryDate')?.value || todayYMD();
+
+    target.innerHTML=`
+      <div class="previewTitle">${esc(surgery.name || type)}</div>
+      <div class="previewMeta">Preview date: ${esc(date)} · Total days: ${esc(surgery.totalDays || '-')}</div>
+      <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
+
+      <div class="previewBlock previewReminder">
+        <h4>Today’s Reminder</h4>
+        <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
+      </div>
+
+      <div class="previewBlock">
+        <h4>What’s Normal Today</h4>
+        ${listHtml(stage.normal)}
+      </div>
+
+      <div class="previewBlock previewFoods">
+        <h4>Foods Allowed</h4>
+        ${listHtml(stage.foods)}
+      </div>
+
+      <div class="previewBlock previewAvoid">
+        <h4>Avoid Today</h4>
+        ${listHtml(stage.avoid)}
+      </div>
+
+      <div class="previewSmallNote">
+        This preview is generated inside the Admin page and does not require a patient access code.
+      </div>
+    `;
+  };
+
+  window.loadAdminNoCodePreview = function(){
+    window.populateAdminPreviewControls();
+    window.renderAdminInlinePreview();
+  };
+
+  window.reloadPatientPreview = function(){
+    window.loadAdminNoCodePreview();
+  };
+
+  document.addEventListener('change', function(e){
+    if(e.target && (e.target.id==='adminPreviewSurgeryType' || e.target.id==='adminPreviewStage' || e.target.id==='adminPreviewSurgeryDate')){
+      if(e.target.id==='adminPreviewSurgeryType') window.populateAdminPreviewStages();
+      window.renderAdminInlinePreview();
+    }
+  });
+
+  setTimeout(function(){
+    window.loadAdminNoCodePreview();
+  }, 600);
+})();
+</script>
+
+<!-- ADMIN_PREVIEW_RENDER_FIX_V99 -->
 </body>
 </html>
 

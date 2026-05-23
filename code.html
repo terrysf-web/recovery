@@ -7,14 +7,20 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#0f172a}
-.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 70px}
+body:not(.loggedIn) .managerSection,.header{display:none}
+body.loggedIn .header{display:block}
+body:not(.loggedIn) .wrap{max-width:460px;padding-top:44px}
+.wrap{max-width:1160px;margin:0 auto;padding:18px 14px 70px}
+.loginCard{background:white;border-radius:28px;padding:28px 22px;margin-top:28px;box-shadow:0 16px 48px rgba(15,23,42,.10);border:1px solid rgba(15,23,42,.06)}
+body.loggedIn .loginCard{display:none}
+.loginTitle{font-size:28px;font-weight:950;line-height:1.1;margin:0 0 18px;color:#0f172a}
 .header{background:linear-gradient(135deg,#021b57,#123c99);color:white;border-radius:0 0 28px 28px;padding:20px;margin:-18px -14px 18px}
-.headerInner{max-width:1100px;margin:0 auto}
+.headerInner{max-width:1160px;margin:0 auto}
 .logo{width:128px;height:auto;background:white;border-radius:12px;padding:4px;margin-bottom:10px}
 h1{font-size:28px;margin:0 0 6px;font-weight:950;line-height:1.1}
 .sub{font-size:14px;color:#dbeafe;line-height:1.45}
 .card{background:white;border-radius:24px;padding:18px;margin:14px 0;box-shadow:0 10px 32px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
-.grid{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;gap:12px}
+.grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:12px}
 label{display:block;margin:0 0 6px;font-size:12px;color:#334155;font-weight:950;text-transform:uppercase;letter-spacing:.03em}
 input,select{width:100%;border:1px solid rgba(15,23,42,.14);background:#f8fafc;border-radius:14px;padding:12px 13px;font-size:15px}
 button{border:0;border-radius:14px;padding:12px 14px;font-size:14px;font-weight:950;cursor:pointer}
@@ -23,6 +29,11 @@ button{border:0;border-radius:14px;padding:12px 14px;font-size:14px;font-weight:
 .danger{background:#fee2e2;color:#991b1b}
 .status{margin-top:12px;font-size:14px;font-weight:850;line-height:1.45}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.forgotBtn{width:auto;margin-top:12px;background:transparent;color:#123c99;padding:0;font-size:13px;font-weight:900;text-align:left}
+.forgotBox{display:none;margin-top:12px;background:#f8fafc;border:1px solid rgba(15,23,42,.08);border-radius:14px;padding:12px;font-size:12px;color:#475569;line-height:1.45}
+.compactLogoutBar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:white;border:1px solid rgba(15,23,42,.08);border-radius:16px;padding:10px 12px;margin-bottom:12px;box-shadow:0 6px 18px rgba(15,23,42,.05)}
+.compactLogoutText{font-size:13px;color:#475569;font-weight:800}
+.logoutSmallBtn{width:auto;margin:0;padding:9px 12px;border-radius:10px;font-size:13px;background:#eef2f7;color:#334155}
 .codeBox{display:none;margin-top:14px;background:#eff6ff;border:1px solid rgba(37,99,235,.2);border-radius:18px;padding:14px}
 .codeList{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:10px}
 .codeItem{display:flex;align-items:center;justify-content:space-between;gap:8px;background:white;border-radius:14px;padding:12px;border:1px solid rgba(15,23,42,.08)}
@@ -31,6 +42,7 @@ button{border:0;border-radius:14px;padding:12px 14px;font-size:14px;font-weight:
 .meta{font-size:12px;color:#64748b;line-height:1.45}
 .copyOk{color:#15803d;font-weight:900;margin-top:8px;font-size:13px}
 .notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;margin-top:12px}
+.phiBox{margin-top:14px;background:#fff7ed;border:1px solid #fdba74;color:#9a3412;border-radius:14px;padding:12px;font-size:13px;line-height:1.5;font-weight:800}
 .tableWrap{overflow:auto;border:1px solid rgba(15,23,42,.08);border-radius:16px;margin-top:12px;max-height:560px;background:white}
 table{width:100%;min-width:980px;border-collapse:separate;border-spacing:0}
 th{position:sticky;top:0;background:#f8fafc;z-index:2;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#334155;padding:12px 10px;border-bottom:1px solid rgba(15,23,42,.08)}
@@ -45,248 +57,121 @@ td{font-size:13px;color:#334155;padding:12px 10px;border-bottom:1px solid rgba(1
 .topRow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .searchBox{max-width:320px}
 .small{font-size:12px;color:#64748b;line-height:1.45}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:14px 10px 60px}.header{margin:-14px -10px 14px}.tableWrap{max-height:520px}}
-
-/* v88 login-before-generate guard */
-.lockedSection{
-  opacity:.45;
-  pointer-events:none;
-  filter:grayscale(.1);
-}
-
-.loginRow{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
-  align-items:end;
-}
-
-.loginBtn{
-  min-width:120px;
-  height:46px;
-  margin-top:0 !important;
-}
-
-.loginOk{
-  color:#15803d;
-}
-
-.loginBad{
-  color:#b91c1c;
-}
-
-@media(max-width:760px){
-  .loginRow{
-    grid-template-columns:1fr;
-  }
-  .loginBtn{
-    width:100%;
-  }
-}
-
-
-/* v89 clean login screen + compact logout after login */
-body:not(.loggedIn) .wrap{
-  max-width:460px !important;
-  padding-top:44px !important;
-}
-
-body:not(.loggedIn) .header,
-body:not(.loggedIn) .managerSection{
-  display:none !important;
-}
-
-body:not(.loggedIn) .loginCard{
-  display:block !important;
-}
-
-body.loggedIn .loginCard{
-  display:none !important;
-}
-
-body.loggedIn .managerSection{
-  display:block !important;
-}
-
-body.loggedIn .compactLogoutBar{
-  display:flex !important;
-}
-
-.loginCard{
-  background:white;
-  border-radius:28px;
-  padding:28px 22px;
-  margin-top:28px;
-  box-shadow:0 16px 48px rgba(15,23,42,.10);
-  border:1px solid rgba(15,23,42,.06);
-}
-
-.loginTitle{
-  font-size:28px;
-  font-weight:950;
-  line-height:1.1;
-  margin:0 0 18px;
-  color:#0f172a;
-}
-
-.forgotBtn{
-  width:auto;
-  margin-top:12px;
-  background:transparent;
-  color:#123c99;
-  padding:0;
-  font-size:13px;
-  font-weight:900;
-  text-align:left;
-}
-
-.forgotBox{
-  display:none;
-  margin-top:12px;
-  background:#f8fafc;
-  border:1px solid rgba(15,23,42,.08);
-  border-radius:14px;
-  padding:12px;
-  font-size:12px;
-  color:#475569;
-  line-height:1.45;
-}
-
-.compactLogoutBar{
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  background:white;
-  border:1px solid rgba(15,23,42,.08);
-  border-radius:16px;
-  padding:10px 12px;
-  margin-bottom:12px;
-  box-shadow:0 6px 18px rgba(15,23,42,.05);
-}
-
-.compactLogoutText{
-  font-size:13px;
-  color:#475569;
-  font-weight:800;
-}
-
-.logoutSmallBtn{
-  width:auto;
-  margin:0;
-  padding:9px 12px;
-  border-radius:10px;
-  font-size:13px;
-  background:#eef2f7;
-  color:#334155;
-}
-
+.categoryCard{border:1px solid rgba(15,23,42,.08);border-radius:18px;padding:14px;margin-top:12px;background:#fbfdff}
+.categoryHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.categoryTitle{font-size:17px;font-weight:950;color:#0f172a}
+.categoryCount{font-size:12px;color:#64748b;font-weight:850}
+.changeRow{display:flex;gap:6px;align-items:center}
+.changeSelect{min-width:160px;padding:9px 10px;border-radius:10px;font-size:12px}
+.changeBtn{padding:9px 10px;font-size:12px;border-radius:10px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:14px 10px 60px}.header{margin:-14px -10px 14px}.tableWrap{max-height:520px}.changeRow{display:block}.changeSelect,.changeBtn{width:100%;margin-top:6px}.topRow{display:block}.searchBox{max-width:none;margin-top:10px}}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="headerInner">
-    <img class="logo" src="./logo.png" alt="SPARK logo">
-    <h1>Patient Code Management</h1>
-    <div class="sub">Staff page for generating and managing Recovery Guide access codes.</div>
-  </div>
-</div>
 
 <div class="wrap">
   <div class="loginCard">
     <h1 class="loginTitle">Patient Code Management Login</h1>
-
     <label>Password</label>
     <input id="staffPassword" type="password" placeholder="Enter password">
-
     <button class="primary" onclick="staffLogin()">Login</button>
-
     <button class="forgotBtn" onclick="toggleForgotPassword()" type="button">Forgot password?</button>
-
-    <div id="forgotPasswordBox" class="forgotBox">
-      Please contact the clinic administrator to reset the staff password.
-    </div>
-
+    <div id="forgotPasswordBox" class="forgotBox">Please contact the clinic administrator to reset the staff password.</div>
     <div id="loginStatus" class="status"></div>
   </div>
 
   <div class="managerSection">
+    <div class="header">
+      <div class="headerInner">
+        <img class="logo" src="./logo.png" alt="SPARK logo">
+        <h1>Patient Code Management</h1>
+        <div class="sub">Staff page for generating and managing Recovery Guide access codes.</div>
+      </div>
+    </div>
+
     <div class="compactLogoutBar">
       <div class="compactLogoutText">Logged in to Patient Code Management</div>
       <button class="logoutSmallBtn" onclick="logoutStaff()">Log off</button>
     </div>
 
-  <div class="card">
-    <div class="grid" id="generatorFields">
-      <div>
-        <label>Procedure</label>
-        <select id="surgeryType"></select>
+    <div class="card">
+      <div class="grid">
+        <div>
+          <label>Procedure</label>
+          <select id="surgeryType"></select>
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input id="quantity" type="number" min="1" max="50" value="5">
+        </div>
+        <div>
+          <label>Batch Note / Chart #</label>
+          <input id="chartNumber" type="text" placeholder="Optional">
+        </div>
       </div>
-      <div>
-        <label>Quantity</label>
-        <input id="quantity" type="number" min="1" max="50" value="5">
+
+      <div class="actions">
+        <button id="generateBtn" class="primary" onclick="generateCodes()">Generate Code Batch</button>
+        <button id="refreshBtn" class="secondary" onclick="loadCodes()">Refresh Code List</button>
+        <button class="secondary" onclick="copyAllCodes()">Copy New Codes</button>
       </div>
-      <div>
-        <label>Batch Note / Chart #</label>
-        <input id="chartNumber" type="text" placeholder="Optional">
+
+      <div class="notice">Login first, then select the correct procedure and quantity before generating codes. Patient enters code + surgery date in the app after surgery.</div>
+
+      <div id="status" class="status"></div>
+
+      <div id="codeBox" class="codeBox">
+        <b>Newly Generated Codes</b>
+        <div id="codeList" class="codeList"></div>
+        <div id="copyStatus" class="copyOk"></div>
+        <div id="codeMeta" class="meta"></div>
       </div>
+
+      <div class="phiBox">⚠️ IMPORTANT:<br>Do NOT enter patient names or PHI.<br>Use Chart # or internal reference only.</div>
     </div>
 
-    <div class="actions">
-      <button id="generateBtn" class="primary" onclick="generateCodes()" disabled>Generate Code Batch</button>
-      <button id="refreshBtn" class="secondary" onclick="loadCodes()" disabled>Refresh Code List</button>
-      <button class="secondary" onclick="copyAllCodes()">Copy New Codes</button>
-    </div>
-
-    <div class="notice">
-      Login first, then select the correct procedure and quantity before generating codes. Patient enters code + surgery date in the app after surgery.
-    </div>
-
-    <div id="status" class="status"></div>
-
-    <div id="codeBox" class="codeBox">
-      <b>Newly Generated Codes</b>
-      <div id="codeList" class="codeList"></div>
-      <div id="copyStatus" class="copyOk"></div>
-      <div id="codeMeta" class="meta"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="topRow">
-      <div>
-        <h2 style="margin:0;font-size:22px">Code List</h2>
-        <div class="small">Ready = not assigned/activated yet. Used = patient entered surgery date and opened guide.</div>
+    <div class="card">
+      <div class="topRow">
+        <div>
+          <h2 style="margin:0;font-size:22px">Ready Codes</h2>
+          <div class="small">Unused codes are grouped into the same procedure categories as the Recovery Guide app.</div>
+        </div>
+        <input id="searchInput" class="searchBox" placeholder="Search code, chart #, procedure..." oninput="renderCodes()">
       </div>
-      <input id="searchInput" class="searchBox" placeholder="Search code, chart #, procedure..." oninput="renderCodes()">
+      <div id="tableStatus" class="status"></div>
+      <div id="readyCategoryContainer"></div>
     </div>
 
-    <div id="tableStatus" class="status"></div>
-
-    <div class="tableWrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Code</th>
-            <th>Chart # / Note</th>
-            <th>Procedure</th>
-            <th>Surgery Date</th>
-            <th>Expires</th>
-            <th>Created</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="codeTableBody">
-          <tr><td colspan="8">Please login first. Codes will not be generated until login is successful.</td></tr>
-        </tbody>
-      </table>
+    <div class="card">
+      <div class="topRow">
+        <div>
+          <h2 style="margin:0;font-size:22px">Activated / Completed Codes</h2>
+          <div class="small">Sorted by Used, Active, then other statuses. Disable management is here.</div>
+        </div>
+      </div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Code</th>
+              <th>Procedure</th>
+              <th>Chart # / Note</th>
+              <th>Surgery Date</th>
+              <th>Expires</th>
+              <th>Last Used</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr><td colspan="8">No activated codes.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-
-  </div>
 <script>
 const WORKER_URL='https://shrill-union-34e3.terryjseo.workers.dev';
 let protocol={};
@@ -296,18 +181,15 @@ let staffLoggedIn=false;
 
 function getPass(){return document.getElementById('staffPassword').value.trim();}
 
+function toggleForgotPassword(){
+  const box=document.getElementById('forgotPasswordBox');
+  if(box) box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
 function formatDateTime(iso){
   if(!iso)return '-';
   try{
-    return new Intl.DateTimeFormat('en-US',{
-      timeZone:'America/Los_Angeles',
-      month:'2-digit',
-      day:'2-digit',
-      year:'numeric',
-      hour:'numeric',
-      minute:'2-digit',
-      hour12:true
-    }).format(new Date(iso));
+    return new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',month:'2-digit',day:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true}).format(new Date(iso));
   }catch(e){return String(iso).slice(0,16);}
 }
 
@@ -318,6 +200,13 @@ function statusFor(c){
   if(c.usedAt || c.firstUsedAt || c.lastUsedAt)return ['Used','used'];
   if(c.surgeryDate)return ['Active','active'];
   return ['Ready','ready'];
+}
+
+function surgeryOptionsHtml(selected){
+  return Object.keys(protocol).map(k=>{
+    const name=protocol[k]?.name || k;
+    return `<option value="${k}" ${k===selected?'selected':''}>${name}</option>`;
+  }).join('');
 }
 
 async function loadProtocol(){
@@ -334,19 +223,19 @@ async function loadProtocol(){
       select.appendChild(opt);
     });
   }catch(e){
-    status.textContent='Could not load procedure list.';
-    status.style.color='#b91c1c';
+    if(status){
+      status.textContent='Could not load procedure list.';
+      status.style.color='#b91c1c';
+    }
   }
 }
-
 
 async function staffLogin(){
   const password=getPass();
   const loginStatus=document.getElementById('loginStatus');
-  const tableStatus=document.getElementById('tableStatus');
 
   if(!password){
-    loginStatus.textContent='Please enter your staff password.';
+    loginStatus.textContent='Please enter your password.';
     loginStatus.className='status loginBad';
     return;
   }
@@ -355,70 +244,54 @@ async function staffLogin(){
     loginStatus.textContent='Checking password...';
     loginStatus.className='status';
 
-    const res=await fetch(WORKER_URL+'/access-codes',{
-      headers:{'x-admin-password':password},
-      cache:'no-store'
-    });
+    const res=await fetch(WORKER_URL+'/access-codes',{headers:{'x-admin-password':password},cache:'no-store'});
 
-    if(!res.ok){
-      throw new Error('Incorrect password. Please try again.');
-    }
+    if(!res.ok) throw new Error('Incorrect password. Please try again.');
 
     const data=await res.json();
     allCodes=data.codes || [];
-
     staffLoggedIn=true;
     document.body.classList.add('loggedIn');
 
-    document.getElementById('generateBtn').disabled=false;
-    document.getElementById('refreshBtn').disabled=false;
-
-    loginStatus.textContent='Login successful. You can now generate patient codes.';
-    loginStatus.className='status loginOk';
-
+    loginStatus.textContent='';
     renderCodes();
 
+    const tableStatus=document.getElementById('tableStatus');
     if(tableStatus){
       tableStatus.textContent='Loaded '+allCodes.length+' codes.';
       tableStatus.style.color='#15803d';
     }
-
   }catch(e){
     staffLoggedIn=false;
     document.body.classList.remove('loggedIn');
-
-    document.getElementById('generateBtn').disabled=true;
-    document.getElementById('refreshBtn').disabled=true;
-
     loginStatus.textContent=e.message || 'Incorrect password. Please try again.';
     loginStatus.className='status loginBad';
-
-    const body=document.getElementById('codeTableBody');
-    if(body){
-      body.innerHTML='<tr><td colspan="8">Login required.</td></tr>';
-    }
   }
 }
 
+function logoutStaff(){
+  staffLoggedIn=false;
+  latestCodes=[];
+  allCodes=[];
+  document.body.classList.remove('loggedIn');
+  const pass=document.getElementById('staffPassword');
+  if(pass) pass.value='';
+  document.getElementById('readyCategoryContainer').innerHTML='';
+  document.getElementById('historyTableBody').innerHTML='<tr><td colspan="8">No activated codes.</td></tr>';
+}
 
 async function generateCodes(){
-  const password=getPass();
-  const chartNumber=document.getElementById('chartNumber').value.trim();
-  const surgeryType=document.getElementById('surgeryType').value;
-  const quantity=Math.max(1,Math.min(50,Number(document.getElementById('quantity').value||1)));
-  const status=document.getElementById('status');
-
   if(!staffLoggedIn){
     status.textContent='Please login first before generating codes.';
     status.style.color='#b91c1c';
     return;
   }
 
-  if(!password){
-    status.textContent='Please enter your staff password.';
-    status.style.color='#b91c1c';
-    return;
-  }
+  const password=getPass();
+  const chartNumber=document.getElementById('chartNumber').value.trim();
+  const surgeryType=document.getElementById('surgeryType').value;
+  const quantity=Math.max(1,Math.min(50,Number(document.getElementById('quantity').value||1)));
+  const status=document.getElementById('status');
 
   try{
     status.textContent='Generating codes...';
@@ -445,36 +318,22 @@ async function generateCodes(){
       </div>
     `).join('');
 
-    document.getElementById('codeMeta').innerHTML=
-      'Procedure: '+(protocol[surgeryType]?.name || surgeryType)+
-      '<br>Quantity: '+latestCodes.length+
-      '<br>Status: Ready to assign. Patient will enter surgery date.';
-
+    document.getElementById('codeMeta').innerHTML='Procedure: '+(protocol[surgeryType]?.name || surgeryType)+'<br>Quantity: '+latestCodes.length+'<br>Status: Ready to assign.';
     document.getElementById('codeBox').style.display='block';
     document.getElementById('copyStatus').textContent='';
     status.textContent='Code batch generated.';
     status.style.color='#15803d';
-
     await loadCodes();
 
   }catch(e){
-    status.textContent = e.message && e.message.includes('Unauthorized') ? 'Incorrect password. Please try again.' : 'Generate failed: '+e.message;
+    status.textContent=e.message && e.message.includes('Unauthorized') ? 'Incorrect password. Please try again.' : 'Generate failed: '+e.message;
     status.style.color='#b91c1c';
   }
 }
 
 async function loadCodes(){
-  const password=getPass();
-  const tableStatus=document.getElementById('tableStatus');
-
   if(!staffLoggedIn){
     tableStatus.textContent='Please login first.';
-    tableStatus.style.color='#b91c1c';
-    return;
-  }
-
-  if(!password){
-    tableStatus.textContent='Please enter your staff password.';
     tableStatus.style.color='#b91c1c';
     return;
   }
@@ -483,60 +342,152 @@ async function loadCodes(){
     tableStatus.textContent='Loading codes...';
     tableStatus.style.color='#334155';
 
-    const res=await fetch(WORKER_URL+'/access-codes',{
-      headers:{'x-admin-password':password},
-      cache:'no-store'
-    });
-
+    const res=await fetch(WORKER_URL+'/access-codes',{headers:{'x-admin-password':getPass()},cache:'no-store'});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error || 'Failed to load codes');
 
     allCodes=data.codes || [];
     renderCodes();
-
     tableStatus.textContent='Loaded '+allCodes.length+' codes.';
     tableStatus.style.color='#15803d';
-
   }catch(e){
-    tableStatus.textContent = e.message && e.message.includes('Unauthorized') ? 'Incorrect password. Please try again.' : 'Load failed: '+e.message;
+    tableStatus.textContent=e.message && e.message.includes('Unauthorized') ? 'Incorrect password. Please try again.' : 'Load failed: '+e.message;
     tableStatus.style.color='#b91c1c';
   }
 }
 
 function renderCodes(){
   const q=(document.getElementById('searchInput').value||'').toLowerCase().trim();
-  const rows=allCodes.filter(c=>{
+  const today=new Date().toISOString().slice(0,10);
+
+  const filtered=allCodes.filter(c=>{
     const typeName=protocol[c.surgeryType]?.name || c.surgeryType || '';
     const text=[c.code,c.chartNumber,typeName,c.surgeryDate,c.expiresAt].join(' ').toLowerCase();
     return !q || text.includes(q);
   });
 
-  const body=document.getElementById('codeTableBody');
+  const readyCodes=filtered.filter(c=>{
+    if(c.active===false) return false;
+    if(c.expiresAt && c.expiresAt < today) return false;
+    return !c.usedAt && !c.firstUsedAt && !c.lastUsedAt && !c.surgeryDate;
+  });
 
-  if(!rows.length){
-    body.innerHTML='<tr><td colspan="8">No matching codes.</td></tr>';
+  const historyCodes=filtered.filter(c=>{
+    if(c.active===false) return true;
+    if(c.expiresAt && c.expiresAt < today) return true;
+    return !!(c.usedAt || c.firstUsedAt || c.lastUsedAt || c.surgeryDate);
+  });
+
+  historyCodes.sort((a,b)=>{
+    const rank=(c)=>{
+      if(c.usedAt || c.firstUsedAt || c.lastUsedAt) return 1;
+      if(c.surgeryDate && c.active!==false) return 2;
+      return 3;
+    };
+    const ra=rank(a);
+    const rb=rank(b);
+    if(ra !== rb) return ra-rb;
+    return new Date(b.createdAt||0)-new Date(a.createdAt||0);
+  });
+
+  renderReadyCategories(readyCodes);
+  renderHistory(historyCodes);
+}
+
+function renderReadyCategories(readyCodes){
+  const container=document.getElementById('readyCategoryContainer');
+  const keys=Object.keys(protocol);
+
+  container.innerHTML=keys.map(key=>{
+    const name=protocol[key]?.name || key;
+    const codes=readyCodes.filter(c=>c.surgeryType===key);
+
+    const rows=codes.length ? codes.map(c=>`
+      <tr>
+        <td class="codeCell">${c.code}</td>
+        <td>${c.chartNumber || '-'}</td>
+        <td>${formatDateTime(c.createdAt)}</td>
+        <td><button class="secondary" onclick="copyOne('${c.code}')">Copy</button></td>
+        <td>
+          <div class="changeRow">
+            <select class="changeSelect" id="move_${c.code}">${surgeryOptionsHtml(c.surgeryType)}</select>
+            <button class="secondary changeBtn" onclick="changeProcedure('${c.code}')">Change</button>
+          </div>
+        </td>
+      </tr>`).join('') : '<tr><td colspan="5">No ready codes in this category.</td></tr>';
+
+    return `
+      <div class="categoryCard">
+        <div class="categoryHeader">
+          <div class="categoryTitle">${name}</div>
+          <div class="categoryCount">${codes.length} ready code(s)</div>
+        </div>
+        <div class="tableWrap" style="max-height:320px">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Chart # / Note</th>
+                <th>Created</th>
+                <th>Copy</th>
+                <th>Wrong Procedure?</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderHistory(historyCodes){
+  const body=document.getElementById('historyTableBody');
+
+  if(!historyCodes.length){
+    body.innerHTML='<tr><td colspan="8">No activated or completed codes.</td></tr>';
     return;
   }
 
-  body.innerHTML=rows.map(c=>{
+  body.innerHTML=historyCodes.map(c=>{
     const [label,cls]=statusFor(c);
     const typeName=protocol[c.surgeryType]?.name || c.surgeryType || '-';
-    const action=c.active===false
-      ? '—'
-      : `<button class="danger" onclick="disableCode('${c.code}')">Disable</button>`;
+    const disableBtn=c.active===false ? '—' : `<button class="danger" onclick="disableCode('${c.code}')">Disable</button>`;
 
     return `
       <tr>
         <td><span class="badge ${cls}">${label}</span></td>
         <td class="codeCell">${c.code}</td>
-        <td>${c.chartNumber || '-'}</td>
         <td>${typeName}</td>
+        <td>${c.chartNumber || '-'}</td>
         <td>${c.surgeryDate || '-'}</td>
         <td>${c.expiresAt || '-'}</td>
-        <td>${formatDateTime(c.createdAt)}</td>
-        <td>${action}</td>
+        <td>${formatDateTime(c.lastUsedAt || c.usedAt || c.firstUsedAt)}</td>
+        <td>${disableBtn}</td>
       </tr>`;
   }).join('');
+}
+
+async function changeProcedure(code){
+  const select=document.getElementById('move_'+code);
+  const surgeryType=select?.value;
+  if(!surgeryType)return;
+
+  if(!confirm('Change procedure for ready code '+code+'?'))return;
+
+  try{
+    const res=await fetch(WORKER_URL+'/access-code/update-procedure',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-password':getPass()},
+      body:JSON.stringify({code,surgeryType})
+    });
+
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error || 'Change failed');
+
+    await loadCodes();
+  }catch(e){
+    alert('Change failed: '+e.message);
+  }
 }
 
 async function disableCode(code){
@@ -560,65 +511,20 @@ async function disableCode(code){
 
 async function copyOne(code){
   await navigator.clipboard.writeText(code);
-  document.getElementById('copyStatus').textContent='Copied '+code+'.';
+  const c=document.getElementById('copyStatus');
+  if(c)c.textContent='Copied '+code+'.';
 }
 
 async function copyAllCodes(){
   if(!latestCodes.length)return;
   await navigator.clipboard.writeText(latestCodes.map(c=>c.code).join('\n'));
-  document.getElementById('copyStatus').textContent='All new codes copied.';
+  const c=document.getElementById('copyStatus');
+  if(c)c.textContent='All new codes copied.';
 }
-
 
 document.getElementById('staffPassword').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    staffLogin();
-  }
+  if(e.key==='Enter') staffLogin();
 });
-
-
-function toggleForgotPassword(){
-  const box=document.getElementById('forgotPasswordBox');
-  if(box){
-    box.style.display = box.style.display === 'block' ? 'none' : 'block';
-  }
-}
-
-function logoutStaff(){
-  staffLoggedIn=false;
-  latestCodes=[];
-  allCodes=[];
-  document.body.classList.remove('loggedIn');
-
-  const pass=document.getElementById('staffPassword');
-  if(pass) pass.value='';
-
-  const loginStatus=document.getElementById('loginStatus');
-  if(loginStatus){
-    loginStatus.textContent='';
-    loginStatus.className='status';
-  }
-
-  const status=document.getElementById('status');
-  if(status) status.textContent='';
-
-  const tableStatus=document.getElementById('tableStatus');
-  if(tableStatus) tableStatus.textContent='';
-
-  const body=document.getElementById('codeTableBody');
-  if(body){
-    body.innerHTML='<tr><td colspan="8">Please login first. Codes will not be generated until login is successful.</td></tr>';
-  }
-
-  const box=document.getElementById('codeBox');
-  if(box) box.style.display='none';
-
-  const gen=document.getElementById('generateBtn');
-  if(gen) gen.disabled=true;
-
-  const refresh=document.getElementById('refreshBtn');
-  if(refresh) refresh.disabled=true;
-}
 
 loadProtocol();
 </script>

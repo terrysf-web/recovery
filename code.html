@@ -7,23 +7,28 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#eef2f7;color:#0f172a}
-.wrap{max-width:480px;margin:0 auto;padding:18px 14px 70px}
+.wrap{max-width:560px;margin:0 auto;padding:18px 14px 70px}
 .card{background:white;border-radius:26px;padding:20px;margin:12px 0;box-shadow:0 10px 32px rgba(15,23,42,.08);border:1px solid rgba(15,23,42,.06)}
 .logo{width:128px;height:auto;margin-bottom:10px}
 h1{font-size:26px;margin:0 0 6px;font-weight:950;line-height:1.1}
 .sub{font-size:14px;color:#64748b;line-height:1.45}
 label{display:block;margin:15px 0 6px;font-size:13px;color:#334155;font-weight:900}
 input,select{width:100%;border:1px solid rgba(15,23,42,.14);background:#f8fafc;border-radius:16px;padding:13px 14px;font-size:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 button{width:100%;border:0;border-radius:17px;padding:15px;font-size:16px;font-weight:950;margin-top:14px;cursor:pointer}
 .primary{background:#123c99;color:white}
 .secondary{background:#eef2f7;color:#334155}
 .status{margin-top:12px;font-size:14px;font-weight:850;line-height:1.45}
-.codeBox{display:none;margin-top:18px;background:#eff6ff;border:1px solid rgba(37,99,235,.2);border-radius:22px;padding:18px;text-align:center}
-.codeLabel{font-size:13px;color:#475569;font-weight:900}
-.code{font-size:36px;letter-spacing:.12em;font-weight:950;color:#0f172a;margin:8px 0 4px}
-.meta{font-size:13px;color:#475569;line-height:1.5}
+.codeBox{display:none;margin-top:18px;background:#eff6ff;border:1px solid rgba(37,99,235,.2);border-radius:22px;padding:16px;text-align:left}
+.codeList{display:grid;gap:8px;margin-top:10px}
+.codeItem{display:flex;align-items:center;justify-content:space-between;gap:8px;background:white;border-radius:14px;padding:12px;border:1px solid rgba(15,23,42,.08)}
+.code{font-size:22px;letter-spacing:.10em;font-weight:950;color:#0f172a}
+.copyBtn{width:auto;margin:0;padding:9px 12px;border-radius:10px;font-size:13px;background:#eef2f7;color:#334155}
+.meta{font-size:13px;color:#475569;line-height:1.5;margin-top:10px}
 .copyOk{color:#15803d;font-weight:900;margin-top:8px;font-size:13px}
 .small{font-size:12px;color:#64748b;line-height:1.45;margin-top:12px}
+.warning{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:12px;font-size:12px;line-height:1.45;margin-top:12px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -31,45 +36,49 @@ button{width:100%;border:0;border-radius:17px;padding:15px;font-size:16px;font-w
   <div class="card">
     <img class="logo" src="./logo.png" alt="SPARK logo">
     <h1>Patient Code Generator</h1>
-    <div class="sub">Staff-only page for generating patient Recovery Guide access codes.</div>
+    <div class="sub">Generate batches of recovery access codes by procedure. The patient enters the surgery date when opening the app.</div>
 
     <label>Staff Password</label>
     <input id="staffPassword" type="password" placeholder="Enter staff password">
 
-    <label>Chart # (Optional)</label>
-    <input id="chartNumber" type="text" placeholder="Example: 24851">
-
     <label>Procedure</label>
     <select id="surgeryType"></select>
 
-    <label>Surgery Date</label>
-    <input id="surgeryDate" type="date">
+    <div class="row">
+      <div>
+        <label>Quantity</label>
+        <input id="quantity" type="number" min="1" max="50" value="5">
+      </div>
+      <div>
+        <label>Batch Note / Chart # (Optional)</label>
+        <input id="chartNumber" type="text" placeholder="Optional">
+      </div>
+    </div>
 
-    <button class="primary" onclick="generateCode()">Generate Patient Code</button>
+    <button class="primary" onclick="generateCodes()">Generate Code Batch</button>
+
+    <div class="warning">
+      Staff can prepare codes by procedure in advance. The recovery timeline starts only after the patient enters the code and surgery date in the app.
+    </div>
 
     <div id="status" class="status"></div>
 
     <div id="codeBox" class="codeBox">
-      <div class="codeLabel">Patient Access Code</div>
-      <div id="codeText" class="code"></div>
-      <button class="secondary" onclick="copyCode()">Copy Code</button>
+      <b>Generated Codes</b>
+      <div id="codeList" class="codeList"></div>
+      <button class="secondary" onclick="copyAllCodes()">Copy All Codes</button>
       <div id="copyStatus" class="copyOk"></div>
       <div id="codeMeta" class="meta"></div>
     </div>
 
-    <div class="small">Do not enter patient names or PHI. Use Chart # only.</div>
+    <div class="small">Do not enter patient names or PHI. Chart # or internal reference only.</div>
   </div>
 </div>
 
 <script>
 const WORKER_URL='https://shrill-union-34e3.terryjseo.workers.dev';
 let protocol={};
-
-function todayYMD(){
-  return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-}
-
-document.getElementById('surgeryDate').value=todayYMD();
+let latestCodes=[];
 
 async function loadProtocol(){
   const status=document.getElementById('status');
@@ -90,11 +99,11 @@ async function loadProtocol(){
   }
 }
 
-async function generateCode(){
+async function generateCodes(){
   const password=document.getElementById('staffPassword').value.trim();
   const chartNumber=document.getElementById('chartNumber').value.trim();
   const surgeryType=document.getElementById('surgeryType').value;
-  const surgeryDate=document.getElementById('surgeryDate').value;
+  const quantity=Math.max(1,Math.min(50,Number(document.getElementById('quantity').value||1)));
   const status=document.getElementById('status');
 
   if(!password){
@@ -103,47 +112,64 @@ async function generateCode(){
     return;
   }
 
-  if(!surgeryType || !surgeryDate){
-    status.textContent='Select procedure and surgery date.';
+  if(!surgeryType){
+    status.textContent='Select procedure.';
     status.style.color='#b91c1c';
     return;
   }
 
   try{
-    status.textContent='Generating code...';
+    status.textContent='Generating codes...';
     status.style.color='#334155';
 
     const res=await fetch(WORKER_URL+'/access-code',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-admin-password':password},
-      body:JSON.stringify({surgeryType,surgeryDate,chartNumber})
+      body:JSON.stringify({surgeryType,chartNumber,quantity})
     });
 
     const data=await res.json();
-    if(!res.ok) throw new Error(data.error || 'Failed to generate code');
+    if(!res.ok) throw new Error(data.error || 'Failed to generate codes');
 
-    document.getElementById('codeText').textContent=data.code;
+    latestCodes=data.codes || [data];
+
+    const list=document.getElementById('codeList');
+    list.innerHTML=latestCodes.map(c=>`
+      <div class="codeItem">
+        <div>
+          <div class="code">${c.code}</div>
+          <div class="meta">${protocol[surgeryType]?.name || surgeryType}</div>
+        </div>
+        <button class="copyBtn" onclick="copyOne('${c.code}')">Copy</button>
+      </div>
+    `).join('');
+
     document.getElementById('codeMeta').innerHTML=
-      'Chart #: '+(data.chartNumber || '-')+
-      '<br>Procedure: '+(protocol[surgeryType]?.name || surgeryType)+
-      '<br>Surgery date: '+data.surgeryDate+
-      '<br>Expires: '+data.expiresAt;
+      'Procedure: '+(protocol[surgeryType]?.name || surgeryType)+
+      '<br>Quantity: '+latestCodes.length+
+      '<br>Status: Ready to assign. Patient will enter surgery date.';
 
     document.getElementById('codeBox').style.display='block';
     document.getElementById('copyStatus').textContent='';
-    status.textContent='Code generated.';
+    status.textContent='Code batch generated.';
     status.style.color='#15803d';
+
   }catch(e){
     status.textContent='Generate failed: '+e.message;
     status.style.color='#b91c1c';
   }
 }
 
-async function copyCode(){
-  const code=document.getElementById('codeText').textContent.trim();
-  if(!code)return;
+async function copyOne(code){
   await navigator.clipboard.writeText(code);
-  document.getElementById('copyStatus').textContent='Copied.';
+  document.getElementById('copyStatus').textContent='Copied '+code+'.';
+}
+
+async function copyAllCodes(){
+  if(!latestCodes.length)return;
+  const text=latestCodes.map(c=>c.code).join('\n');
+  await navigator.clipboard.writeText(text);
+  document.getElementById('copyStatus').textContent='All codes copied.';
 }
 
 loadProtocol();

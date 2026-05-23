@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=75">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=75">
+<link rel="manifest" href="./manifest.json?v=86">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=86">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -203,6 +203,16 @@
   font-weight:900;
 }
 
+
+.accessDateLabel{
+  display:block;
+  margin:12px 0 6px;
+  font-size:13px;
+  color:#334155;
+  font-weight:900;
+  text-align:left;
+}
+
 </style>
 </head>
 <body>
@@ -223,6 +233,10 @@
     <div class="accessTitle">Recovery Guide</div>
     <div class="accessText">Enter your access code to open your personalized recovery guide.</div>
     <input id="accessCodeInput" class="accessInput" placeholder="Enter code" autocomplete="one-time-code">
+
+    <label class="accessDateLabel">Surgery Date</label>
+    <input id="patientSurgeryDateInput" class="accessInput" type="date" autocomplete="off">
+
     <button class="primary-btn" onclick="verifyAccessCode()">Open Recovery Guide</button>
     <button class="staffModeBtn" onclick="openStaffMode()">Staff Code Generator</button>
 
@@ -313,6 +327,21 @@ function getDeviceToken(){
   return token;
 }
 
+
+function todayPacificYMD(){
+  return new Intl.DateTimeFormat('en-CA',{
+    timeZone:'America/Los_Angeles',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).format(new Date());
+}
+
+window.addEventListener('load',()=>{
+  const d=document.getElementById('patientSurgeryDateInput');
+  if(d && !d.value) d.value=todayPacificYMD();
+});
+
 function savedAccessCode(){
   return localStorage.getItem("recoveryAccessCode") || "";
 }
@@ -329,16 +358,22 @@ async function verifyAccessCode(codeFromStorage){
   const input=document.getElementById("accessCodeInput");
   const msg=document.getElementById("accessMessage");
   const code=(codeFromStorage || (input?input.value:"")).trim().toUpperCase();
+  const surgeryDateParam=(document.getElementById("patientSurgeryDateInput")?.value || localStorage.getItem("surgeryDate") || "").trim();
 
   if(!code){
     if(msg) msg.textContent="Please enter your recovery code.";
     return false;
   }
 
+  if(!surgeryDateParam){
+    if(msg) msg.textContent="Please enter your surgery date.";
+    return false;
+  }
+
   if(msg) msg.textContent="Checking code...";
 
   try{
-    const res=await fetch(ACCESS_API_URL+"/access-code?code="+encodeURIComponent(code)+"&deviceToken="+encodeURIComponent(getDeviceToken())+"&deviceFingerprint="+encodeURIComponent(getDeviceFingerprint()),{cache:"no-store"});
+    const res=await fetch(ACCESS_API_URL+"/access-code?code="+encodeURIComponent(code)+"&surgeryDate="+encodeURIComponent(surgeryDateParam)+"&deviceToken="+encodeURIComponent(getDeviceToken())+"&deviceFingerprint="+encodeURIComponent(getDeviceFingerprint()),{cache:"no-store"});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error || "Invalid access code");
 
@@ -474,7 +509,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=75").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=86").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -552,7 +587,7 @@ function closeExpiredOverlay(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=75';
+    location.href='./?v=86';
   },300);
 }
 
@@ -644,7 +679,7 @@ function returnToRecoveryLogin(){
 
   clearAllLoginMessagesAndInputs();
 
-  history.replaceState(null,'','./?v=75&login=1');
+  history.replaceState(null,'','./?v=86&login=1');
 
   setTimeout(clearAllLoginMessagesAndInputs,100);
   setTimeout(clearAllLoginMessagesAndInputs,500);

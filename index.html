@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=86">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=86">
+<link rel="manifest" href="./manifest.json?v=101">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=101">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -342,6 +342,30 @@ window.addEventListener('load',()=>{
   if(d && !d.value) d.value=todayPacificYMD();
 });
 
+
+function getAdminPreviewParams(){
+  const params=new URLSearchParams(location.search);
+  return {
+    enabled: params.get('adminPreview') === '1',
+    surgeryType: params.get('surgeryType') || params.get('type') || 'periodontal',
+    surgeryDate: params.get('surgeryDate') || todayPacificYMD()
+  };
+}
+
+function initAdminPreviewMode(){
+  const preview=getAdminPreviewParams();
+  if(!preview.enabled) return false;
+
+  ACCESS_READY=true;
+  localStorage.setItem("surgeryType", preview.surgeryType);
+  localStorage.setItem("surgeryDate", preview.surgeryDate);
+
+  hideAccessGate();
+  loadClinicProtocol();
+  setTimeout(()=>renderToday(),250);
+  return true;
+}
+
 function savedAccessCode(){
   return localStorage.getItem("recoveryAccessCode") || "";
 }
@@ -405,6 +429,7 @@ async function verifyAccessCode(codeFromStorage){
 }
 
 async function initAccessGate(){
+  if(initAdminPreviewMode()) return;
   const code=savedAccessCode();
   if(code){
     const input=document.getElementById("accessCodeInput");
@@ -509,7 +534,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=86").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=101").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -587,7 +612,7 @@ function closeExpiredOverlay(){
   clearRecoverySession();
 
   setTimeout(()=>{
-    location.href='./?v=86';
+    location.href='./?v=101';
   },300);
 }
 
@@ -679,7 +704,7 @@ function returnToRecoveryLogin(){
 
   clearAllLoginMessagesAndInputs();
 
-  history.replaceState(null,'','./?v=86&login=1');
+  history.replaceState(null,'','./?v=101&login=1');
 
   setTimeout(clearAllLoginMessagesAndInputs,100);
   setTimeout(clearAllLoginMessagesAndInputs,500);
@@ -834,3 +859,7 @@ window.addEventListener('load',()=>{
 
 </body>
 </html>
+
+<!-- ADMIN_PREVIEW_NO_CODE_V96 -->
+
+<!-- LIVE_PREVIEW_SUPPORT_V101 -->

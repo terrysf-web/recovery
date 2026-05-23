@@ -1504,6 +1504,7 @@ button.danger{
         </div>
         <div class="actions" style="margin-top:10px">
           <button class="btn primary" onclick="loadAdminNoCodePreview()">Preview Selected Guide</button>
+          <button class="btn secondary" onclick="openAdminLivePreview()">Open Live Preview</button>
           <button class="btn secondary" onclick="reloadPatientPreview()">Reload Preview</button>
         </div>
         <div class="previewHint">Admin preview opens the patient guide without using an access code. This is for testing only.</div>
@@ -2531,18 +2532,18 @@ function renderPreview(){
 
   window.populateAdminPreviewControls = function(){
     const typeSelect=document.getElementById('adminPreviewSurgeryType');
-    if(typeSelect && window.protocol){
+    if(typeSelect && protocol){
       const current=typeSelect.value;
       typeSelect.innerHTML='';
 
-      Object.keys(window.protocol).forEach(key=>{
+      Object.keys(protocol).forEach(key=>{
         const opt=document.createElement('option');
         opt.value=key;
-        opt.textContent=window.protocol[key]?.name || key;
+        opt.textContent=protocol[key]?.name || key;
         typeSelect.appendChild(opt);
       });
 
-      if(current && window.protocol[current]){
+      if(current && protocol[current]){
         typeSelect.value=current;
       }
     }
@@ -2556,7 +2557,7 @@ function renderPreview(){
   };
 
   window.populateAdminPreviewStages = function(){
-    const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(window.protocol||{})[0];
+    const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(protocol||{})[0];
     let stageSelect=document.getElementById('adminPreviewStage');
 
     if(!stageSelect){
@@ -2569,10 +2570,10 @@ function renderPreview(){
       }
     }
 
-    if(!stageSelect || !window.protocol || !window.protocol[type]) return;
+    if(!stageSelect || !protocol || !protocol[type]) return;
 
     const current=stageSelect.value;
-    const stages=window.protocol[type].stages || [];
+    const stages=protocol[type].stages || [];
     stageSelect.innerHTML='';
 
     stages.forEach((stage,idx)=>{
@@ -2591,13 +2592,13 @@ function renderPreview(){
     const target=document.getElementById('adminPreviewContent');
     if(!target) return;
 
-    if(!window.protocol || !Object.keys(window.protocol).length){
+    if(!protocol || !Object.keys(protocol).length){
       target.innerHTML='<div class="previewEmptyIcon">▣</div><div class="previewEmptyText">Protocol is not loaded yet. Click Reload Current Protocol first.</div>';
       return;
     }
 
-    const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(window.protocol)[0];
-    const surgery=window.protocol[type];
+    const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(protocol)[0];
+    const surgery=protocol[type];
 
     if(!surgery){
       target.innerHTML='<div class="previewEmptyIcon">▣</div><div class="previewEmptyText">Select a surgery type to preview.</div>';
@@ -2665,6 +2666,74 @@ function renderPreview(){
 </script>
 
 <!-- ADMIN_PREVIEW_RENDER_FIX_V99 -->
+
+<script>
+/* v100 preview global protocol fix */
+(function(){
+  function waitForProtocolAndRender(attempt){
+    attempt = attempt || 0;
+
+    try{
+      if(typeof protocol !== 'undefined' && protocol && Object.keys(protocol).length){
+        if(typeof populateAdminPreviewControls === 'function') populateAdminPreviewControls();
+        if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
+        return;
+      }
+    }catch(e){}
+
+    if(attempt < 20){
+      setTimeout(()=>waitForProtocolAndRender(attempt+1), 300);
+    }
+  }
+
+  document.addEventListener('click', function(e){
+    const text=(e.target && e.target.textContent || '').trim();
+    if(text.includes('Reload Current Protocol') || text.includes('Login') || text.includes('Preview Selected Guide') || text.includes('Reload Preview')){
+      setTimeout(()=>waitForProtocolAndRender(0), 400);
+    }
+  });
+
+  setTimeout(()=>waitForProtocolAndRender(0), 700);
+})();
+</script>
+
+<!-- ADMIN_PREVIEW_PROTOCOL_FIX_V100 -->
+
+<script>
+/* v101 Open actual app preview in new tab */
+function openAdminLivePreview(){
+  try{
+    if(typeof populateAdminPreviewControls === 'function') populateAdminPreviewControls();
+
+    const type =
+      document.getElementById('adminPreviewSurgeryType')?.value ||
+      document.getElementById('surgerySelect')?.value ||
+      'periodontal';
+
+    const date =
+      document.getElementById('adminPreviewSurgeryDate')?.value ||
+      new Intl.DateTimeFormat('en-CA',{
+        timeZone:'America/Los_Angeles',
+        year:'numeric',
+        month:'2-digit',
+        day:'2-digit'
+      }).format(new Date());
+
+    const url =
+      'https://terrysf-web.github.io/recovery/index.html' +
+      '?adminPreview=1' +
+      '&surgeryType=' + encodeURIComponent(type) +
+      '&surgeryDate=' + encodeURIComponent(date) +
+      '&v=101&t=' + Date.now();
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }catch(e){
+    alert('Could not open live preview: ' + e.message);
+  }
+}
+</script>
+
+<!-- OPEN_LIVE_PREVIEW_V101 -->
 </body>
 </html>
 
@@ -2677,3 +2746,5 @@ function renderPreview(){
 <!-- ADMIN_DASHBOARD_INLINE_PREVIEW_V97 -->
 
 <!-- LOGIN_FIX_V98 -->
+
+<!-- ADMIN_OPEN_LIVE_PREVIEW_V101 -->

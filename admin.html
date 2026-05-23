@@ -1163,6 +1163,259 @@ body.adminActive #adminPreviewColumn{
   }
 }
 
+
+/* v96 softer admin color system */
+:root{
+  --admin-primary:#315a8c;
+  --admin-primary-dark:#24466f;
+  --admin-soft:#eef4fb;
+  --admin-border:#dbe6f2;
+}
+
+.btn.primary,
+button.btn.primary,
+button.primary{
+  background:linear-gradient(135deg,#315a8c,#24466f) !important;
+  color:white !important;
+}
+
+.btn.secondary,
+button.btn.secondary,
+button.secondary{
+  background:#eef4fb !important;
+  color:#27364a !important;
+  border:1px solid #dbe6f2 !important;
+}
+
+.header{
+  background:linear-gradient(135deg,#1f3658,#315a8c) !important;
+}
+
+.warningBox,
+.lockedNotice{
+  border-color:#f2c89b !important;
+}
+
+.previewControlBox{
+  margin-top:12px;
+  background:#f8fbff;
+  border:1px solid #dbe6f2;
+  border-radius:14px;
+  padding:12px;
+}
+
+.previewControlGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  align-items:end;
+}
+
+.previewControlBox label{
+  margin-top:0;
+}
+
+.previewHint{
+  margin-top:8px;
+  font-size:12px;
+  color:#64748b;
+  line-height:1.45;
+}
+
+@media(max-width:980px){
+  .previewControlGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* v97 Admin dashboard polish + internal no-code preview */
+:root{
+  --admin-navy:#24364f;
+  --admin-navy-2:#334b6b;
+  --admin-btn:#344b68;
+  --admin-soft:#f3f6fa;
+  --admin-line:#dbe5f1;
+  --admin-danger:#b91c1c;
+}
+
+.header{
+  background:linear-gradient(135deg,#24364f,#334b6b) !important;
+}
+
+.btn.primary,
+button.btn.primary,
+button.primary{
+  background:linear-gradient(135deg,#344b68,#283b55) !important;
+  color:#fff !important;
+}
+
+.btn.secondary,
+button.btn.secondary,
+button.secondary{
+  background:#f3f6fa !important;
+  color:#25364b !important;
+  border:1px solid #dbe5f1 !important;
+}
+
+.btn.danger,
+button.btn.danger,
+button.danger{
+  background:#fde2e2 !important;
+  color:#991b1b !important;
+  border:1px solid #fecaca !important;
+}
+
+.card{
+  border:1px solid rgba(15,23,42,.06) !important;
+  box-shadow:0 10px 28px rgba(15,23,42,.06) !important;
+}
+
+.previewControlBox{
+  margin-top:12px;
+  background:#f8fbff;
+  border:1px solid #dbe6f2;
+  border-radius:14px;
+  padding:12px;
+}
+
+.previewControlGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  align-items:end;
+}
+
+.previewHint{
+  margin-top:8px;
+  font-size:12px;
+  color:#64748b;
+  line-height:1.45;
+}
+
+.adminInlinePreview{
+  margin-top:14px;
+  background:#f8fafc;
+  border:1px solid #dbe5f1;
+  border-radius:20px;
+  min-height:560px;
+  padding:18px;
+  overflow:auto;
+}
+
+.adminPreviewContent{
+  background:white;
+  border-radius:22px;
+  border:1px solid rgba(15,23,42,.08);
+  padding:18px;
+  min-height:510px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.6);
+}
+
+.previewEmptyIcon{
+  font-size:56px;
+  color:#64748b;
+  text-align:center;
+  margin-top:170px;
+}
+
+.previewEmptyText{
+  color:#64748b;
+  text-align:center;
+  font-size:15px;
+  line-height:1.45;
+  max-width:260px;
+  margin:8px auto 0;
+}
+
+.previewTitle{
+  font-size:20px;
+  font-weight:950;
+  color:#0f172a;
+  margin-bottom:4px;
+}
+
+.previewMeta{
+  font-size:12px;
+  color:#64748b;
+  margin-bottom:14px;
+}
+
+.previewStagePill{
+  display:inline-flex;
+  align-items:center;
+  background:#eef4fb;
+  color:#25364b;
+  border:1px solid #dbe5f1;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:850;
+  margin-bottom:12px;
+}
+
+.previewBlock{
+  border:1px solid #e2e8f0;
+  border-radius:16px;
+  padding:13px;
+  margin:10px 0;
+  background:#fbfdff;
+}
+
+.previewBlock h4{
+  margin:0 0 8px;
+  font-size:14px;
+  color:#0f172a;
+}
+
+.previewBlock ul{
+  margin:0;
+  padding-left:19px;
+}
+
+.previewBlock li{
+  margin:5px 0;
+  color:#334155;
+  font-size:13px;
+  line-height:1.4;
+}
+
+.previewReminder{
+  background:#fff7ed;
+  border-color:#fed7aa;
+}
+
+.previewFoods{
+  background:#f0fdf4;
+  border-color:#bbf7d0;
+}
+
+.previewAvoid{
+  background:#fff1f2;
+  border-color:#fecdd3;
+}
+
+.previewSmallNote{
+  margin-top:14px;
+  font-size:12px;
+  color:#64748b;
+  line-height:1.45;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:10px;
+}
+
+@media(max-width:980px){
+  .previewControlGrid{
+    grid-template-columns:1fr;
+  }
+
+  .adminInlinePreview{
+    min-height:420px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1230,9 +1483,33 @@ body.adminActive #adminPreviewColumn{
         </div>
         <button class="btn secondary" onclick="reloadPatientPreview()">Reload</button><button class="previewToggleBtn" onclick="togglePreview()">Hide Preview</button>
       </div>
-      <div class="phonePreviewShell">
-        <iframe id="patientAppPreview" src="https://terrysf-web.github.io/recovery/?adminPreview=1"></iframe>
+      
+      <div class="previewControlBox">
+        <div class="previewControlGrid">
+          <div>
+            <label>Preview Surgery Type</label>
+            <select id="adminPreviewSurgeryType"></select>
+          </div>
+          <div>
+            <label>Preview Surgery Date</label>
+            <input id="adminPreviewSurgeryDate" type="date">
+          </div>
+        </div>
+        <div class="actions" style="margin-top:10px">
+          <button class="btn primary" onclick="loadAdminNoCodePreview()">Preview Selected Guide</button>
+          <button class="btn secondary" onclick="reloadPatientPreview()">Reload Preview</button>
+        </div>
+        <div class="previewHint">Admin preview opens the patient guide without using an access code. This is for testing only.</div>
       </div>
+
+      
+      <div class="adminInlinePreview">
+        <div id="adminPreviewContent" class="adminPreviewContent">
+          <div class="previewEmptyIcon">▣</div>
+          <div class="previewEmptyText">Select a surgery type and stage to preview the patient guide.</div>
+        </div>
+      </div>
+    
     </div>
   </div>
 
@@ -1359,6 +1636,128 @@ function setStatus(msg,good=true){
 function setSaveStatus(msg,good=true){
   saveStatus.textContent=msg;
   saveStatus.style.color=good?'#15803d':'#b91c1c';
+}
+
+
+
+function todayPacificYMD(){
+  return new Intl.DateTimeFormat('en-CA',{
+    timeZone:'America/Los_Angeles',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).format(new Date());
+}
+
+function normalizeList(value){
+  if(Array.isArray(value)) return value.filter(Boolean);
+  if(typeof value === 'string' && value.trim()) return value.split('
+').map(x=>x.trim()).filter(Boolean);
+  return [];
+}
+
+function populateAdminPreviewControls(){
+  const typeSelect=document.getElementById('adminPreviewSurgeryType');
+  if(typeSelect && protocol){
+    const current=typeSelect.value;
+    typeSelect.innerHTML='';
+    Object.keys(protocol).forEach(key=>{
+      const opt=document.createElement('option');
+      opt.value=key;
+      opt.textContent=protocol[key]?.name || key;
+      typeSelect.appendChild(opt);
+    });
+    if(current && protocol[current]) typeSelect.value=current;
+  }
+
+  const dateInput=document.getElementById('adminPreviewSurgeryDate');
+  if(dateInput && !dateInput.value){
+    dateInput.value=todayPacificYMD();
+  }
+
+  populateAdminPreviewStages();
+}
+
+function populateAdminPreviewStages(){
+  const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(protocol||{})[0];
+  const stageSelect=document.getElementById('adminPreviewStage');
+  if(!stageSelect || !protocol || !protocol[type]) return;
+
+  const current=stageSelect.value;
+  const stages=protocol[type].stages || [];
+  stageSelect.innerHTML='';
+
+  stages.forEach((stage,idx)=>{
+    const opt=document.createElement('option');
+    opt.value=String(idx);
+    opt.textContent=stage.label || stage.phase || ('Stage '+(idx+1));
+    stageSelect.appendChild(opt);
+  });
+
+  if(current && stages[Number(current)]) stageSelect.value=current;
+}
+
+function previewListHtml(items){
+  const list=normalizeList(items);
+  if(!list.length) return '<ul><li>No content entered.</li></ul>';
+  return '<ul>'+list.map(x=>'<li>'+escapeHtml(String(x))+'</li>').join('')+'</ul>';
+}
+
+function renderAdminInlinePreview(){
+  const target=document.getElementById('adminPreviewContent');
+  if(!target || !protocol) return;
+
+  const type=document.getElementById('adminPreviewSurgeryType')?.value || Object.keys(protocol||{})[0];
+  const surgery=protocol[type];
+
+  if(!surgery){
+    target.innerHTML='<div class="previewEmptyIcon">▣</div><div class="previewEmptyText">Select a surgery type to preview.</div>';
+    return;
+  }
+
+  const stages=surgery.stages || [];
+  const idx=Number(document.getElementById('adminPreviewStage')?.value || 0);
+  const stage=stages[idx] || stages[0] || {};
+  const date=document.getElementById('adminPreviewSurgeryDate')?.value || todayPacificYMD();
+
+  target.innerHTML=`
+    <div class="previewTitle">${escapeHtml(surgery.name || type)}</div>
+    <div class="previewMeta">Preview date: ${escapeHtml(date)} · Total days: ${escapeHtml(String(surgery.totalDays || '-'))}</div>
+    <div class="previewStagePill">${escapeHtml(stage.label || stage.phase || 'Selected stage')}</div>
+
+    <div class="previewBlock previewReminder">
+      <h4>Today’s Reminder</h4>
+      <ul><li>${escapeHtml(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
+    </div>
+
+    <div class="previewBlock">
+      <h4>What’s Normal Today</h4>
+      ${previewListHtml(stage.normal)}
+    </div>
+
+    <div class="previewBlock previewFoods">
+      <h4>Foods Allowed</h4>
+      ${previewListHtml(stage.foods)}
+    </div>
+
+    <div class="previewBlock previewAvoid">
+      <h4>Avoid Today</h4>
+      ${previewListHtml(stage.avoid)}
+    </div>
+
+    <div class="previewSmallNote">
+      This preview is generated inside the Admin page and does not require a patient access code.
+    </div>
+  `;
+}
+
+function loadAdminNoCodePreview(){
+  populateAdminPreviewControls();
+  renderAdminInlinePreview();
+}
+
+function reloadPatientPreview(){
+  renderAdminInlinePreview();
 }
 
 function getPass(){
@@ -2070,8 +2469,7 @@ async function disablePatientCode(code){
 }
 
 function reloadPatientPreview(){
-  const frame=document.getElementById('patientAppPreview');
-  if(frame) frame.src='https://terrysf-web.github.io/recovery/?adminPreview=1&t=' + Date.now();
+  loadAdminNoCodePreview();
 }
 
 
@@ -2097,3 +2495,7 @@ function renderPreview(){
 <!-- CHART_NUMBER_OPTIONAL_V76 -->
 
 <!-- ADMIN_APP_MANAGEMENT_ONLY_V85 -->
+
+<!-- SOFT_BLUE_ADMIN_PREVIEW_V96 -->
+
+<!-- ADMIN_DASHBOARD_INLINE_PREVIEW_V97 -->

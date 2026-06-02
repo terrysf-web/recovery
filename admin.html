@@ -1499,33 +1499,7 @@ button.danger{
   }
 }
 
-
-/* v104 sticky preview + custom section card editor */
-#adminPreviewColumn{position:sticky !important;top:14px !important;align-self:start !important;max-height:calc(100vh - 28px) !important;overflow:auto !important}
-.customCardRow{border:1px solid #e2e8f0;border-radius:12px;padding:10px;margin:8px 0;background:#fbfdff}
-.customCardToolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.customCardTitle{font-weight:900;font-size:13px;color:#334155;margin-bottom:6px}
-@media(max-width:980px){#adminPreviewColumn{position:relative !important;top:auto !important;max-height:none !important}}
-
 </style>
-
-<link rel="icon" type="image/png" href="./pwa_icon_192.png">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png">
-<link rel="shortcut icon" href="./pwa_icon_192.png">
-
-
-<style>
-#adminPreviewColumn,
-.previewColumn,
-.rightPreviewColumn{
-position:sticky !important;
-top:12px !important;
-align-self:flex-start !important;
-height:fit-content !important;
-z-index:10 !important;
-}
-</style>
-
 </head>
 <body>
 <div class="header">
@@ -2047,89 +2021,64 @@ function customSectionsEditor(){
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">➕</span> Extra App Sections</div>
-        <div class="appSectionHelp">Add another patient-app section. Each section can contain multiple cards/items.</div>
+        <div class="appSectionHelp">Add another card section. It will appear in the patient app under the standard cards.</div>
       </div>
       <button class="btn primary" onclick="addCustomSection()">+ Add Section</button>
     </div>
 
-    ${sections.length ? sections.map((sec,i)=>{
-      if(!sec.cards){ sec.cards = sec.text ? [{title: sec.title || 'Card', text: sec.text}] : []; }
-      return `
+    ${sections.length ? sections.map((sec,i)=>`
       <div class="customSectionRow">
         <div class="row">
           <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
           <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
         </div>
+        <label>Card Text</label>
+        <textarea oninput="updateCustomSection(${i},'text',this.value)">${esc(sec.text || '')}</textarea>
         <div class="customSectionToolbar">
-          <button class="miniBtn upBtn" onclick="moveCustomSection(${i},-1)">↑ Move Section Up</button>
-          <button class="miniBtn downBtn" onclick="moveCustomSection(${i},1)">↓ Move Section Down</button>
+          <button class="miniBtn upBtn" onclick="moveCustomSection(${i},-1)">↑ Move Up</button>
+          <button class="miniBtn downBtn" onclick="moveCustomSection(${i},1)">↓ Move Down</button>
           <button class="miniBtn deleteBtn" onclick="deleteCustomSection(${i})">Delete Section</button>
-          <button class="miniBtn upBtn" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
-        <div style="height:8px"></div>
-        <label>Cards / Items in this Section</label>
-        ${(sec.cards||[]).length ? (sec.cards||[]).map((card,j)=>`
-          <div class="customCardRow">
-            <div class="customCardTitle">Card ${j+1}</div>
-            <div class="row">
-              <div><label>Card Title</label><input value="${esc(card.title || '')}" oninput="updateCustomCard(${i},${j},'title',this.value)"></div>
-              <div><label>Card Text</label><textarea oninput="updateCustomCard(${i},${j},'text',this.value)">${esc(card.text || '')}</textarea></div>
-            </div>
-            <div class="customCardToolbar">
-              <button class="miniBtn upBtn" onclick="moveCustomCard(${i},${j},-1)">↑ Move Card Up</button>
-              <button class="miniBtn downBtn" onclick="moveCustomCard(${i},${j},1)">↓ Move Card Down</button>
-              <button class="miniBtn deleteBtn" onclick="deleteCustomCard(${i},${j})">Delete Card</button>
-            </div>
-          </div>`).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}
-      </div>`;
-    }).join('') : `<div class="small">No extra sections added yet.</div>`}
+      </div>
+    `).join('') : `<div class="small">No extra sections added yet.</div>`}
   </div>`;
 }
 
-function addCustomCard(sectionIndex){
+function addCustomSection(){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
   if(!st.customSections) st.customSections=[];
-  const sec=st.customSections[sectionIndex];
-  if(!sec) return;
-  if(!sec.cards) sec.cards=[];
-  sec.cards.push({title:'New Card', text:''});
+  st.customSections.push({title:'New Section', icon:'📌', text:''});
   renderStages();
 }
 
-function updateCustomCard(sectionIndex,cardIndex,k,v){
+function updateCustomSection(i,k,v){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const sec=(st.customSections||[])[sectionIndex];
-  if(!sec) return;
-  if(!sec.cards) sec.cards=[];
-  if(!sec.cards[cardIndex]) return;
-  sec.cards[cardIndex][k]=v;
+  if(!st.customSections) st.customSections=[];
+  if(!st.customSections[i]) return;
+  st.customSections[i][k]=v;
   renderPreview();
-  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
-function moveCustomCard(sectionIndex,cardIndex,dir){
+function moveCustomSection(i,dir){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const sec=(st.customSections||[])[sectionIndex];
-  if(!sec || !sec.cards) return;
-  const arr=sec.cards;
-  const j=cardIndex+dir;
+  const arr=st.customSections || [];
+  const j=i+dir;
   if(j<0||j>=arr.length)return;
-  [arr[cardIndex],arr[j]]=[arr[j],arr[cardIndex]];
+  [arr[i],arr[j]]=[arr[j],arr[i]];
   renderStages();
 }
 
-function deleteCustomCard(sectionIndex,cardIndex){
+function deleteCustomSection(i){
   if(!requireLogin())return;
-  if(!confirm('Delete this card?'))return;
+  if(!confirm('Delete this app section?'))return;
   const st=currentSurgery().stages[currentStageIndex];
-  const sec=(st.customSections||[])[sectionIndex];
-  if(!sec || !sec.cards) return;
-  sec.cards.splice(cardIndex,1);
+  (st.customSections||[]).splice(i,1);
   renderStages();
 }
+
 
 function updateStage(k,v){
   if(!requireLogin())return;
@@ -2965,41 +2914,6 @@ function openAdminLivePreview(){
 </script>
 
 <!-- OPEN_LIVE_PREVIEW_V101 -->
-
-<div id="adminVersionBadge" style="
-position:fixed;
-right:16px;
-bottom:16px;
-z-index:9999;
-background:#24364f;
-color:white;
-padding:8px 12px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-box-shadow:0 8px 24px rgba(0,0,0,.18);
-">
-Recovery Admin v105
-</div>
-
-
-<div style="
-position:fixed;
-right:14px;
-bottom:14px;
-z-index:99999;
-background:#24364f;
-color:white;
-padding:8px 12px;
-border-radius:999px;
-font-size:12px;
-font-weight:900;
-box-shadow:0 8px 24px rgba(0,0,0,.18);
-opacity:.96;
-">
-Recovery Admin v106
-</div>
-
 </body>
 </html>
 
@@ -3016,7 +2930,3 @@ Recovery Admin v106
 <!-- ADMIN_OPEN_LIVE_PREVIEW_V101 -->
 
 <!-- APP_MATCHED_SECTION_EDITOR_V103 -->
-
-<!-- V104_FAVICON_CUSTOM_CARDS_STICKY_PREVIEW -->
-
-<!-- V105_STICKY_AND_VERSION -->

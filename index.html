@@ -214,6 +214,11 @@
 }
 
 </style>
+
+<link rel="icon" type="image/png" href="./pwa_icon_192.png">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png">
+<link rel="shortcut icon" href="./pwa_icon_192.png">
+
 </head>
 <body>
 
@@ -483,7 +488,11 @@ const avoidTitleEl=document.querySelector("#avoidList")?.closest(".card")?.query
 const warnTitleEl=document.querySelector("#warningList")?.closest(".card")?.querySelector(".card-title"); if(warnTitleEl) warnTitleEl.textContent="📞 "+(g.warningsTitle||"Call Clinic If");
 const customBox=document.getElementById("customSectionCards");
 if(customBox){
-  customBox.innerHTML=(g.customSections||[]).map(sec=>`<div class="card"><div class="card-title">${sec.icon||"📌"} ${sec.title||"Additional Information"}</div><div class="card-text">${sec.text||""}</div></div>`).join("");
+  customBox.innerHTML=(g.customSections||[]).map(sec=>{
+  const cards=sec.cards || (sec.text ? [{title:sec.title||"Information", text:sec.text}] : []);
+  const cardHtml=cards.map(card=>`<div class="card"><div class="card-title">${card.title||sec.title||"Information"}</div><div class="card-text">${card.text||""}</div></div>`).join("");
+  return `<div class="card"><div class="card-title">${sec.icon||"📌"} ${sec.title||"Additional Section"}</div></div>${cardHtml}`;
+}).join("");
 }
 const next=MILESTONES.find(m=>m.day>day&&m.day<=surgery.totalDays);nextMilestone.textContent=next?`${recoveryDayLabel(next.day)}: ${next.phase} — ${next.summary}`:"You are at the final recovery stage. Continue following your clinic’s instructions."}function showToday(){setActiveNav("today");renderToday()}function nearestMilestone(day,total){const valid=MILESTONES.filter(m=>m.day<=total).map(m=>m.day);return valid.find(m=>m>=day)||valid[valid.length-1]}function showTimeline(){const saved=getSaved();if(!saved.type||!saved.date){showToday();return}setActiveNav("timeline");homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.remove("hidden");const day=displayRecoveryDay(saved.date);const surgery=SURGERIES[saved.type];timelineList.innerHTML=MILESTONES.filter(m=>m.day<=surgery.totalDays).map(m=>{const state=m.day<day?"done":m.day===day||nearestMilestone(day,surgery.totalDays)===m.day?"current":"future";const icon=m.day<day?"✓":state==="current"?"●":"○";return `<div class="timeline-item ${state}"><div class="timeline-dot">${icon}</div><div><div class="timeline-day">${recoveryDayLabel(m.day)}${m.day===day?" · Today":""}</div><div class="timeline-phase">${m.phase}</div><div class="timeline-summary">${m.summary}</div></div></div>`}).join("")}
 function openAssistant(){setActiveNav("assistant");chatBackdrop.classList.add("show");chatPanel.classList.add("show");backToAssistant()}function closeAssistant(){chatBackdrop.classList.remove("show");chatPanel.classList.remove("show");setActiveNav(todayScreen.classList.contains("hidden")?"timeline":"today")}function backToAssistant(){chatGrid.style.display="grid";assistantAnswer.classList.remove("show")}function askAssistant(topic){const saved=getSaved();const day=saved.date?displayRecoveryDay(saved.date):1;const g=guidance(day,saved.type||"periodontal");const data={bleeding:["Bleeding guidance","Light bleeding or pink saliva can be normal early after surgery. Avoid hard rinsing, spitting, straws, smoking, and heavy activity.","Call the clinic if bleeding is heavy, does not slow with gentle pressure, or fills the mouth quickly."],swelling:["Swelling guidance",day<=3?"Swelling commonly increases during the first 2–3 days and may peak around this time.":"Swelling should gradually improve. New or rapidly worsening swelling should be checked.","Call the clinic if swelling is rapidly worsening, spreading, or comes with fever."],pain:["Pain guidance",day<=7?"Soreness and tenderness can be normal, but pain should gradually improve.":"Pain should be much better by now. New throbbing pain or worsening discomfort should be checked.","Call the clinic if pain is severe, suddenly worsening, or not controlled by your instructions."],food:["Food guidance",`Today’s food guidance: ${g.foods.join(", ")}.`,"Avoid crunchy, sharp, hard foods or anything that hurts the surgical site."],brushing:["Brushing guidance",day<=7?"Do not brush or floss the surgical site yet. Keep the rest of the mouth clean carefully.":"Use a soft toothbrush gently and avoid aggressive cleaning around tender tissue.","Call the clinic if brushing causes heavy bleeding or increasing pain."],urgent:["Urgent signs","Contact the clinic promptly for heavy bleeding, fever, rapidly increasing swelling, pus/drainage, severe pain, trouble swallowing, or trouble breathing.","For breathing difficulty or emergency symptoms, seek urgent/emergency care immediately."]};const r=data[topic];assistantTitle.textContent=`${r[0]} · ${recoveryDayLabel(day)}`;assistantText.textContent=r[1];assistantWarning.textContent=r[2];chatGrid.style.display="none";assistantAnswer.classList.add("show")}
@@ -881,3 +890,5 @@ window.addEventListener('load',()=>{
 <!-- LIVE_PREVIEW_SUPPORT_V101 -->
 
 <!-- CUSTOM_APP_SECTIONS_SUPPORT_V103 -->
+
+<!-- V107_EXTRA_SECTION_CARDS_SUPPORT -->

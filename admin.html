@@ -1499,7 +1499,34 @@ button.danger{
   }
 }
 
+
+/* v107 Extra App Section cards */
+.extraCardBox{
+  border:1px solid #dbe6f2;
+  border-radius:14px;
+  background:#fbfdff;
+  padding:12px;
+  margin:10px 0;
+}
+.extraCardTitle{
+  font-size:13px;
+  font-weight:900;
+  color:#334155;
+  margin-bottom:8px;
+}
+.extraCardActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
 </style>
+
+<link rel="icon" type="image/png" href="./pwa_icon_192.png">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png">
+<link rel="shortcut icon" href="./pwa_icon_192.png">
+
 </head>
 <body>
 <div class="header">
@@ -2021,34 +2048,110 @@ function customSectionsEditor(){
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">➕</span> Extra App Sections</div>
-        <div class="appSectionHelp">Add another card section. It will appear in the patient app under the standard cards.</div>
+        <div class="appSectionHelp">Add another card section. Each section can contain multiple cards/items.</div>
       </div>
       <button class="btn primary" onclick="addCustomSection()">+ Add Section</button>
     </div>
 
-    ${sections.length ? sections.map((sec,i)=>`
+    ${sections.length ? sections.map((sec,i)=>{
+      if(!sec.cards){
+        sec.cards = sec.text ? [{title: sec.title || 'Card', text: sec.text}] : [];
+      }
+
+      return `
       <div class="customSectionRow">
         <div class="row">
           <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
           <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
         </div>
-        <label>Card Text</label>
-        <textarea oninput="updateCustomSection(${i},'text',this.value)">${esc(sec.text || '')}</textarea>
+
         <div class="customSectionToolbar">
           <button class="miniBtn upBtn" onclick="moveCustomSection(${i},-1)">↑ Move Up</button>
           <button class="miniBtn downBtn" onclick="moveCustomSection(${i},1)">↓ Move Down</button>
           <button class="miniBtn deleteBtn" onclick="deleteCustomSection(${i})">Delete Section</button>
+          <button class="miniBtn upBtn" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
-      </div>
-    `).join('') : `<div class="small">No extra sections added yet.</div>`}
+
+        <div style="height:10px"></div>
+        <label>Cards in this Section</label>
+
+        ${(sec.cards||[]).length ? (sec.cards||[]).map((card,j)=>`
+          <div class="extraCardBox">
+            <div class="extraCardTitle">Card ${j+1}</div>
+            <div class="row">
+              <div>
+                <label>Card Title</label>
+                <input value="${esc(card.title || '')}" oninput="updateCustomCard(${i},${j},'title',this.value)">
+              </div>
+              <div>
+                <label>Card Text</label>
+                <textarea oninput="updateCustomCard(${i},${j},'text',this.value)">${esc(card.text || '')}</textarea>
+              </div>
+            </div>
+            <div class="extraCardActions">
+              <button class="miniBtn upBtn" onclick="moveCustomCard(${i},${j},-1)">↑ Move Card Up</button>
+              <button class="miniBtn downBtn" onclick="moveCustomCard(${i},${j},1)">↓ Move Card Down</button>
+              <button class="miniBtn deleteBtn" onclick="deleteCustomCard(${i},${j})">Delete Card</button>
+            </div>
+          </div>
+        `).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}
+      </div>`;
+    }).join('') : `<div class="small">No extra sections added yet.</div>`}
   </div>`;
 }
+
+
+function addCustomCard(sectionIndex){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  if(!st.customSections) st.customSections=[];
+  const sec=st.customSections[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  sec.cards.push({title:'New Card', text:''});
+  renderStages();
+}
+
+function updateCustomCard(sectionIndex,cardIndex,k,v){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  if(!sec.cards[cardIndex]) return;
+  sec.cards[cardIndex][k]=v;
+  renderPreview();
+  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
+}
+
+function moveCustomCard(sectionIndex,cardIndex,dir){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec || !sec.cards) return;
+  const arr=sec.cards;
+  const target=cardIndex+dir;
+  if(target<0 || target>=arr.length) return;
+  [arr[cardIndex],arr[target]]=[arr[target],arr[cardIndex]];
+  renderStages();
+}
+
+function deleteCustomCard(sectionIndex,cardIndex){
+  if(!requireLogin())return;
+  if(!confirm('Delete this card?'))return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec || !sec.cards) return;
+  sec.cards.splice(cardIndex,1);
+  renderStages();
+}
+
 
 function addCustomSection(){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
   if(!st.customSections) st.customSections=[];
-  st.customSections.push({title:'New Section', icon:'📌', text:''});
+  st.customSections.push({title:'New Section', icon:'📌', cards:[{title:'New Card', text:''}]});
   renderStages();
 }
 
@@ -2914,6 +3017,23 @@ function openAdminLivePreview(){
 </script>
 
 <!-- OPEN_LIVE_PREVIEW_V101 -->
+
+<div style="
+position:fixed;
+right:14px;
+bottom:14px;
+z-index:99999;
+background:#24364f;
+color:white;
+padding:8px 12px;
+border-radius:999px;
+font-size:12px;
+font-weight:900;
+box-shadow:0 8px 24px rgba(0,0,0,.18);
+opacity:.96;">
+Recovery Admin v107
+</div>
+
 </body>
 </html>
 
@@ -2930,3 +3050,5 @@ function openAdminLivePreview(){
 <!-- ADMIN_OPEN_LIVE_PREVIEW_V101 -->
 
 <!-- APP_MATCHED_SECTION_EDITOR_V103 -->
+
+<!-- V107_EXTRA_SECTION_ADD_CARD -->

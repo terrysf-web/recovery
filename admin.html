@@ -1423,6 +1423,31 @@ button.danger{
   font-weight:900;
 }
 
+
+/* v102 editable app section titles */
+.sectionTitleEditorBox{
+  background:#f8fbff;
+  border:1px solid #dbe6f2;
+  border-radius:14px;
+  padding:12px;
+  margin:12px 0;
+}
+.sectionTitleEditorGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.sectionTitleEditorGrid label{margin-top:0}
+.sectionTitleNote{
+  margin-top:8px;
+  font-size:12px;
+  color:#64748b;
+  line-height:1.45;
+}
+@media(max-width:780px){
+  .sectionTitleEditorGrid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -1494,7 +1519,7 @@ button.danger{
       <div class="previewControlBox">
         <div class="previewControlGrid">
           <div>
-            <label>Preview Surgery Type</label>
+            <label>Preview Procedure Type</label>
             <select id="adminPreviewSurgeryType"></select>
           </div>
           <div>
@@ -1563,19 +1588,19 @@ button.danger{
 
     
     <div class="card">
-      <div class="sectionTitle">Surgery Type Management</div>
-      <div class="small">Add a new surgery protocol, copy the current one, or delete an unused surgery type.</div>
+      <div class="sectionTitle">Procedure Type Management</div>
+      <div class="small">Add a new procedure guide, copy the current one, or delete an unused procedure type.</div>
 
-      <label>New Surgery Type Name</label>
+      <label>New Procedure Type Name</label>
       <input id="newSurgeryName" placeholder="Example: Bone Graft">
 
-      <label>New Surgery Key</label>
+      <label>New Procedure Key</label>
       <input id="newSurgeryKey" placeholder="Example: bone_graft">
 
       <div class="actions">
-        <button class="btn primary" onclick="addSurgeryType(false)">Add Blank Surgery Type</button>
-        <button class="btn secondary" onclick="addSurgeryType(true)">Copy Current Surgery Type</button>
-        <button class="btn danger" onclick="deleteSurgeryType()">Delete Current Surgery Type</button>
+        <button class="btn primary" onclick="addSurgeryType(false)">Add Blank Procedure Type</button>
+        <button class="btn secondary" onclick="addSurgeryType(true)">Copy Current Procedure Type</button>
+        <button class="btn danger" onclick="deleteSurgeryType()">Delete Current Procedure Type</button>
       </div>
 
       <div class="warningBox">
@@ -1584,15 +1609,15 @@ button.danger{
     </div>
 
     <div class="card">
-      <div class="sectionTitle">Week / Stage Management</div>
-      <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
+      <div class="sectionTitle">Recovery Timeline Management</div>
+      <div class="small">Add, copy, delete, or reorder the same timeline sections shown in the Recovery Guide app.</div>
 
       <div class="actions">
-        <button class="btn primary" onclick="addStageAfterCurrent()">Add Week After Current</button>
-        <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Stage</button>
-        <button class="btn secondary" onclick="moveStageUp()">Move Stage Up</button>
-        <button class="btn secondary" onclick="moveStageDown()">Move Stage Down</button>
-        <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Stage</button>
+        <button class="btn primary" onclick="addStageAfterCurrent()">Add Timeline Section After Current</button>
+        <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Section</button>
+        <button class="btn secondary" onclick="moveStageUp()">Move Section Up</button>
+        <button class="btn secondary" onclick="moveStageDown()">Move Section Down</button>
+        <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Section</button>
       </div>
 
       <div class="warningBox">
@@ -1601,10 +1626,10 @@ button.danger{
     </div>
 
 <div class="card">
-      <label>Surgery Type</label>
+      <label>Procedure Type</label>
       <select id="surgerySelect" onchange="currentStageIndex=0;renderStages()"></select>
 
-      <label>Surgery Name</label>
+      <label>Procedure Name</label>
       <input id="surgeryName" oninput="saveSurgeryMeta()">
 
       <label>Total Days</label>
@@ -1733,22 +1758,22 @@ function renderAdminInlinePreview(){
     <div class="previewStagePill">${escapeHtml(stage.label || stage.phase || 'Selected stage')}</div>
 
     <div class="previewBlock previewReminder">
-      <h4>Today’s Reminder</h4>
+      <h4>${esc(stage.reminderTitle || 'Today’s Reminder')}</h4>
       <ul><li>${escapeHtml(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
     </div>
 
     <div class="previewBlock">
-      <h4>What’s Normal Today</h4>
+      <h4>${esc(stage.normalTitle || 'What’s Normal Today')}</h4>
       ${previewListHtml(stage.normal)}
     </div>
 
     <div class="previewBlock previewFoods">
-      <h4>Foods Allowed</h4>
+      <h4>${esc(stage.foodsTitle || 'Foods Allowed')}</h4>
       ${previewListHtml(stage.foods)}
     </div>
 
     <div class="previewBlock previewAvoid">
-      <h4>Avoid Today</h4>
+      <h4>${esc(stage.avoidTitle || 'Avoid Today')}</h4>
       ${previewListHtml(stage.avoid)}
     </div>
 
@@ -1765,6 +1790,93 @@ function loadAdminNoCodePreview(){
 
 function reloadPatientPreview(){
   renderAdminInlinePreview();
+}
+
+
+function ensureStageTitleFields(){
+  const container=document.getElementById('stageEditor');
+  if(!container || !protocol) return;
+
+  const surgeryKey=document.getElementById('surgerySelect')?.value;
+  const surgery=protocol[surgeryKey];
+  if(!surgery || !surgery.stages || !surgery.stages[currentStageIndex]) return;
+
+  const stage=surgery.stages[currentStageIndex];
+
+  const existing=document.getElementById('stageTitleEditorBox');
+  if(existing) existing.remove();
+
+  const box=document.createElement('div');
+  box.id='stageTitleEditorBox';
+  box.className='sectionTitleEditorBox';
+  box.innerHTML=`
+    <div class="sectionTitle">App Section Titles</div>
+    <div class="small">These titles match what the patient sees in the Recovery Guide app.</div>
+    <div class="sectionTitleEditorGrid">
+      <div>
+        <label>Timeline Section Title</label>
+        <input id="stageLabelTitleInput" value="${escapeHtml(stage.label || stage.phase || '')}" oninput="saveStageTitlesFromEditor()">
+      </div>
+      <div>
+        <label>Recovery Phase Title</label>
+        <input id="stagePhaseTitleInput" value="${escapeHtml(stage.phase || stage.label || '')}" oninput="saveStageTitlesFromEditor()">
+      </div>
+      <div>
+        <label>Reminder Section Title</label>
+        <input id="reminderTitleInput" value="${escapeHtml(stage.reminderTitle || 'Today’s Reminder')}" oninput="saveStageTitlesFromEditor()">
+      </div>
+      <div>
+        <label>Normal Section Title</label>
+        <input id="normalTitleInput" value="${escapeHtml(stage.normalTitle || 'What’s Normal Today')}" oninput="saveStageTitlesFromEditor()">
+      </div>
+      <div>
+        <label>Foods Section Title</label>
+        <input id="foodsTitleInput" value="${escapeHtml(stage.foodsTitle || 'Foods Allowed')}" oninput="saveStageTitlesFromEditor()">
+      </div>
+      <div>
+        <label>Avoid Section Title</label>
+        <input id="avoidTitleInput" value="${escapeHtml(stage.avoidTitle || 'Avoid Today')}" oninput="saveStageTitlesFromEditor()">
+      </div>
+    </div>
+    <div class="sectionTitleNote">
+      Edit these titles if the Admin title and app title do not match. Click Save to Cloudflare after changes.
+    </div>
+  `;
+
+  container.prepend(box);
+}
+
+function saveStageTitlesFromEditor(){
+  const surgeryKey=document.getElementById('surgerySelect')?.value;
+  const surgery=protocol[surgeryKey];
+  if(!surgery || !surgery.stages || !surgery.stages[currentStageIndex]) return;
+
+  const stage=surgery.stages[currentStageIndex];
+
+  stage.label=document.getElementById('stageLabelTitleInput')?.value || stage.label || '';
+  stage.phase=document.getElementById('stagePhaseTitleInput')?.value || stage.phase || stage.label || '';
+  stage.reminderTitle=document.getElementById('reminderTitleInput')?.value || 'Today’s Reminder';
+  stage.normalTitle=document.getElementById('normalTitleInput')?.value || 'What’s Normal Today';
+  stage.foodsTitle=document.getElementById('foodsTitleInput')?.value || 'Foods Allowed';
+  stage.avoidTitle=document.getElementById('avoidTitleInput')?.value || 'Avoid Today';
+
+  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
+}
+
+function patchStageTitleEditor(){
+  if(typeof renderStages === 'function' && !renderStages.__titleEditorPatched){
+    const original=renderStages;
+    renderStages=function(){
+      const result=original.apply(this, arguments);
+      setTimeout(()=>{
+        ensureStageTitleFields();
+        if(typeof populateAdminPreviewControls === 'function') populateAdminPreviewControls();
+        if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
+      },50);
+      return result;
+    };
+    renderStages.__titleEditorPatched=true;
+  }
 }
 
 function getPass(){
@@ -1829,6 +1941,10 @@ function initEditor(){
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
+  patchStageTitleEditor();
+  ensureStageTitleFields();
+    patchStageTitleEditor();
+    ensureStageTitleFields();
   syncCodeSurgeryOptions();
   if(document.getElementById('codeSurgeryDate')&&!codeSurgeryDate.value) codeSurgeryDate.value=todayYMD();
 }
@@ -2618,22 +2734,22 @@ function renderPreview(){
       <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
 
       <div class="previewBlock previewReminder">
-        <h4>Today’s Reminder</h4>
+        <h4>${esc(stage.reminderTitle || 'Today’s Reminder')}</h4>
         <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
       </div>
 
       <div class="previewBlock">
-        <h4>What’s Normal Today</h4>
+        <h4>${esc(stage.normalTitle || 'What’s Normal Today')}</h4>
         ${listHtml(stage.normal)}
       </div>
 
       <div class="previewBlock previewFoods">
-        <h4>Foods Allowed</h4>
+        <h4>${esc(stage.foodsTitle || 'Foods Allowed')}</h4>
         ${listHtml(stage.foods)}
       </div>
 
       <div class="previewBlock previewAvoid">
-        <h4>Avoid Today</h4>
+        <h4>${esc(stage.avoidTitle || 'Avoid Today')}</h4>
         ${listHtml(stage.avoid)}
       </div>
 
@@ -2734,6 +2850,16 @@ function openAdminLivePreview(){
 </script>
 
 <!-- OPEN_LIVE_PREVIEW_V101 -->
+
+<script>
+/* v102 ensure title editor attaches after page load */
+setTimeout(()=>{
+  if(typeof patchStageTitleEditor === 'function') patchStageTitleEditor();
+  if(typeof ensureStageTitleFields === 'function') ensureStageTitleFields();
+},800);
+</script>
+
+<!-- ADMIN_TITLES_EDITABLE_V102 -->
 </body>
 </html>
 

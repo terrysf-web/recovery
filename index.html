@@ -857,6 +857,61 @@ window.addEventListener('load',()=>{
   </div>
 </div>
 
+
+<script>
+/* v102 custom section title support */
+(function(){
+  function getCurrentStageForTitles(){
+    try{
+      const type=localStorage.getItem('surgeryType');
+      const date=localStorage.getItem('surgeryDate');
+      if(!type || !date || typeof CLINIC_PROTOCOL==='undefined') return null;
+      const surgery=CLINIC_PROTOCOL[type];
+      if(!surgery || !surgery.stages) return null;
+
+      const start=new Date(date+'T00:00:00');
+      const now=new Date();
+      const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+      const day=Math.max(1,Math.floor((today-start)/(24*60*60*1000))+1);
+
+      return surgery.stages.find(s=>day>=Number(s.startDay||s.start||1) && day<=Number(s.endDay||s.end||999)) || surgery.stages[0];
+    }catch(e){
+      return null;
+    }
+  }
+
+  function applyCustomSectionTitles(){
+    const stage=getCurrentStageForTitles();
+    if(!stage) return;
+
+    const titleMap={
+      'Today’s Reminder': stage.reminderTitle,
+      'What’s Normal Today': stage.normalTitle,
+      "What's Normal Today": stage.normalTitle,
+      'Foods Allowed': stage.foodsTitle,
+      'Avoid Today': stage.avoidTitle
+    };
+
+    document.querySelectorAll('h1,h2,h3,h4,.section-title,.accordion-title,.card-title,button').forEach(el=>{
+      const text=(el.textContent||'').trim();
+      if(titleMap[text]) el.textContent=titleMap[text];
+    });
+  }
+
+  const oldRenderToday=window.renderToday;
+  if(typeof oldRenderToday==='function'){
+    window.renderToday=function(){
+      const result=oldRenderToday.apply(this,arguments);
+      setTimeout(applyCustomSectionTitles,50);
+      return result;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(applyCustomSectionTitles,500));
+})();
+</script>
+
+<!-- PATIENT_APP_TITLES_SUPPORT_V102 -->
 </body>
 </html>
 

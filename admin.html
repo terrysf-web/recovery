@@ -1783,7 +1783,7 @@ function populateAdminPreviewStages(){
 function previewListHtml(items){
   const list=normalizeList(items);
   if(!list.length) return '<ul><li>No content entered.</li></ul>';
-  return '<ul>'+list.map(x=>'<li>'+escapeHtml(String(x))+'</li>').join('')+'</ul>';
+  return '<ul>'+list.map(x=>'<li>'+esc(String(x))+'</li>').join('')+'</ul>';
 }
 
 function renderAdminInlinePreview(){
@@ -1804,29 +1804,41 @@ function renderAdminInlinePreview(){
   const date=document.getElementById('adminPreviewSurgeryDate')?.value || todayPacificYMD();
 
   target.innerHTML=`
-    <div class="previewTitle">${escapeHtml(surgery.name || type)}</div>
-    <div class="previewMeta">Preview date: ${escapeHtml(date)} · Total days: ${escapeHtml(String(surgery.totalDays || '-'))}</div>
-    <div class="previewStagePill">${escapeHtml(stage.label || stage.phase || 'Selected stage')}</div>
+    <div class="previewTitle">${esc(surgery.name || type)}</div>
+    <div class="previewMeta">Preview date: ${esc(date)} · Total days: ${esc(String(surgery.totalDays || '-'))}</div>
+    <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
 
     <div class="previewBlock previewReminder">
-      <h4>Today’s Reminder</h4>
-      <ul><li>${escapeHtml(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
+      <h4>${esc(stage.reminderTitle || 'Today’s Reminder')}</h4>
+      <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
     </div>
 
     <div class="previewBlock">
-      <h4>What’s Normal Today</h4>
+      <h4>${esc(stage.normalTitle || 'What’s Normal Today')}</h4>
       ${previewListHtml(stage.normal)}
     </div>
 
     <div class="previewBlock previewFoods">
-      <h4>Foods Allowed</h4>
+      <h4>${esc(stage.foodsTitle || 'Foods Allowed')}</h4>
       ${previewListHtml(stage.foods)}
     </div>
 
     <div class="previewBlock previewAvoid">
-      <h4>Avoid Today</h4>
+      <h4>${esc(stage.avoidTitle || 'Avoid Today')}</h4>
       ${previewListHtml(stage.avoid)}
     </div>
+
+    <div class="previewBlock previewAvoid">
+      <h4>${esc(stage.warningsTitle || 'Call Clinic If')}</h4>
+      ${previewListHtml(stage.warnings)}
+    </div>
+
+    ${(stage.customSections || []).map(sec=>`
+      <div class="previewBlock">
+        <h4>${esc(sec.icon || '📌')} ${esc(sec.title || 'Additional Information')}</h4>
+        <ul><li>${esc(sec.text || 'No content entered.')}</li></ul>
+      </div>
+    `).join('')}
 
     <div class="previewSmallNote">
       This preview is generated inside the Admin page and does not require a patient access code.
@@ -1876,9 +1888,6 @@ async function loadProtocol(){
     protocol=data&&data.periodontal?data:JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
     initEditor();
     setStatus('Loaded current protocol.');
-    syncCodeSurgeryOptions();
-    loadPatientCodes();
-    if(document.getElementById('chartNumberInput')) chartNumberInput.value='';
   }catch(e){
     protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
     initEditor();
@@ -1891,7 +1900,6 @@ function loadDefault(){
   protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
   initEditor();
   setStatus('Loaded default protocol.');
-  syncCodeSurgeryOptions();
 }
 
 function initEditor(){
@@ -1905,8 +1913,6 @@ function initEditor(){
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
-  syncCodeSurgeryOptions();
-  if(document.getElementById('codeSurgeryDate')&&!codeSurgeryDate.value) codeSurgeryDate.value=todayYMD();
 }
 
 function currentSurgeryKey(){
@@ -1929,7 +1935,7 @@ function renderStages(){
   const s=currentSurgery();
   surgeryName.value=s.name;
   totalDays.value=s.totalDays;
-  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new week at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
+  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${esc(st.label)}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new week at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
   renderStageEditor();
   renderPreview();
 }
@@ -2137,7 +2143,6 @@ async function saveProtocol(){
     const data=await res.json();
     if(!res.ok)throw new Error(data.error||'Save failed');
     setSaveStatus('Saved successfully.');
-    reloadPatientPreview();
     reloadPatientPreview();
   }catch(e){
     setSaveStatus('Save failed: '+e.message,false);
@@ -2506,6 +2511,10 @@ function todayYMD(){
 
 async function generatePatientCode(){
   if(!requireLogin())return;
+  if(!document.getElementById('codeSurgery')){
+    setStatus('Staff code generation is managed in code.html.', false);
+    return;
+  }
   const surgeryType=document.getElementById('codeSurgery').value;
   const surgeryDate=document.getElementById('codeSurgeryDate').value || todayYMD();
   const chartNumber=document.getElementById('chartNumberInput')?.value.trim() || '';
@@ -2526,7 +2535,6 @@ async function generatePatientCode(){
     if(!res.ok) throw new Error(data.error||'Failed to generate code');
     generatedCodeBox.innerHTML=`<b>Random Access Code:</b> ${data.code}<br><b>Surgery:</b> ${protocol[surgeryType]?.name||surgeryType}<br><b>Date:</b> ${surgeryDate}<br><b>Chart #:</b> ${chartNumber || '-'}<br><b>Expires:</b> ${data.expiresAt}<br><br><b>Patient link:</b><br>https://terrysf-web.github.io/recovery/`;
     codeStatus.textContent='Patient code generated.';
-    reloadPatientPreview();
     reloadPatientPreview();
     codeStatus.style.color='#15803d';
     loadPatientCodes();
@@ -2557,6 +2565,8 @@ function formatPacificDateTime(iso){
 
 async function loadPatientCodes(){
   if(!requireLogin()) return;
+  const listEl=document.getElementById('patientCodeList');
+  if(!listEl) return;
 
   try{
     const res = await fetch(
@@ -2576,7 +2586,7 @@ async function loadPatientCodes(){
     const codes = data.codes || [];
 
     if(!codes.length){
-      patientCodeList.innerHTML = 'No patient access codes found.';
+      listEl.innerHTML = 'No patient access codes found.';
       return;
     }
 
@@ -2591,7 +2601,7 @@ async function loadPatientCodes(){
 
     codes.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
 
-    patientCodeList.innerHTML = `
+    listEl.innerHTML = `
       <div class="codeTableWrap">
         <table class="codeTable">
           <thead>
@@ -2634,7 +2644,7 @@ async function loadPatientCodes(){
         </table>
       </div>`;
   }catch(e){
-    patientCodeList.innerHTML = 'Could not load codes: ' + e.message;
+    listEl.innerHTML = 'Could not load codes: ' + e.message;
   }
 }
 
@@ -2798,24 +2808,36 @@ function renderPreview(){
       <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
 
       <div class="previewBlock previewReminder">
-        <h4>Today’s Reminder</h4>
+        <h4>${esc(stage.reminderTitle || 'Today’s Reminder')}</h4>
         <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
       </div>
 
       <div class="previewBlock">
-        <h4>What’s Normal Today</h4>
+        <h4>${esc(stage.normalTitle || 'What’s Normal Today')}</h4>
         ${listHtml(stage.normal)}
       </div>
 
       <div class="previewBlock previewFoods">
-        <h4>Foods Allowed</h4>
+        <h4>${esc(stage.foodsTitle || 'Foods Allowed')}</h4>
         ${listHtml(stage.foods)}
       </div>
 
       <div class="previewBlock previewAvoid">
-        <h4>Avoid Today</h4>
+        <h4>${esc(stage.avoidTitle || 'Avoid Today')}</h4>
         ${listHtml(stage.avoid)}
       </div>
+
+      <div class="previewBlock previewAvoid">
+        <h4>${esc(stage.warningsTitle || 'Call Clinic If')}</h4>
+        ${listHtml(stage.warnings)}
+      </div>
+
+      ${(stage.customSections || []).map(sec=>`
+        <div class="previewBlock">
+          <h4>${esc(sec.icon || '📌')} ${esc(sec.title || 'Additional Information')}</h4>
+          <ul><li>${esc(sec.text || 'No content entered.')}</li></ul>
+        </div>
+      `).join('')}
 
       <div class="previewSmallNote">
         This preview is generated inside the Admin page and does not require a patient access code.

@@ -1513,6 +1513,19 @@ button.danger{
 <link rel="apple-touch-icon" href="./pwa_icon_192.png">
 <link rel="shortcut icon" href="./pwa_icon_192.png">
 
+
+<style>
+#adminPreviewColumn,
+.previewColumn,
+.rightPreviewColumn{
+position:sticky !important;
+top:12px !important;
+align-self:flex-start !important;
+height:fit-content !important;
+z-index:10 !important;
+}
+</style>
+
 </head>
 <body>
 <div class="header">
@@ -2952,6 +2965,41 @@ function openAdminLivePreview(){
 </script>
 
 <!-- OPEN_LIVE_PREVIEW_V101 -->
+
+<div id="adminVersionBadge" style="
+position:fixed;
+right:16px;
+bottom:16px;
+z-index:9999;
+background:#24364f;
+color:white;
+padding:8px 12px;
+border-radius:999px;
+font-size:12px;
+font-weight:800;
+box-shadow:0 8px 24px rgba(0,0,0,.18);
+">
+Recovery Admin v105
+</div>
+
+
+<div style="
+position:fixed;
+right:14px;
+bottom:14px;
+z-index:99999;
+background:#24364f;
+color:white;
+padding:8px 12px;
+border-radius:999px;
+font-size:12px;
+font-weight:900;
+box-shadow:0 8px 24px rgba(0,0,0,.18);
+opacity:.96;
+">
+Recovery Admin v106
+</div>
+
 </body>
 </html>
 
@@ -2970,3 +3018,5 @@ function openAdminLivePreview(){
 <!-- APP_MATCHED_SECTION_EDITOR_V103 -->
 
 <!-- V104_FAVICON_CUSTOM_CARDS_STICKY_PREVIEW -->
+
+<!-- V105_STICKY_AND_VERSION -->

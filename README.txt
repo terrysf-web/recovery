@@ -1,22 +1,21 @@
-Admin Titles Editable v102
+App-Matched Section Editor v103
 
 Upload:
-1. admin_titles_editable_v102.html -> admin.html
-2. index_titles_support_v102.html -> index.html
+1. admin_app_sections_v103.html -> admin.html
+2. index_app_sections_v103.html -> index.html
 
 Changes:
-- Admin labels aligned closer to app terminology:
-  Procedure Type, Recovery Timeline Management, Timeline Section.
-- Added App Section Titles editor for each timeline section:
-  Timeline Section Title
-  Recovery Phase Title
-  Reminder Section Title
-  Normal Section Title
-  Foods Section Title
-  Avoid Section Title
-- Admin preview uses these editable titles.
-- Patient app can apply these titles after Save to Cloudflare.
-
-After editing:
-- Click Save to Cloudflare.
-- Use Open Live Preview to test.
+- Admin section titles now match the patient app:
+  Today’s Reminder
+  What’s Normal Today
+  Foods Allowed
+  Avoid Today
+  Call Clinic If
+- Each standard section title is editable.
+- Added Extra App Sections:
+  + Add Section
+  Move Up / Move Down
+  Delete Section
+  Each extra section has Title, Icon, and Card Text.
+- Extra sections appear in the patient app below the standard cards.
+- Existing item-level Add/Move/Delete still works.

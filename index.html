@@ -249,7 +249,7 @@
 <main class="content">
 <section id="homeScreen"><div class="screen-title">Select Surgery Type</div><div class="card select-card" onclick="selectSurgery('periodontal')"><div class="select-icon">🔬</div><div><div class="select-name">Periodontal Surgery</div><div class="select-sub">8 week recovery guide</div></div><div class="arrow">›</div></div><div class="card select-card" onclick="selectSurgery('implant')"><div class="select-icon">🦷</div><div><div class="select-name">Implant</div><div class="select-sub">8 week recovery guide</div></div><div class="arrow">›</div></div><div class="card select-card" onclick="selectSurgery('graft')"><div class="select-icon">🌿</div><div><div class="select-name">Gum Grafting</div><div class="select-sub">9 week recovery guide</div></div><div class="arrow">›</div></div><div class="card select-card" onclick="selectSurgery('extraction')"><div class="select-icon">🦷</div><div><div class="select-name">Extraction</div><div class="select-sub">9 week recovery guide</div></div><div class="arrow">›</div></div></section>
 <section id="dateScreen" class="hidden"><div class="screen-title">Surgery Date</div><div class="card date-panel"><div class="card-title" id="selectedSurgeryTitle">Selected Surgery</div><div class="card-text">Choose the surgery date. The app will automatically update the recovery day based on today’s Pacific Time date.</div><input id="surgeryDateInput" type="date"><button class="primary-btn" onclick="saveSurgeryDate()">Start Recovery Guide</button><button class="ghost-btn" onclick="resetGuide()">Back / Reset</button></div></section>
-<section id="todayScreen" class="hidden"><div class="card soft-blue"><div class="day-hero"><div><div class="day-label">Today’s Recovery</div><div class="day-number" id="dayNumber">Day 1</div><div class="phase" id="phaseText">Initial Healing</div><div class="card-text" id="surgeryMeta" style="margin-top:8px"></div></div><div class="ring" id="progressRing" style="--p:5"><div class="ring-inner"><div id="progressPercent">5%</div><span>complete</span></div></div></div></div><div class="card soft-orange"><div class="row"><div class="icon-badge">🔔</div><div><div class="card-title" id="reminderTitle">Today’s Reminder</div><div class="card-text" id="reminderText"></div></div></div></div><div class="card"><div class="card-title">✅ What’s Normal Today</div><ul class="list" id="normalList"></ul></div><div class="card soft-green"><div class="card-title">🍲 Foods Allowed</div><ul class="list" id="foodList"></ul></div><div class="card soft-orange"><div class="card-title">🚫 Avoid Today</div><ul class="list" id="avoidList"></ul></div><div class="card soft-red"><div class="card-title">📞 Call Clinic If</div><ul class="list" id="warningList"></ul></div><div class="card"><div class="card-title">⏭ Next Milestone</div><div class="card-text" id="nextMilestone"></div></div><button class="ghost-btn" id="refreshProtocolBtn" onclick="loadClinicProtocol()">Refresh Instructions</button><button class="ghost-btn" onclick="clearAccessCode()">Use Different Access Code</button><button class="ghost-btn" onclick="resetGuide()">Reset Guide</button></section>
+<section id="todayScreen" class="hidden"><div class="card soft-blue"><div class="day-hero"><div><div class="day-label">Today’s Recovery</div><div class="day-number" id="dayNumber">Day 1</div><div class="phase" id="phaseText">Initial Healing</div><div class="card-text" id="surgeryMeta" style="margin-top:8px"></div></div><div class="ring" id="progressRing" style="--p:5"><div class="ring-inner"><div id="progressPercent">5%</div><span>complete</span></div></div></div></div><div class="card soft-orange"><div class="row"><div class="icon-badge">🔔</div><div><div class="card-title" id="reminderTitle">Today’s Reminder</div><div class="card-text" id="reminderText"></div></div></div></div><div class="card"><div class="card-title">✅ What’s Normal Today</div><ul class="list" id="normalList"></ul></div><div class="card soft-green"><div class="card-title">🍲 Foods Allowed</div><ul class="list" id="foodList"></ul></div><div class="card soft-orange"><div class="card-title">🚫 Avoid Today</div><ul class="list" id="avoidList"></ul></div><div class="card soft-red"><div class="card-title">📞 Call Clinic If</div><ul class="list" id="warningList"></ul></div><div id="customSectionCards"></div><div class="card"><div class="card-title">⏭ Next Milestone</div><div class="card-text" id="nextMilestone"></div></div><button class="ghost-btn" id="refreshProtocolBtn" onclick="loadClinicProtocol()">Refresh Instructions</button><button class="ghost-btn" onclick="clearAccessCode()">Use Different Access Code</button><button class="ghost-btn" onclick="resetGuide()">Reset Guide</button></section>
 <section id="timelineScreen" class="hidden"><div class="screen-title">Recovery Timeline</div><div class="card"><div class="card-title">Review the full recovery journey</div><div class="card-text">You can review past, current, and upcoming recovery stages. Tap Today anytime to return to your current day.</div></div><div class="card" id="timelineList"></div></section>
 </main></div>
 <div class="chat-backdrop" id="chatBackdrop" onclick="closeAssistant()"></div><div class="chat-panel" id="chatPanel"><div class="chat-head"><div><div class="chat-title">💬 Recovery Assistant</div><div class="card-text">Quick guidance based on your recovery day</div></div><button class="chat-close" onclick="closeAssistant()">×</button></div><div class="chat-grid" id="chatGrid"><button class="chat-chip" onclick="askAssistant('bleeding')">🩸 Bleeding</button><button class="chat-chip" onclick="askAssistant('swelling')">😮‍💨 Swelling</button><button class="chat-chip" onclick="askAssistant('pain')">⚡ Pain</button><button class="chat-chip" onclick="askAssistant('food')">🍲 Food</button><button class="chat-chip" onclick="askAssistant('brushing')">🪥 Brushing</button><button class="chat-chip" onclick="askAssistant('urgent')">🚨 Urgent Signs</button></div>
@@ -455,7 +455,13 @@ function guidance(day,type){
       normal: st.normal || [],
       foods: st.foods || [],
       avoid: st.avoid || [],
-      warnings: st.warnings || []
+      warnings: st.warnings || [],
+      reminderTitle: st.reminderTitle || "Today’s Reminder",
+      normalTitle: st.normalTitle || "What’s Normal Today",
+      foodsTitle: st.foodsTitle || "Foods Allowed",
+      avoidTitle: st.avoidTitle || "Avoid Today",
+      warningsTitle: st.warningsTitle || "Call Clinic If",
+      customSections: st.customSections || []
     };
   }
 
@@ -466,10 +472,20 @@ function guidance(day,type){
     normal: [],
     foods: [],
     avoid: [],
-    warnings: ["Contact the clinic if symptoms worsen."]
+    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[]
   };
 }
-function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);const next=MILESTONES.find(m=>m.day>day&&m.day<=surgery.totalDays);nextMilestone.textContent=next?`${recoveryDayLabel(next.day)}: ${next.phase} — ${next.summary}`:"You are at the final recovery stage. Continue following your clinic’s instructions."}function showToday(){setActiveNav("today");renderToday()}function nearestMilestone(day,total){const valid=MILESTONES.filter(m=>m.day<=total).map(m=>m.day);return valid.find(m=>m>=day)||valid[valid.length-1]}function showTimeline(){const saved=getSaved();if(!saved.type||!saved.date){showToday();return}setActiveNav("timeline");homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.remove("hidden");const day=displayRecoveryDay(saved.date);const surgery=SURGERIES[saved.type];timelineList.innerHTML=MILESTONES.filter(m=>m.day<=surgery.totalDays).map(m=>{const state=m.day<day?"done":m.day===day||nearestMilestone(day,surgery.totalDays)===m.day?"current":"future";const icon=m.day<day?"✓":state==="current"?"●":"○";return `<div class="timeline-item ${state}"><div class="timeline-dot">${icon}</div><div><div class="timeline-day">${recoveryDayLabel(m.day)}${m.day===day?" · Today":""}</div><div class="timeline-phase">${m.phase}</div><div class="timeline-summary">${m.summary}</div></div></div>`}).join("")}
+function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);
+const rt=document.getElementById("reminderTitle"); if(rt) rt.textContent=g.reminderTitle||"Today’s Reminder";
+const normalTitleEl=document.querySelector("#normalList")?.closest(".card")?.querySelector(".card-title"); if(normalTitleEl) normalTitleEl.textContent="✅ "+(g.normalTitle||"What’s Normal Today");
+const foodTitleEl=document.querySelector("#foodList")?.closest(".card")?.querySelector(".card-title"); if(foodTitleEl) foodTitleEl.textContent="🍲 "+(g.foodsTitle||"Foods Allowed");
+const avoidTitleEl=document.querySelector("#avoidList")?.closest(".card")?.querySelector(".card-title"); if(avoidTitleEl) avoidTitleEl.textContent="🚫 "+(g.avoidTitle||"Avoid Today");
+const warnTitleEl=document.querySelector("#warningList")?.closest(".card")?.querySelector(".card-title"); if(warnTitleEl) warnTitleEl.textContent="📞 "+(g.warningsTitle||"Call Clinic If");
+const customBox=document.getElementById("customSectionCards");
+if(customBox){
+  customBox.innerHTML=(g.customSections||[]).map(sec=>`<div class="card"><div class="card-title">${sec.icon||"📌"} ${sec.title||"Additional Information"}</div><div class="card-text">${sec.text||""}</div></div>`).join("");
+}
+const next=MILESTONES.find(m=>m.day>day&&m.day<=surgery.totalDays);nextMilestone.textContent=next?`${recoveryDayLabel(next.day)}: ${next.phase} — ${next.summary}`:"You are at the final recovery stage. Continue following your clinic’s instructions."}function showToday(){setActiveNav("today");renderToday()}function nearestMilestone(day,total){const valid=MILESTONES.filter(m=>m.day<=total).map(m=>m.day);return valid.find(m=>m>=day)||valid[valid.length-1]}function showTimeline(){const saved=getSaved();if(!saved.type||!saved.date){showToday();return}setActiveNav("timeline");homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.remove("hidden");const day=displayRecoveryDay(saved.date);const surgery=SURGERIES[saved.type];timelineList.innerHTML=MILESTONES.filter(m=>m.day<=surgery.totalDays).map(m=>{const state=m.day<day?"done":m.day===day||nearestMilestone(day,surgery.totalDays)===m.day?"current":"future";const icon=m.day<day?"✓":state==="current"?"●":"○";return `<div class="timeline-item ${state}"><div class="timeline-dot">${icon}</div><div><div class="timeline-day">${recoveryDayLabel(m.day)}${m.day===day?" · Today":""}</div><div class="timeline-phase">${m.phase}</div><div class="timeline-summary">${m.summary}</div></div></div>`}).join("")}
 function openAssistant(){setActiveNav("assistant");chatBackdrop.classList.add("show");chatPanel.classList.add("show");backToAssistant()}function closeAssistant(){chatBackdrop.classList.remove("show");chatPanel.classList.remove("show");setActiveNav(todayScreen.classList.contains("hidden")?"timeline":"today")}function backToAssistant(){chatGrid.style.display="grid";assistantAnswer.classList.remove("show")}function askAssistant(topic){const saved=getSaved();const day=saved.date?displayRecoveryDay(saved.date):1;const g=guidance(day,saved.type||"periodontal");const data={bleeding:["Bleeding guidance","Light bleeding or pink saliva can be normal early after surgery. Avoid hard rinsing, spitting, straws, smoking, and heavy activity.","Call the clinic if bleeding is heavy, does not slow with gentle pressure, or fills the mouth quickly."],swelling:["Swelling guidance",day<=3?"Swelling commonly increases during the first 2–3 days and may peak around this time.":"Swelling should gradually improve. New or rapidly worsening swelling should be checked.","Call the clinic if swelling is rapidly worsening, spreading, or comes with fever."],pain:["Pain guidance",day<=7?"Soreness and tenderness can be normal, but pain should gradually improve.":"Pain should be much better by now. New throbbing pain or worsening discomfort should be checked.","Call the clinic if pain is severe, suddenly worsening, or not controlled by your instructions."],food:["Food guidance",`Today’s food guidance: ${g.foods.join(", ")}.`,"Avoid crunchy, sharp, hard foods or anything that hurts the surgical site."],brushing:["Brushing guidance",day<=7?"Do not brush or floss the surgical site yet. Keep the rest of the mouth clean carefully.":"Use a soft toothbrush gently and avoid aggressive cleaning around tender tissue.","Call the clinic if brushing causes heavy bleeding or increasing pain."],urgent:["Urgent signs","Contact the clinic promptly for heavy bleeding, fever, rapidly increasing swelling, pus/drainage, severe pain, trouble swallowing, or trouble breathing.","For breathing difficulty or emergency symptoms, seek urgent/emergency care immediately."]};const r=data[topic];assistantTitle.textContent=`${r[0]} · ${recoveryDayLabel(day)}`;assistantText.textContent=r[1];assistantWarning.textContent=r[2];chatGrid.style.display="none";assistantAnswer.classList.add("show")}
 const GEMINI_DAILY_LIMIT=10;
 const GEMINI_FUNCTION_URL = "https://shrill-union-34e3.terryjseo.workers.dev";
@@ -857,64 +873,11 @@ window.addEventListener('load',()=>{
   </div>
 </div>
 
-
-<script>
-/* v102 custom section title support */
-(function(){
-  function getCurrentStageForTitles(){
-    try{
-      const type=localStorage.getItem('surgeryType');
-      const date=localStorage.getItem('surgeryDate');
-      if(!type || !date || typeof CLINIC_PROTOCOL==='undefined') return null;
-      const surgery=CLINIC_PROTOCOL[type];
-      if(!surgery || !surgery.stages) return null;
-
-      const start=new Date(date+'T00:00:00');
-      const now=new Date();
-      const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-      const day=Math.max(1,Math.floor((today-start)/(24*60*60*1000))+1);
-
-      return surgery.stages.find(s=>day>=Number(s.startDay||s.start||1) && day<=Number(s.endDay||s.end||999)) || surgery.stages[0];
-    }catch(e){
-      return null;
-    }
-  }
-
-  function applyCustomSectionTitles(){
-    const stage=getCurrentStageForTitles();
-    if(!stage) return;
-
-    const titleMap={
-      'Today’s Reminder': stage.reminderTitle,
-      'What’s Normal Today': stage.normalTitle,
-      "What's Normal Today": stage.normalTitle,
-      'Foods Allowed': stage.foodsTitle,
-      'Avoid Today': stage.avoidTitle
-    };
-
-    document.querySelectorAll('h1,h2,h3,h4,.section-title,.accordion-title,.card-title,button').forEach(el=>{
-      const text=(el.textContent||'').trim();
-      if(titleMap[text]) el.textContent=titleMap[text];
-    });
-  }
-
-  const oldRenderToday=window.renderToday;
-  if(typeof oldRenderToday==='function'){
-    window.renderToday=function(){
-      const result=oldRenderToday.apply(this,arguments);
-      setTimeout(applyCustomSectionTitles,50);
-      return result;
-    };
-  }
-
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(applyCustomSectionTitles,500));
-})();
-</script>
-
-<!-- PATIENT_APP_TITLES_SUPPORT_V102 -->
 </body>
 </html>
 
 <!-- ADMIN_PREVIEW_NO_CODE_V96 -->
 
 <!-- LIVE_PREVIEW_SUPPORT_V101 -->
+
+<!-- CUSTOM_APP_SECTIONS_SUPPORT_V103 -->

@@ -1424,28 +1424,79 @@ button.danger{
 }
 
 
-/* v102 editable app section titles */
-.sectionTitleEditorBox{
-  background:#f8fbff;
+/* v103 App-matched section editor */
+.appSectionBlock{
   border:1px solid #dbe6f2;
-  border-radius:14px;
-  padding:12px;
-  margin:12px 0;
+  background:#fbfdff;
+  border-radius:16px;
+  padding:13px;
+  margin:14px 0;
 }
-.sectionTitleEditorGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
+
+.appSectionHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   gap:10px;
+  margin-bottom:10px;
 }
-.sectionTitleEditorGrid label{margin-top:0}
-.sectionTitleNote{
-  margin-top:8px;
+
+.appSectionTitle{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:15px;
+  font-weight:950;
+  color:#0f172a;
+}
+
+.appSectionIcon{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#eef4fb;
+  font-size:18px;
+}
+
+.appSectionHelp{
   font-size:12px;
   color:#64748b;
-  line-height:1.45;
+  line-height:1.4;
 }
+
+.customSectionRow{
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:12px;
+  margin:10px 0;
+  background:white;
+}
+
+.customSectionToolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.customSectionToolbar .miniBtn{
+  min-width:36px;
+}
+
+.titleMiniGrid{
+  display:grid;
+  grid-template-columns:1fr 1.2fr;
+  gap:10px;
+  margin-bottom:10px;
+}
+
 @media(max-width:780px){
-  .sectionTitleEditorGrid{grid-template-columns:1fr}
+  .titleMiniGrid{
+    grid-template-columns:1fr;
+  }
 }
 
 </style>
@@ -1589,7 +1640,7 @@ button.danger{
     
     <div class="card">
       <div class="sectionTitle">Procedure Type Management</div>
-      <div class="small">Add a new procedure guide, copy the current one, or delete an unused procedure type.</div>
+      <div class="small">Add a new surgery protocol, copy the current one, or delete an unused surgery type.</div>
 
       <label>New Procedure Type Name</label>
       <input id="newSurgeryName" placeholder="Example: Bone Graft">
@@ -1610,7 +1661,7 @@ button.danger{
 
     <div class="card">
       <div class="sectionTitle">Recovery Timeline Management</div>
-      <div class="small">Add, copy, delete, or reorder the same timeline sections shown in the Recovery Guide app.</div>
+      <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
 
       <div class="actions">
         <button class="btn primary" onclick="addStageAfterCurrent()">Add Timeline Section After Current</button>
@@ -1758,22 +1809,22 @@ function renderAdminInlinePreview(){
     <div class="previewStagePill">${escapeHtml(stage.label || stage.phase || 'Selected stage')}</div>
 
     <div class="previewBlock previewReminder">
-      <h4>${esc(stage.reminderTitle || 'Today’s Reminder')}</h4>
+      <h4>Today’s Reminder</h4>
       <ul><li>${escapeHtml(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
     </div>
 
     <div class="previewBlock">
-      <h4>${esc(stage.normalTitle || 'What’s Normal Today')}</h4>
+      <h4>What’s Normal Today</h4>
       ${previewListHtml(stage.normal)}
     </div>
 
     <div class="previewBlock previewFoods">
-      <h4>${esc(stage.foodsTitle || 'Foods Allowed')}</h4>
+      <h4>Foods Allowed</h4>
       ${previewListHtml(stage.foods)}
     </div>
 
     <div class="previewBlock previewAvoid">
-      <h4>${esc(stage.avoidTitle || 'Avoid Today')}</h4>
+      <h4>Avoid Today</h4>
       ${previewListHtml(stage.avoid)}
     </div>
 
@@ -1790,93 +1841,6 @@ function loadAdminNoCodePreview(){
 
 function reloadPatientPreview(){
   renderAdminInlinePreview();
-}
-
-
-function ensureStageTitleFields(){
-  const container=document.getElementById('stageEditor');
-  if(!container || !protocol) return;
-
-  const surgeryKey=document.getElementById('surgerySelect')?.value;
-  const surgery=protocol[surgeryKey];
-  if(!surgery || !surgery.stages || !surgery.stages[currentStageIndex]) return;
-
-  const stage=surgery.stages[currentStageIndex];
-
-  const existing=document.getElementById('stageTitleEditorBox');
-  if(existing) existing.remove();
-
-  const box=document.createElement('div');
-  box.id='stageTitleEditorBox';
-  box.className='sectionTitleEditorBox';
-  box.innerHTML=`
-    <div class="sectionTitle">App Section Titles</div>
-    <div class="small">These titles match what the patient sees in the Recovery Guide app.</div>
-    <div class="sectionTitleEditorGrid">
-      <div>
-        <label>Timeline Section Title</label>
-        <input id="stageLabelTitleInput" value="${escapeHtml(stage.label || stage.phase || '')}" oninput="saveStageTitlesFromEditor()">
-      </div>
-      <div>
-        <label>Recovery Phase Title</label>
-        <input id="stagePhaseTitleInput" value="${escapeHtml(stage.phase || stage.label || '')}" oninput="saveStageTitlesFromEditor()">
-      </div>
-      <div>
-        <label>Reminder Section Title</label>
-        <input id="reminderTitleInput" value="${escapeHtml(stage.reminderTitle || 'Today’s Reminder')}" oninput="saveStageTitlesFromEditor()">
-      </div>
-      <div>
-        <label>Normal Section Title</label>
-        <input id="normalTitleInput" value="${escapeHtml(stage.normalTitle || 'What’s Normal Today')}" oninput="saveStageTitlesFromEditor()">
-      </div>
-      <div>
-        <label>Foods Section Title</label>
-        <input id="foodsTitleInput" value="${escapeHtml(stage.foodsTitle || 'Foods Allowed')}" oninput="saveStageTitlesFromEditor()">
-      </div>
-      <div>
-        <label>Avoid Section Title</label>
-        <input id="avoidTitleInput" value="${escapeHtml(stage.avoidTitle || 'Avoid Today')}" oninput="saveStageTitlesFromEditor()">
-      </div>
-    </div>
-    <div class="sectionTitleNote">
-      Edit these titles if the Admin title and app title do not match. Click Save to Cloudflare after changes.
-    </div>
-  `;
-
-  container.prepend(box);
-}
-
-function saveStageTitlesFromEditor(){
-  const surgeryKey=document.getElementById('surgerySelect')?.value;
-  const surgery=protocol[surgeryKey];
-  if(!surgery || !surgery.stages || !surgery.stages[currentStageIndex]) return;
-
-  const stage=surgery.stages[currentStageIndex];
-
-  stage.label=document.getElementById('stageLabelTitleInput')?.value || stage.label || '';
-  stage.phase=document.getElementById('stagePhaseTitleInput')?.value || stage.phase || stage.label || '';
-  stage.reminderTitle=document.getElementById('reminderTitleInput')?.value || 'Today’s Reminder';
-  stage.normalTitle=document.getElementById('normalTitleInput')?.value || 'What’s Normal Today';
-  stage.foodsTitle=document.getElementById('foodsTitleInput')?.value || 'Foods Allowed';
-  stage.avoidTitle=document.getElementById('avoidTitleInput')?.value || 'Avoid Today';
-
-  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
-}
-
-function patchStageTitleEditor(){
-  if(typeof renderStages === 'function' && !renderStages.__titleEditorPatched){
-    const original=renderStages;
-    renderStages=function(){
-      const result=original.apply(this, arguments);
-      setTimeout(()=>{
-        ensureStageTitleFields();
-        if(typeof populateAdminPreviewControls === 'function') populateAdminPreviewControls();
-        if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
-      },50);
-      return result;
-    };
-    renderStages.__titleEditorPatched=true;
-  }
 }
 
 function getPass(){
@@ -1941,10 +1905,6 @@ function initEditor(){
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
-  patchStageTitleEditor();
-  ensureStageTitleFields();
-    patchStageTitleEditor();
-    ensureStageTitleFields();
   syncCodeSurgeryOptions();
   if(document.getElementById('codeSurgeryDate')&&!codeSurgeryDate.value) codeSurgeryDate.value=todayYMD();
 }
@@ -1976,13 +1936,21 @@ function renderStages(){
 
 function renderStageEditor(){
   const st=currentSurgery().stages[currentStageIndex];
+
+  if(!st.reminderTitle) st.reminderTitle='Today’s Reminder';
+  if(!st.normalTitle) st.normalTitle='What’s Normal Today';
+  if(!st.foodsTitle) st.foodsTitle='Foods Allowed';
+  if(!st.avoidTitle) st.avoidTitle='Avoid Today';
+  if(!st.warningsTitle) st.warningsTitle='Call Clinic If';
+  if(!st.customSections) st.customSections=[];
+
   stageEditor.innerHTML=`<div class="card">
     <div class="stageTitle">${st.label}</div>
     <div class="small">Use ↑ / ↓ to change card order. Delete and add are locked behind admin login.</div>
 
     <div class="row">
-      <div><label>Label</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
-      <div><label>Phase</label><input value="${esc(st.phase)}" oninput="updateStage('phase',this.value)"></div>
+      <div><label>Timeline Section Title</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
+      <div><label>Recovery Phase</label><input value="${esc(st.phase)}" oninput="updateStage('phase',this.value)"></div>
     </div>
 
     <div class="row">
@@ -1990,31 +1958,127 @@ function renderStageEditor(){
       <div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div>
     </div>
 
-    <label>Reminder / Diet Instruction</label>
-    <textarea oninput="updateStage('reminder',this.value)">${esc(st.reminder)}</textarea>
+    <div class="appSectionBlock">
+      <div class="appSectionHeader">
+        <div>
+          <div class="appSectionTitle"><span class="appSectionIcon">🔔</span> Today’s Reminder</div>
+          <div class="appSectionHelp">This matches the reminder card title in the patient app.</div>
+        </div>
+      </div>
+      <div class="titleMiniGrid">
+        <div><label>Section Title</label><input value="${esc(st.reminderTitle)}" oninput="updateStage('reminderTitle',this.value)"></div>
+        <div><label>Card Text</label><textarea oninput="updateStage('reminder',this.value)">${esc(st.reminder)}</textarea></div>
+      </div>
+    </div>
 
-    ${arrayEditor('normal','Home Care / Instructions')}
-    ${arrayEditor('foods','Food Examples')}
-    ${arrayEditor('avoid','Avoid / Restrictions')}
-    ${arrayEditor('warnings','Additional Notes / Warnings')}
+    ${arrayEditor('normal',st.normalTitle,'What’s Normal Today','✅')}
+    ${arrayEditor('foods',st.foodsTitle,'Foods Allowed','🍲')}
+    ${arrayEditor('avoid',st.avoidTitle,'Avoid Today','🚫')}
+    ${arrayEditor('warnings',st.warningsTitle,'Call Clinic If','📞')}
+
+    ${customSectionsEditor()}
   </div>`;
 }
 
-function arrayEditor(key,title){
-  const arr=currentSurgery().stages[currentStageIndex][key]||[];
-  return `<label>${title}</label>
-  <div class="arrayBox">
-    ${arr.map((v,i)=>`<div class="arrayRow">
-      <textarea oninput="updateArray('${key}',${i},this.value)">${esc(v)}</textarea>
-      <div class="arrayActions">
-        <button class="miniBtn upBtn" title="Move up" onclick="moveUp('${key}',${i})">↑</button>
-        <button class="miniBtn downBtn" title="Move down" onclick="moveDown('${key}',${i})">↓</button>
-        <button class="miniBtn deleteBtn" title="Delete" onclick="removeArray('${key}',${i})">×</button>
+function arrayEditor(key,currentTitle,defaultTitle,icon){
+  const st=currentSurgery().stages[currentStageIndex];
+  const arr=st[key]||[];
+  const titleKey=key+'Title';
+  const title=st[titleKey] || currentTitle || defaultTitle;
+
+  return `<div class="appSectionBlock">
+    <div class="appSectionHeader">
+      <div>
+        <div class="appSectionTitle"><span class="appSectionIcon">${icon}</span> ${esc(title)}</div>
+        <div class="appSectionHelp">This section title appears in the patient app.</div>
       </div>
-    </div>`).join('')}
-  </div>
-  <button class="btn secondary" onclick="addArray('${key}')">+ Add ${title}</button>`;
+    </div>
+
+    <label>Section Title</label>
+    <input value="${esc(title)}" oninput="updateStage('${titleKey}',this.value)">
+
+    <div style="height:8px"></div>
+    <label>Card Items</label>
+    <div class="arrayBox">
+      ${arr.map((v,i)=>`<div class="arrayRow">
+        <textarea oninput="updateArray('${key}',${i},this.value)">${esc(v)}</textarea>
+        <div class="arrayActions">
+          <button class="miniBtn upBtn" title="Move up" onclick="moveUp('${key}',${i})">↑</button>
+          <button class="miniBtn downBtn" title="Move down" onclick="moveDown('${key}',${i})">↓</button>
+          <button class="miniBtn deleteBtn" title="Delete" onclick="removeArray('${key}',${i})">×</button>
+        </div>
+      </div>`).join('')}
+    </div>
+    <button class="btn secondary" onclick="addArray('${key}')">+ Add Item to ${esc(title)}</button>
+  </div>`;
 }
+
+function customSectionsEditor(){
+  const st=currentSurgery().stages[currentStageIndex];
+  const sections=st.customSections || [];
+
+  return `<div class="appSectionBlock">
+    <div class="appSectionHeader">
+      <div>
+        <div class="appSectionTitle"><span class="appSectionIcon">➕</span> Extra App Sections</div>
+        <div class="appSectionHelp">Add another card section. It will appear in the patient app under the standard cards.</div>
+      </div>
+      <button class="btn primary" onclick="addCustomSection()">+ Add Section</button>
+    </div>
+
+    ${sections.length ? sections.map((sec,i)=>`
+      <div class="customSectionRow">
+        <div class="row">
+          <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
+          <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
+        </div>
+        <label>Card Text</label>
+        <textarea oninput="updateCustomSection(${i},'text',this.value)">${esc(sec.text || '')}</textarea>
+        <div class="customSectionToolbar">
+          <button class="miniBtn upBtn" onclick="moveCustomSection(${i},-1)">↑ Move Up</button>
+          <button class="miniBtn downBtn" onclick="moveCustomSection(${i},1)">↓ Move Down</button>
+          <button class="miniBtn deleteBtn" onclick="deleteCustomSection(${i})">Delete Section</button>
+        </div>
+      </div>
+    `).join('') : `<div class="small">No extra sections added yet.</div>`}
+  </div>`;
+}
+
+function addCustomSection(){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  if(!st.customSections) st.customSections=[];
+  st.customSections.push({title:'New Section', icon:'📌', text:''});
+  renderStages();
+}
+
+function updateCustomSection(i,k,v){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  if(!st.customSections) st.customSections=[];
+  if(!st.customSections[i]) return;
+  st.customSections[i][k]=v;
+  renderPreview();
+}
+
+function moveCustomSection(i,dir){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const arr=st.customSections || [];
+  const j=i+dir;
+  if(j<0||j>=arr.length)return;
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+  renderStages();
+}
+
+function deleteCustomSection(i){
+  if(!requireLogin())return;
+  if(!confirm('Delete this app section?'))return;
+  const st=currentSurgery().stages[currentStageIndex];
+  (st.customSections||[]).splice(i,1);
+  renderStages();
+}
+
 
 function updateStage(k,v){
   if(!requireLogin())return;
@@ -2734,22 +2798,22 @@ function renderPreview(){
       <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
 
       <div class="previewBlock previewReminder">
-        <h4>${esc(stage.reminderTitle || 'Today’s Reminder')}</h4>
+        <h4>Today’s Reminder</h4>
         <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
       </div>
 
       <div class="previewBlock">
-        <h4>${esc(stage.normalTitle || 'What’s Normal Today')}</h4>
+        <h4>What’s Normal Today</h4>
         ${listHtml(stage.normal)}
       </div>
 
       <div class="previewBlock previewFoods">
-        <h4>${esc(stage.foodsTitle || 'Foods Allowed')}</h4>
+        <h4>Foods Allowed</h4>
         ${listHtml(stage.foods)}
       </div>
 
       <div class="previewBlock previewAvoid">
-        <h4>${esc(stage.avoidTitle || 'Avoid Today')}</h4>
+        <h4>Avoid Today</h4>
         ${listHtml(stage.avoid)}
       </div>
 
@@ -2850,16 +2914,6 @@ function openAdminLivePreview(){
 </script>
 
 <!-- OPEN_LIVE_PREVIEW_V101 -->
-
-<script>
-/* v102 ensure title editor attaches after page load */
-setTimeout(()=>{
-  if(typeof patchStageTitleEditor === 'function') patchStageTitleEditor();
-  if(typeof ensureStageTitleFields === 'function') ensureStageTitleFields();
-},800);
-</script>
-
-<!-- ADMIN_TITLES_EDITABLE_V102 -->
 </body>
 </html>
 
@@ -2874,3 +2928,5 @@ setTimeout(()=>{
 <!-- LOGIN_FIX_V98 -->
 
 <!-- ADMIN_OPEN_LIVE_PREVIEW_V101 -->
+
+<!-- APP_MATCHED_SECTION_EDITOR_V103 -->

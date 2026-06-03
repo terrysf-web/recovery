@@ -1476,14 +1476,19 @@ button.danger{
 }
 
 .customSectionToolbar{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:38px 38px 38px 1fr;
+  gap:6px;
+  align-items:center;
   margin-top:8px;
 }
 
 .customSectionToolbar .miniBtn{
-  min-width:36px;
+  min-width:0;
+  width:38px;
+  height:38px;
+  min-height:38px;
+  padding:0;
 }
 
 .titleMiniGrid{
@@ -1515,10 +1520,17 @@ button.danger{
   margin-bottom:8px;
 }
 .extraCardActions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:38px 38px 38px 1fr;
+  gap:6px;
+  align-items:center;
   margin-top:8px;
+}
+.extraCardActions .miniBtn{
+  width:38px;
+  height:38px;
+  min-height:38px;
+  padding:0;
 }
 
 </style>
@@ -2068,7 +2080,7 @@ function customSectionsEditor(){
   return `<div class="appSectionBlock">
     <div class="appSectionHeader">
       <div>
-        <div class="appSectionTitle"><span class="appSectionIcon">➕</span> Extra App Sections</div>
+        <div class="appSectionTitle"><span class="appSectionIcon">+</span> Extra App Sections</div>
         <div class="appSectionHelp">Add another card section. Each section can contain multiple cards/items.</div>
       </div>
       <button class="btn primary" onclick="addCustomSection()">+ Add Section</button>
@@ -2087,10 +2099,10 @@ function customSectionsEditor(){
         </div>
 
         <div class="customSectionToolbar">
-          <button class="miniBtn upBtn" onclick="moveCustomSection(${i},-1)">↑ Move Up</button>
-          <button class="miniBtn downBtn" onclick="moveCustomSection(${i},1)">↓ Move Down</button>
-          <button class="miniBtn deleteBtn" onclick="deleteCustomSection(${i})">Delete Section</button>
-          <button class="miniBtn upBtn" onclick="addCustomCard(${i})">+ Add Card</button>
+          <button class="miniBtn upBtn" title="Move section up" onclick="moveCustomSection(${i},-1)">↑</button>
+          <button class="miniBtn downBtn" title="Move section down" onclick="moveCustomSection(${i},1)">↓</button>
+          <button class="miniBtn deleteBtn" title="Delete section" onclick="deleteCustomSection(${i})">×</button>
+          <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
 
         <div style="height:10px"></div>
@@ -2110,9 +2122,9 @@ function customSectionsEditor(){
               </div>
             </div>
             <div class="extraCardActions">
-              <button class="miniBtn upBtn" onclick="moveCustomCard(${i},${j},-1)">↑ Move Card Up</button>
-              <button class="miniBtn downBtn" onclick="moveCustomCard(${i},${j},1)">↓ Move Card Down</button>
-              <button class="miniBtn deleteBtn" onclick="deleteCustomCard(${i},${j})">Delete Card</button>
+              <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomCard(${i},${j},-1)">↑</button>
+              <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomCard(${i},${j},1)">↓</button>
+              <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomCard(${i},${j})">×</button>
             </div>
           </div>
         `).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}

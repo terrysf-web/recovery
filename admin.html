@@ -3072,6 +3072,22 @@ function openAdminLivePreview(){
 
 <!-- OPEN_LIVE_PREVIEW_V101 -->
 
+<style>
+/* Keep the live preview beside the editor while editing lower sections. */
+body.adminActive:not(.previewHidden) #adminPreviewColumn{
+  display:block !important;
+  position:sticky !important;
+  top:14px !important;
+  align-self:start !important;
+}
+
+@media(max-width:980px){
+  body.adminActive #adminPreviewColumn{
+    display:none !important;
+  }
+}
+</style>
+
 <div style="
 position:fixed;
 right:14px;

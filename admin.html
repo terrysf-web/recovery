@@ -1855,6 +1855,27 @@ function renderAdminInlinePreview(){
       ${previewListHtml(stage.avoid)}
     </div>
 
+    <div class="previewBlock previewAvoid">
+      <h4>${esc(stage.warningsTitle || 'Call Clinic If')}</h4>
+      ${previewListHtml(stage.warnings)}
+    </div>
+
+    ${(stage.customSections || []).map(sec=>{
+      const cards=sec.cards || (sec.text ? [{title:sec.title||'Information', text:sec.text}] : []);
+      const cardHtml=cards.map(card=>`
+        <div class="previewBlock">
+          <h4>${esc(card.title || sec.title || 'Information')}</h4>
+          <ul><li>${esc(card.text || 'No content entered.')}</li></ul>
+        </div>
+      `).join('');
+      return `
+        <div class="previewBlock">
+          <h4>${esc(sec.icon || '📌')} ${esc(sec.title || 'Additional Section')}</h4>
+        </div>
+        ${cardHtml}
+      `;
+    }).join('')}
+
     <div class="previewSmallNote">
       This preview is generated inside the Admin page and does not require a patient access code.
     </div>
@@ -2919,6 +2940,27 @@ function renderPreview(){
         <h4>Avoid Today</h4>
         ${listHtml(stage.avoid)}
       </div>
+
+      <div class="previewBlock previewAvoid">
+        <h4>${esc(stage.warningsTitle || 'Call Clinic If')}</h4>
+        ${listHtml(stage.warnings)}
+      </div>
+
+      ${(stage.customSections || []).map(sec=>{
+        const cards=sec.cards || (sec.text ? [{title:sec.title||'Information', text:sec.text}] : []);
+        const cardHtml=cards.map(card=>`
+          <div class="previewBlock">
+            <h4>${esc(card.title || sec.title || 'Information')}</h4>
+            <ul><li>${esc(card.text || 'No content entered.')}</li></ul>
+          </div>
+        `).join('');
+        return `
+          <div class="previewBlock">
+            <h4>${esc(sec.icon || '📌')} ${esc(sec.title || 'Additional Section')}</h4>
+          </div>
+          ${cardHtml}
+        `;
+      }).join('')}
 
       <div class="previewSmallNote">
         This preview is generated inside the Admin page and does not require a patient access code.

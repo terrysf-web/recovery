@@ -466,7 +466,7 @@ function guidance(day,type){
       foodsTitle: st.foodsTitle || "Foods Allowed",
       avoidTitle: st.avoidTitle || "Avoid Today",
       warningsTitle: st.warningsTitle || "Call Clinic If",
-      customSections: st.customSections || []
+      customSections: st.customSections || [], appCardOrder: st.appCardOrder || ['reminder','normal','foods','avoid','warnings']
     };
   }
 
@@ -477,7 +477,7 @@ function guidance(day,type){
     normal: [],
     foods: [],
     avoid: [],
-    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[]
+    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[], appCardOrder:['reminder','normal','foods','avoid','warnings']
   };
 }
 function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);
@@ -486,6 +486,22 @@ const normalTitleEl=document.querySelector("#normalList")?.closest(".card")?.que
 const foodTitleEl=document.querySelector("#foodList")?.closest(".card")?.querySelector(".card-title"); if(foodTitleEl) foodTitleEl.textContent="🍲 "+(g.foodsTitle||"Foods Allowed");
 const avoidTitleEl=document.querySelector("#avoidList")?.closest(".card")?.querySelector(".card-title"); if(avoidTitleEl) avoidTitleEl.textContent="🚫 "+(g.avoidTitle||"Avoid Today");
 const warnTitleEl=document.querySelector("#warningList")?.closest(".card")?.querySelector(".card-title"); if(warnTitleEl) warnTitleEl.textContent="📞 "+(g.warningsTitle||"Call Clinic If");
+
+const appOrder=(g.appCardOrder||["reminder","normal","foods","avoid","warnings"]).filter(k=>["reminder","normal","foods","avoid","warnings"].includes(k));
+const anchor=document.getElementById("customSectionCards");
+if(anchor){
+  const cardNodes={
+    reminder:document.getElementById("reminderText")?.closest(".card"),
+    normal:document.getElementById("normalList")?.closest(".card"),
+    foods:document.getElementById("foodList")?.closest(".card"),
+    avoid:document.getElementById("avoidList")?.closest(".card"),
+    warnings:document.getElementById("warningList")?.closest(".card")
+  };
+  appOrder.forEach(k=>{
+    if(cardNodes[k]) anchor.parentNode.insertBefore(cardNodes[k],anchor);
+  });
+}
+
 const customBox=document.getElementById("customSectionCards");
 if(customBox){
   customBox.innerHTML=(g.customSections||[]).map(sec=>{
@@ -884,7 +900,7 @@ window.addEventListener('load',()=>{
 
 
 <div style="position:fixed;right:14px;bottom:14px;z-index:99999;background:#1e3a5f;color:white;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:.9;">
-Recovery Guide v111
+Recovery Guide v112
 </div>
 
 </body>
@@ -901,3 +917,5 @@ Recovery Guide v111
 <!-- V110_SAFE_PREVIEW_STANDARD_CARDS_RESTORED -->
 
 <!-- V111_SAFE_INDEX_FOR_LIVE_PREVIEW -->
+
+<!-- RECOVERY_GUIDE_V112_ALL_CARD_MOVE -->

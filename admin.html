@@ -1533,6 +1533,22 @@ button.danger{
   padding:0;
 }
 
+
+/* v112 standard + extra card move controls */
+.appCardOrderToolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.appCardOrderToolbar .miniBtn{min-width:110px}
+.cardOrderHint{
+  font-size:12px;
+  color:#64748b;
+  margin:8px 0 12px;
+  line-height:1.4;
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="./pwa_icon_192.png">
@@ -1994,6 +2010,61 @@ function renderStages(){
   renderPreview();
 }
 
+
+/* v112 patient app card order */
+const APP_CARD_KEYS=['reminder','normal','foods','avoid','warnings'];
+const APP_CARD_META={
+  reminder:{titleKey:'reminderTitle',defaultTitle:'Today’s Reminder',icon:'🔔',type:'single'},
+  normal:{titleKey:'normalTitle',defaultTitle:'What’s Normal Today',icon:'✅',type:'array'},
+  foods:{titleKey:'foodsTitle',defaultTitle:'Foods Allowed',icon:'🍲',type:'array'},
+  avoid:{titleKey:'avoidTitle',defaultTitle:'Avoid Today',icon:'🚫',type:'array'},
+  warnings:{titleKey:'warningsTitle',defaultTitle:'Call Clinic If',icon:'📞',type:'array'}
+};
+function ensureAppCardOrder(stage){
+  if(!stage.appCardOrder || !Array.isArray(stage.appCardOrder)){
+    stage.appCardOrder=[...APP_CARD_KEYS];
+  }
+  APP_CARD_KEYS.forEach(k=>{ if(!stage.appCardOrder.includes(k)) stage.appCardOrder.push(k); });
+  stage.appCardOrder=stage.appCardOrder.filter(k=>APP_CARD_KEYS.includes(k));
+}
+function moveAppCard(key,dir){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  ensureAppCardOrder(st);
+  const i=st.appCardOrder.indexOf(key);
+  const j=i+dir;
+  if(i<0 || j<0 || j>=st.appCardOrder.length) return;
+  [st.appCardOrder[i],st.appCardOrder[j]]=[st.appCardOrder[j],st.appCardOrder[i]];
+  renderStages();
+}
+function appCardToolbar(key){
+  return `<div class="appCardOrderToolbar">
+    <button class="miniBtn upBtn" onclick="moveAppCard('${key}',-1)">↑ Move Card Up</button>
+    <button class="miniBtn downBtn" onclick="moveAppCard('${key}',1)">↓ Move Card Down</button>
+  </div>`;
+}
+function renderAppCardEditor(key,stage){
+  const meta=APP_CARD_META[key];
+  if(!stage[meta.titleKey]) stage[meta.titleKey]=meta.defaultTitle;
+  if(meta.type==='single'){
+    return `<div class="appSectionBlock">
+      <div class="appSectionHeader">
+        <div>
+          <div class="appSectionTitle"><span class="appSectionIcon">${meta.icon}</span> ${esc(stage[meta.titleKey])}</div>
+          <div class="appSectionHelp">This card title appears in the patient app.</div>
+        </div>
+      </div>
+      <label>Card Title</label>
+      <input value="${esc(stage[meta.titleKey])}" oninput="updateStage('${meta.titleKey}',this.value)">
+      <div style="height:8px"></div>
+      <label>Card Text</label>
+      <textarea oninput="updateStage('reminder',this.value)">${esc(stage.reminder||'')}</textarea>
+      ${appCardToolbar(key)}
+    </div>`;
+  }
+  return arrayEditor(key,stage[meta.titleKey],meta.defaultTitle,meta.icon)+appCardToolbar(key);
+}
+
 function renderStageEditor(){
   const st=currentSurgery().stages[currentStageIndex];
 
@@ -2003,6 +2074,7 @@ function renderStageEditor(){
   if(!st.avoidTitle) st.avoidTitle='Avoid Today';
   if(!st.warningsTitle) st.warningsTitle='Call Clinic If';
   if(!st.customSections) st.customSections=[];
+  ensureAppCardOrder(st);
 
   stageEditor.innerHTML=`<div class="card">
     <div class="stageTitle">${st.label}</div>
@@ -2018,23 +2090,8 @@ function renderStageEditor(){
       <div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div>
     </div>
 
-    <div class="appSectionBlock">
-      <div class="appSectionHeader">
-        <div>
-          <div class="appSectionTitle"><span class="appSectionIcon">🔔</span> Today’s Reminder</div>
-          <div class="appSectionHelp">This matches the reminder card title in the patient app.</div>
-        </div>
-      </div>
-      <div class="titleMiniGrid">
-        <div><label>Section Title</label><input value="${esc(st.reminderTitle)}" oninput="updateStage('reminderTitle',this.value)"></div>
-        <div><label>Card Text</label><textarea oninput="updateStage('reminder',this.value)">${esc(st.reminder)}</textarea></div>
-      </div>
-    </div>
-
-    ${arrayEditor('normal',st.normalTitle,'What’s Normal Today','✅')}
-    ${arrayEditor('foods',st.foodsTitle,'Foods Allowed','🍲')}
-    ${arrayEditor('avoid',st.avoidTitle,'Avoid Today','🚫')}
-    ${arrayEditor('warnings',st.warningsTitle,'Call Clinic If','📞')}
+    <div class="cardOrderHint">Patient app cards appear in this order. Use Move Card Up / Move Card Down on each card.</div>
+    ${st.appCardOrder.map(key=>renderAppCardEditor(key,st)).join('')}
 
     ${customSectionsEditor()}
   </div>`;
@@ -3107,7 +3164,7 @@ font-size:12px;
 font-weight:900;
 box-shadow:0 8px 24px rgba(0,0,0,.18);
 opacity:.96;">
-Recovery Admin v111
+Recovery Admin v112
 </div>
 
 </body>
@@ -3132,3 +3189,5 @@ Recovery Admin v111
 <!-- V110_SAFE_PREVIEW_STANDARD_CARDS_RESTORED -->
 
 <!-- V111_LIVE_PREVIEW_LOCAL_URL_FIX -->
+
+<!-- RECOVERY_ADMIN_V112_ALL_CARD_MOVE -->

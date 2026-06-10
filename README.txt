@@ -1,14 +1,21 @@
-v111 Live Preview Fix
+v112 All Card Move
 
 Upload:
 1. admin.html -> recovery/admin.html
 2. index.html -> recovery/index.html
 
-Fix:
-- Open Live Preview uses local ./index.html instead of old hardcoded/cached link.
-- Adds v=111 and cache busting.
-- Reload Preview and Live Preview should use the same current files.
+Changes:
+- Existing standard patient app cards can be moved:
+  Today's Reminder
+  What's Normal Today
+  Foods Allowed
+  Avoid Today
+  Call Clinic If
+- Extra App Cards keep their existing Add Card / Move / Delete functions.
+- Card order is saved in appCardOrder after Save to Cloudflare.
+- Patient app reorders existing cards without hiding/recreating them.
 - No Worker change required.
 
 Test:
-Open admin.html?v=111 and click Open Live Preview.
+- admin.html?v=112
+- Move one standard card, Save to Cloudflare, Open Live Preview.

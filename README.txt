@@ -1,32 +1,24 @@
-v107 Add Card Fix
-
-Current version targets:
-- v65: stable emergency rollback baseline
-- v103: previous Codex-stabilized GitHub baseline
-- v107: current development target in this folder
+v108 Card Labels + Order
 
 Upload:
-1. admin_v107_add_card.html -> admin.html
-2. index_v107_add_card.html -> index.html
+1. admin.html -> recovery/admin.html
+2. index.html -> recovery/index.html
 
-Changes:
-- Extra App Sections now have + Add Card.
-- Each card has Card Title and Card Text.
-- Each card can Move Up, Move Down, Delete.
-- Extra section Move Up/Down/Delete still works.
-- Patient app displays extra sections and all cards.
-- Visible Admin version badge: Recovery Admin v107.
-- No Worker change required.
+This update only changes the patient-app card editing area:
+- Keeps Procedure Type Management unchanged.
+- Keeps Recovery Timeline Management unchanged.
+- Renames Extra App Sections to Extra App Cards.
+- Renames + Add Section to + Add Card inside the extra card area.
+- Extra card controls are now:
+  Move Card Up
+  Move Card Down
+  Delete Card
+- Adds Move Card Up / Move Card Down to standard app cards:
+  Today’s Reminder
+  What’s Normal Today
+  Foods Allowed
+  Avoid Today
+  Call Clinic If
+- Patient app renders cards using saved card order.
 
-Current files:
-- index.html: Patient Recovery Guide
-- code.html: Staff Code Management
-- admin.html: Admin App Management
-- worker-api.js: Cloudflare Worker API source
-
-Cloudflare Worker API:
-- Deploy worker-api.js as the Worker script.
-- Required KV binding: RECOVERY_KV
-- Required secret: ADMIN_PASSWORD
-- Optional secrets: STAFF_PASSWORD, GEMINI_API_KEY
-- If STAFF_PASSWORD is not set, staff code.html accepts ADMIN_PASSWORD.
+No Worker change required.

@@ -466,7 +466,7 @@ function guidance(day,type){
       foodsTitle: st.foodsTitle || "Foods Allowed",
       avoidTitle: st.avoidTitle || "Avoid Today",
       warningsTitle: st.warningsTitle || "Call Clinic If",
-      customSections: st.customSections || []
+      customSections: st.customSections || [], appCardOrder: st.appCardOrder || ['reminder','normal','foods','avoid','warnings']
     };
   }
 
@@ -477,10 +477,29 @@ function guidance(day,type){
     normal: [],
     foods: [],
     avoid: [],
-    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[]
+    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[], appCardOrder:['reminder','normal','foods','avoid','warnings']
   };
 }
-function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);
+function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);["reminderText","normalList","foodList","avoidList","warningList"].forEach(id=>{const el=document.getElementById(id);const card=el?el.closest(".card"):null;if(card)card.style.display="none";});
+const orderedBox=document.getElementById("customSectionCards");
+if(orderedBox){
+  const listHtml=(items)=>`<ul class="list">${(items||[]).map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  const order=(g.appCardOrder||["reminder","normal","foods","avoid","warnings"]).filter(k=>["reminder","normal","foods","avoid","warnings"].includes(k));
+  const cards={
+    reminder:`<div class="card soft-orange"><div class="row"><div class="icon-badge">🔔</div><div><div class="card-title">${g.reminderTitle||"Today’s Reminder"}</div><div class="card-text">${g.reminder||""}</div></div></div></div>`,
+    normal:`<div class="card"><div class="card-title">✅ ${g.normalTitle||"What’s Normal Today"}</div>${listHtml(g.normal)}</div>`,
+    foods:`<div class="card soft-green"><div class="card-title">🍲 ${g.foodsTitle||"Foods Allowed"}</div>${listHtml(g.foods)}</div>`,
+    avoid:`<div class="card soft-orange"><div class="card-title">🚫 ${g.avoidTitle||"Avoid Today"}</div>${listHtml(g.avoid)}</div>`,
+    warnings:`<div class="card soft-red"><div class="card-title">📞 ${g.warningsTitle||"Call Clinic If"}</div>${listHtml(g.warnings)}</div>`
+  };
+  const extra=(g.customSections||[]).map(card=>{
+    if(card.cards && card.cards.length && !card.text){
+      return card.cards.map(c=>`<div class="card"><div class="card-title">${c.title||card.title||"Information"}</div><div class="card-text">${c.text||""}</div></div>`).join("");
+    }
+    return `<div class="card"><div class="card-title">${card.icon||"📌"} ${card.title||"Additional Information"}</div><div class="card-text">${card.text||""}</div></div>`;
+  }).join("");
+  orderedBox.innerHTML=order.map(k=>cards[k]).join("")+extra;
+}
 const rt=document.getElementById("reminderTitle"); if(rt) rt.textContent=g.reminderTitle||"Today’s Reminder";
 const normalTitleEl=document.querySelector("#normalList")?.closest(".card")?.querySelector(".card-title"); if(normalTitleEl) normalTitleEl.textContent="✅ "+(g.normalTitle||"What’s Normal Today");
 const foodTitleEl=document.querySelector("#foodList")?.closest(".card")?.querySelector(".card-title"); if(foodTitleEl) foodTitleEl.textContent="🍲 "+(g.foodsTitle||"Foods Allowed");
@@ -892,3 +911,5 @@ window.addEventListener('load',()=>{
 <!-- CUSTOM_APP_SECTIONS_SUPPORT_V103 -->
 
 <!-- V107_EXTRA_SECTION_CARDS_SUPPORT -->
+
+<!-- RECOVERY_GUIDE_V108_CARD_LABELS_AND_ORDER -->

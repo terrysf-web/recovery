@@ -3164,9 +3164,136 @@ font-size:12px;
 font-weight:900;
 box-shadow:0 8px 24px rgba(0,0,0,.18);
 opacity:.96;">
-Recovery Admin v112
+Recovery Admin v113
 </div>
 
+
+<script>
+/* v113 Admin Reload Preview uses appCardOrder */
+(function(){
+  function escV113(s){
+    return String(s ?? '').replace(/[&<>"']/g, ch => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[ch]));
+  }
+
+  function listHtmlV113(items){
+    const list=Array.isArray(items) ? items : [];
+    if(!list.length) return '<ul><li>No content entered.</li></ul>';
+    return '<ul>'+list.map(x=>'<li>'+escV113(x)+'</li>').join('')+'</ul>';
+  }
+
+  function todayYMDV113(){
+    return new Intl.DateTimeFormat('en-CA',{
+      timeZone:'America/Los_Angeles',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit'
+    }).format(new Date());
+  }
+
+  function currentPreviewStageV113(){
+    try{
+      const type=document.getElementById('adminPreviewSurgeryType')?.value || document.getElementById('surgerySelect')?.value || Object.keys(protocol||{})[0];
+      const surgery=protocol[type];
+      if(!surgery) return null;
+
+      const stages=surgery.stages || [];
+      const idx=Number(document.getElementById('adminPreviewStage')?.value || currentStageIndex || 0);
+      const stage=stages[idx] || stages[currentStageIndex] || stages[0] || {};
+
+      return {type,surgery,stage,idx};
+    }catch(e){
+      return null;
+    }
+  }
+
+  window.renderAdminInlinePreview=function(){
+    const target=document.getElementById('adminPreviewContent');
+    if(!target) return;
+
+    const ctx=currentPreviewStageV113();
+    if(!ctx){
+      target.innerHTML='<div class="previewEmptyIcon">▣</div><div class="previewEmptyText">Protocol is not loaded yet. Click Reload Current Protocol first.</div>';
+      return;
+    }
+
+    const {type,surgery,stage}=ctx;
+    const date=document.getElementById('adminPreviewSurgeryDate')?.value || todayYMDV113();
+
+    const order=(Array.isArray(stage.appCardOrder) ? stage.appCardOrder : ['reminder','normal','foods','avoid','warnings'])
+      .filter(k=>['reminder','normal','foods','avoid','warnings'].includes(k));
+
+    const standardCards={
+      reminder:`<div class="previewBlock previewReminder">
+        <h4>${escV113(stage.reminderTitle || 'Today’s Reminder')}</h4>
+        <ul><li>${escV113(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
+      </div>`,
+      normal:`<div class="previewBlock">
+        <h4>${escV113(stage.normalTitle || 'What’s Normal Today')}</h4>
+        ${listHtmlV113(stage.normal)}
+      </div>`,
+      foods:`<div class="previewBlock previewFoods">
+        <h4>${escV113(stage.foodsTitle || 'Foods Allowed')}</h4>
+        ${listHtmlV113(stage.foods)}
+      </div>`,
+      avoid:`<div class="previewBlock previewAvoid">
+        <h4>${escV113(stage.avoidTitle || 'Avoid Today')}</h4>
+        ${listHtmlV113(stage.avoid)}
+      </div>`,
+      warnings:`<div class="previewBlock previewAvoid">
+        <h4>${escV113(stage.warningsTitle || 'Call Clinic If')}</h4>
+        ${listHtmlV113(stage.warnings)}
+      </div>`
+    };
+
+    const customCards=(stage.customSections||[]).map(sec=>{
+      if(sec.cards && sec.cards.length && !sec.text){
+        return sec.cards.map(card=>`
+          <div class="previewBlock">
+            <h4>${escV113(card.title || sec.title || 'Information')}</h4>
+            <ul><li>${escV113(card.text || '')}</li></ul>
+          </div>
+        `).join('');
+      }
+
+      return `<div class="previewBlock">
+        <h4>${escV113(sec.icon || '📌')} ${escV113(sec.title || 'Additional Information')}</h4>
+        <ul><li>${escV113(sec.text || '')}</li></ul>
+      </div>`;
+    }).join('');
+
+    target.innerHTML=`
+      <div class="previewTitle">${escV113(surgery.name || type)}</div>
+      <div class="previewMeta">Preview date: ${escV113(date)} · Total days: ${escV113(String(surgery.totalDays || '-'))}</div>
+      <div class="previewStagePill">${escV113(stage.label || stage.phase || 'Selected stage')}</div>
+      ${order.map(k=>standardCards[k]).join('')}
+      ${customCards}
+      <div class="previewSmallNote">
+        This preview is generated inside the Admin page and follows the saved card order for this timeline section.
+      </div>
+    `;
+  };
+
+  window.reloadPatientPreview=function(){
+    if(typeof populateAdminPreviewControls === 'function') populateAdminPreviewControls();
+    renderAdminInlinePreview();
+  };
+
+  document.addEventListener('click', function(e){
+    const txt=(e.target?.textContent||'').trim();
+    if(txt.includes('Move Card Up') || txt.includes('Move Card Down')){
+      setTimeout(()=>renderAdminInlinePreview(),80);
+    }
+  });
+})();
+</script>
+
+<!-- V113_RELOAD_PREVIEW_CARD_ORDER_FIX -->
 </body>
 </html>
 
@@ -3191,3 +3318,5 @@ Recovery Admin v112
 <!-- V111_LIVE_PREVIEW_LOCAL_URL_FIX -->
 
 <!-- RECOVERY_ADMIN_V112_ALL_CARD_MOVE -->
+
+<!-- RECOVERY_ADMIN_V113_RELOAD_PREVIEW_CARD_ORDER_FIX -->

@@ -1,24 +1,21 @@
-v108 Card Labels + Order
+v110 Safe Preview Fix
 
 Upload:
 1. admin.html -> recovery/admin.html
 2. index.html -> recovery/index.html
 
-This update only changes the patient-app card editing area:
-- Keeps Procedure Type Management unchanged.
-- Keeps Recovery Timeline Management unchanged.
-- Renames Extra App Sections to Extra App Cards.
-- Renames + Add Section to + Add Card inside the extra card area.
-- Extra card controls are now:
-  Move Card Up
-  Move Card Down
-  Delete Card
-- Adds Move Card Up / Move Card Down to standard app cards:
-  Today’s Reminder
-  What’s Normal Today
+Purpose:
+- Fix live preview / patient app where the standard cards disappeared.
+- Restores standard patient app cards:
+  Today's Reminder
+  What's Normal Today
   Foods Allowed
   Avoid Today
   Call Clinic If
-- Patient app renders cards using saved card order.
+- Extra App Cards still display below the standard cards.
+- Does not hide or reorder standard cards.
+- No Worker change required.
 
-No Worker change required.
+After upload:
+Open live preview with a cache buster:
+index.html?adminPreview=1&surgeryType=periodontal&surgeryDate=2026-06-02&v=110

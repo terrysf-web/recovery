@@ -1533,36 +1533,6 @@ button.danger{
   padding:0;
 }
 
-
-/* v108 Patient App Card order + Extra App Cards */
-.appCardOrderToolbar,
-.extraCardToolbar{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-.appCardOrderToolbar .miniBtn,
-.extraCardToolbar .miniBtn{
-  min-width:110px;
-}
-.extraCardBox{
-  border:1px solid #dbe6f2;
-  border-radius:14px;
-  background:#fbfdff;
-  padding:12px;
-  margin:10px 0;
-}
-.extraCardBox .row{
-  align-items:flex-start;
-}
-.cardOrderHint{
-  font-size:12px;
-  color:#64748b;
-  margin:8px 0 12px;
-  line-height:1.4;
-}
-
 </style>
 
 <link rel="icon" type="image/png" href="./pwa_icon_192.png">
@@ -1735,8 +1705,8 @@ button.danger{
       <div class="actions">
         <button class="btn primary" onclick="addStageAfterCurrent()">Add Timeline Section After Current</button>
         <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Section</button>
-        <button class="btn secondary" onclick="moveStageUp()">Move Section Up</button>
-        <button class="btn secondary" onclick="moveStageDown()">Move Section Down</button>
+        <button class="btn secondary" onclick="moveStageUp()">Move Card Up</button>
+        <button class="btn secondary" onclick="moveStageDown()">Move Card Down</button>
         <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Section</button>
       </div>
 
@@ -2024,69 +1994,6 @@ function renderStages(){
   renderPreview();
 }
 
-
-/* v108 Patient App Card order helpers */
-const APP_CARD_KEYS=['reminder','normal','foods','avoid','warnings'];
-const APP_CARD_META={
-  reminder:{titleKey:'reminderTitle',defaultTitle:'Today’s Reminder',icon:'🔔',type:'single'},
-  normal:{titleKey:'normalTitle',defaultTitle:'What’s Normal Today',icon:'✅',type:'array'},
-  foods:{titleKey:'foodsTitle',defaultTitle:'Foods Allowed',icon:'🍲',type:'array'},
-  avoid:{titleKey:'avoidTitle',defaultTitle:'Avoid Today',icon:'🚫',type:'array'},
-  warnings:{titleKey:'warningsTitle',defaultTitle:'Call Clinic If',icon:'📞',type:'array'}
-};
-
-function ensureAppCardOrder(stage){
-  if(!stage.appCardOrder || !Array.isArray(stage.appCardOrder)){
-    stage.appCardOrder=[...APP_CARD_KEYS];
-  }
-  APP_CARD_KEYS.forEach(k=>{
-    if(!stage.appCardOrder.includes(k)) stage.appCardOrder.push(k);
-  });
-  stage.appCardOrder=stage.appCardOrder.filter(k=>APP_CARD_KEYS.includes(k));
-}
-
-function moveAppCard(key,dir){
-  if(!requireLogin())return;
-  const st=currentSurgery().stages[currentStageIndex];
-  ensureAppCardOrder(st);
-  const i=st.appCardOrder.indexOf(key);
-  const j=i+dir;
-  if(i<0 || j<0 || j>=st.appCardOrder.length) return;
-  [st.appCardOrder[i],st.appCardOrder[j]]=[st.appCardOrder[j],st.appCardOrder[i]];
-  renderStages();
-}
-
-function appCardToolbar(key){
-  return `<div class="appCardOrderToolbar">
-    <button class="miniBtn upBtn" onclick="moveAppCard('${key}',-1)">↑ Move Card Up</button>
-    <button class="miniBtn downBtn" onclick="moveAppCard('${key}',1)">↓ Move Card Down</button>
-  </div>`;
-}
-
-function renderAppCardEditor(key,stage){
-  const meta=APP_CARD_META[key];
-  if(!stage[meta.titleKey]) stage[meta.titleKey]=meta.defaultTitle;
-
-  if(meta.type === 'single'){
-    return `<div class="appSectionBlock">
-      <div class="appSectionHeader">
-        <div>
-          <div class="appSectionTitle"><span class="appSectionIcon">${meta.icon}</span> ${esc(stage[meta.titleKey])}</div>
-          <div class="appSectionHelp">This card title appears in the patient app.</div>
-        </div>
-      </div>
-      <label>Card Title</label>
-      <input value="${esc(stage[meta.titleKey])}" oninput="updateStage('${meta.titleKey}',this.value)">
-      <div style="height:8px"></div>
-      <label>Card Text</label>
-      <textarea oninput="updateStage('reminder',this.value)">${esc(stage.reminder || '')}</textarea>
-      ${appCardToolbar(key)}
-    </div>`;
-  }
-
-  return arrayEditor(key, stage[meta.titleKey], meta.defaultTitle, meta.icon) + appCardToolbar(key);
-}
-
 function renderStageEditor(){
   const st=currentSurgery().stages[currentStageIndex];
 
@@ -2096,7 +2003,6 @@ function renderStageEditor(){
   if(!st.avoidTitle) st.avoidTitle='Avoid Today';
   if(!st.warningsTitle) st.warningsTitle='Call Clinic If';
   if(!st.customSections) st.customSections=[];
-  ensureAppCardOrder(st);
 
   stageEditor.innerHTML=`<div class="card">
     <div class="stageTitle">${st.label}</div>
@@ -2112,11 +2018,23 @@ function renderStageEditor(){
       <div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div>
     </div>
 
-    <div class="cardOrderHint">
-      Patient app cards appear in this order. Use Move Card Up / Move Card Down on each card below.
+    <div class="appSectionBlock">
+      <div class="appSectionHeader">
+        <div>
+          <div class="appSectionTitle"><span class="appSectionIcon">🔔</span> Today’s Reminder</div>
+          <div class="appSectionHelp">This matches the reminder card title in the patient app.</div>
+        </div>
+      </div>
+      <div class="titleMiniGrid">
+        <div><label>Section Title</label><input value="${esc(st.reminderTitle)}" oninput="updateStage('reminderTitle',this.value)"></div>
+        <div><label>Card Text</label><textarea oninput="updateStage('reminder',this.value)">${esc(st.reminder)}</textarea></div>
+      </div>
     </div>
 
-    ${st.appCardOrder.map(key=>renderAppCardEditor(key,st)).join('')}
+    ${arrayEditor('normal',st.normalTitle,'What’s Normal Today','✅')}
+    ${arrayEditor('foods',st.foodsTitle,'Foods Allowed','🍲')}
+    ${arrayEditor('avoid',st.avoidTitle,'Avoid Today','🚫')}
+    ${arrayEditor('warnings',st.warningsTitle,'Call Clinic If','📞')}
 
     ${customSectionsEditor()}
   </div>`;
@@ -2157,47 +2075,116 @@ function arrayEditor(key,currentTitle,defaultTitle,icon){
 
 function customSectionsEditor(){
   const st=currentSurgery().stages[currentStageIndex];
-  const cards=st.customSections || [];
+  const sections=st.customSections || [];
 
   return `<div class="appSectionBlock">
     <div class="appSectionHeader">
       <div>
-        <div class="appSectionTitle"><span class="appSectionIcon">➕</span> Extra App Cards</div>
-        <div class="appSectionHelp">Add extra cards below the standard patient-app cards. Each extra card can be moved up/down or deleted.</div>
+        <div class="appSectionTitle"><span class="appSectionIcon">+</span> Extra App Cards</div>
+        <div class="appSectionHelp">Add another card section. Each section can contain multiple cards/items.</div>
       </div>
       <button class="btn primary" onclick="addCustomSection()">+ Add Card</button>
     </div>
 
-    ${cards.length ? cards.map((card,i)=>{
-      if(card.cards && card.cards.length && !card.text){
-        card.text=card.cards.map(c=>[c.title,c.text].filter(Boolean).join(': ')).join('\\n');
+    ${sections.length ? sections.map((sec,i)=>{
+      if(!sec.cards){
+        sec.cards = sec.text ? [{title: sec.title || 'Card', text: sec.text}] : [];
       }
 
       return `
-      <div class="extraCardBox">
+      <div class="customSectionRow">
         <div class="row">
-          <div><label>Card Title</label><input value="${esc(card.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
-          <div><label>Icon</label><input value="${esc(card.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
+          <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
+          <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
         </div>
 
-        <label>Card Text</label>
-        <textarea oninput="updateCustomSection(${i},'text',this.value)">${esc(card.text || '')}</textarea>
-
-        <div class="extraCardToolbar">
-          <button class="miniBtn upBtn" onclick="moveCustomSection(${i},-1)">↑ Move Card Up</button>
-          <button class="miniBtn downBtn" onclick="moveCustomSection(${i},1)">↓ Move Card Down</button>
-          <button class="miniBtn deleteBtn" onclick="deleteCustomSection(${i})">Delete Card</button>
+        <div class="customSectionToolbar">
+          <button class="miniBtn upBtn" title="Move section up" onclick="moveCustomSection(${i},-1)">↑</button>
+          <button class="miniBtn downBtn" title="Move section down" onclick="moveCustomSection(${i},1)">↓</button>
+          <button class="miniBtn deleteBtn" title="Delete section" onclick="deleteCustomSection(${i})">×</button>
+          <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
+
+        <div style="height:10px"></div>
+        <label>Cards in this Section</label>
+
+        ${(sec.cards||[]).length ? (sec.cards||[]).map((card,j)=>`
+          <div class="extraCardBox">
+            <div class="extraCardTitle">Card ${j+1}</div>
+            <div class="row">
+              <div>
+                <label>Card Title</label>
+                <input value="${esc(card.title || '')}" oninput="updateCustomCard(${i},${j},'title',this.value)">
+              </div>
+              <div>
+                <label>Card Text</label>
+                <textarea oninput="updateCustomCard(${i},${j},'text',this.value)">${esc(card.text || '')}</textarea>
+              </div>
+            </div>
+            <div class="extraCardActions">
+              <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomCard(${i},${j},-1)">↑</button>
+              <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomCard(${i},${j},1)">↓</button>
+              <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomCard(${i},${j})">×</button>
+            </div>
+          </div>
+        `).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}
       </div>`;
-    }).join('') : `<div class="small">No extra cards added yet. Click + Add Card.</div>`}
+    }).join('') : `<div class="small">No extra cards added yet.</div>`}
   </div>`;
 }
+
+
+function addCustomCard(sectionIndex){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  if(!st.customSections) st.customSections=[];
+  const sec=st.customSections[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  sec.cards.push({title:'New Card', text:''});
+  renderStages();
+}
+
+function updateCustomCard(sectionIndex,cardIndex,k,v){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  if(!sec.cards[cardIndex]) return;
+  sec.cards[cardIndex][k]=v;
+  renderPreview();
+  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
+}
+
+function moveCustomCard(sectionIndex,cardIndex,dir){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec || !sec.cards) return;
+  const arr=sec.cards;
+  const target=cardIndex+dir;
+  if(target<0 || target>=arr.length) return;
+  [arr[cardIndex],arr[target]]=[arr[target],arr[cardIndex]];
+  renderStages();
+}
+
+function deleteCustomCard(sectionIndex,cardIndex){
+  if(!requireLogin())return;
+  if(!confirm('Delete this card?'))return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec || !sec.cards) return;
+  sec.cards.splice(cardIndex,1);
+  renderStages();
+}
+
 
 function addCustomSection(){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
   if(!st.customSections) st.customSections=[];
-  st.customSections.push({title:'New Card', icon:'📌', text:''});
+  st.customSections.push({title:'New Section', icon:'📌', cards:[{title:'New Card', text:''}]});
   renderStages();
 }
 
@@ -2222,7 +2209,7 @@ function moveCustomSection(i,dir){
 
 function deleteCustomSection(i){
   if(!requireLogin())return;
-  if(!confirm('Delete this extra card?'))return;
+  if(!confirm('Delete this app section?'))return;
   const st=currentSurgery().stages[currentStageIndex];
   (st.customSections||[]).splice(i,1);
   renderStages();
@@ -3119,7 +3106,7 @@ font-size:12px;
 font-weight:900;
 box-shadow:0 8px 24px rgba(0,0,0,.18);
 opacity:.96;">
-Recovery Admin v108
+Recovery Admin v110
 </div>
 
 </body>
@@ -3141,4 +3128,4 @@ Recovery Admin v108
 
 <!-- V107_EXTRA_SECTION_ADD_CARD -->
 
-<!-- RECOVERY_ADMIN_V108_CARD_LABELS_AND_ORDER -->
+<!-- V110_SAFE_PREVIEW_STANDARD_CARDS_RESTORED -->

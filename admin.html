@@ -3057,13 +3057,14 @@ function openAdminLivePreview(){
       }).format(new Date());
 
     const url =
-      'https://terrysf-web.github.io/recovery/index.html' +
+      './index.html' +
       '?adminPreview=1' +
       '&surgeryType=' + encodeURIComponent(type) +
       '&surgeryDate=' + encodeURIComponent(date) +
-      '&v=101&t=' + Date.now();
+      '&v=111' +
+      '&cache=' + Date.now();
 
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, '_blank');
   }catch(e){
     alert('Could not open live preview: ' + e.message);
   }
@@ -3106,7 +3107,7 @@ font-size:12px;
 font-weight:900;
 box-shadow:0 8px 24px rgba(0,0,0,.18);
 opacity:.96;">
-Recovery Admin v110
+Recovery Admin v111
 </div>
 
 </body>
@@ -3129,3 +3130,5 @@ Recovery Admin v110
 <!-- V107_EXTRA_SECTION_ADD_CARD -->
 
 <!-- V110_SAFE_PREVIEW_STANDARD_CARDS_RESTORED -->
+
+<!-- V111_LIVE_PREVIEW_LOCAL_URL_FIX -->

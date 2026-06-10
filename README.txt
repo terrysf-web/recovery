@@ -1,21 +1,14 @@
-v110 Safe Preview Fix
+v111 Live Preview Fix
 
 Upload:
 1. admin.html -> recovery/admin.html
 2. index.html -> recovery/index.html
 
-Purpose:
-- Fix live preview / patient app where the standard cards disappeared.
-- Restores standard patient app cards:
-  Today's Reminder
-  What's Normal Today
-  Foods Allowed
-  Avoid Today
-  Call Clinic If
-- Extra App Cards still display below the standard cards.
-- Does not hide or reorder standard cards.
+Fix:
+- Open Live Preview uses local ./index.html instead of old hardcoded/cached link.
+- Adds v=111 and cache busting.
+- Reload Preview and Live Preview should use the same current files.
 - No Worker change required.
 
-After upload:
-Open live preview with a cache buster:
-index.html?adminPreview=1&surgeryType=periodontal&surgeryDate=2026-06-02&v=110
+Test:
+Open admin.html?v=111 and click Open Live Preview.

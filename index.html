@@ -213,6 +213,26 @@
   text-align:left;
 }
 
+.custom-card-list{
+  margin:8px 0 0;
+  padding:0;
+  list-style:none;
+}
+.custom-card-list li{
+  display:flex;
+  gap:9px;
+  padding:7px 0;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  font-size:14px;
+  color:#374151;
+}
+.custom-card-list li:last-child{border-bottom:0}
+.custom-card-marker{
+  flex:0 0 16px;
+  text-align:center;
+  font-weight:900;
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="./pwa_icon_192.png">
@@ -504,10 +524,17 @@ if(anchor){
 
 const customBox=document.getElementById("customSectionCards");
 if(customBox){
+  const escapeCustom=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const customMarker=type=>({bullet:"•",check:"✓",arrow:"→",star:"★",diamond:"◆",none:""}[type]??"•");
+  const customCardHtml=card=>{
+    const items=Array.isArray(card.items)?card.items:(card.text?[card.text]:[]);
+    const marker=customMarker(card.itemMarker);
+    return `<div class="card"><div class="card-title">${escapeCustom(card.icon||"📌")} ${escapeCustom(card.title||"Information")}</div><ul class="custom-card-list">${items.map(item=>`<li><span class="custom-card-marker">${escapeCustom(marker)}</span><span>${escapeCustom(item)}</span></li>`).join("")}</ul></div>`;
+  };
   customBox.innerHTML=(g.customSections||[]).map(sec=>{
-  const cards=sec.cards || (sec.text ? [{title:sec.title||"Information", text:sec.text}] : []);
-  const cardHtml=cards.map(card=>`<div class="card"><div class="card-title">${card.title||sec.title||"Information"}</div><div class="card-text">${card.text||""}</div></div>`).join("");
-  return `<div class="card"><div class="card-title">${sec.icon||"📌"} ${sec.title||"Additional Section"}</div></div>${cardHtml}`;
+  if(Array.isArray(sec.items)) return customCardHtml(sec);
+  const cards=sec.cards || (sec.text ? [{title:sec.title||"Information",icon:sec.icon,text:sec.text,itemMarker:sec.itemMarker}] : []);
+  return cards.map(card=>customCardHtml({...card,icon:card.icon||sec.icon,itemMarker:card.itemMarker||sec.itemMarker})).join("");
 }).join("");
 }
 const next=MILESTONES.find(m=>m.day>day&&m.day<=surgery.totalDays);nextMilestone.textContent=next?`${recoveryDayLabel(next.day)}: ${next.phase} — ${next.summary}`:"You are at the final recovery stage. Continue following your clinic’s instructions."}function showToday(){setActiveNav("today");renderToday()}function nearestMilestone(day,total){const valid=MILESTONES.filter(m=>m.day<=total).map(m=>m.day);return valid.find(m=>m>=day)||valid[valid.length-1]}function showTimeline(){const saved=getSaved();if(!saved.type||!saved.date){showToday();return}setActiveNav("timeline");homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.remove("hidden");const day=displayRecoveryDay(saved.date);const surgery=SURGERIES[saved.type];timelineList.innerHTML=MILESTONES.filter(m=>m.day<=surgery.totalDays).map(m=>{const state=m.day<day?"done":m.day===day||nearestMilestone(day,surgery.totalDays)===m.day?"current":"future";const icon=m.day<day?"✓":state==="current"?"●":"○";return `<div class="timeline-item ${state}"><div class="timeline-dot">${icon}</div><div><div class="timeline-day">${recoveryDayLabel(m.day)}${m.day===day?" · Today":""}</div><div class="timeline-phase">${m.phase}</div><div class="timeline-summary">${m.summary}</div></div></div>`}).join("")}

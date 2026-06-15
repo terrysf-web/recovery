@@ -1468,16 +1468,16 @@ button.danger{
 }
 
 .customSectionRow{
-  border:1px solid #e2e8f0;
-  border-radius:14px;
-  padding:12px;
-  margin:10px 0;
-  background:white;
+  margin:14px 0;
+}
+
+.extraCardsGroup{
+  margin:20px 0 0;
 }
 
 .customSectionToolbar{
-  display:grid;
-  grid-template-columns:38px 38px 38px 1fr;
+  display:flex;
+  flex-wrap:wrap;
   gap:6px;
   align-items:center;
   margin-top:8px;
@@ -1491,7 +1491,8 @@ button.danger{
   padding:0;
 }
 
-.titleMiniGrid{
+.titleMiniGrid,
+.cardOptionGrid{
   display:grid;
   grid-template-columns:1fr 1.2fr;
   gap:10px;
@@ -1499,38 +1500,10 @@ button.danger{
 }
 
 @media(max-width:780px){
-  .titleMiniGrid{
+  .titleMiniGrid,
+  .cardOptionGrid{
     grid-template-columns:1fr;
   }
-}
-
-
-/* v107 Extra App Section cards */
-.extraCardBox{
-  border:1px solid #dbe6f2;
-  border-radius:14px;
-  background:#fbfdff;
-  padding:12px;
-  margin:10px 0;
-}
-.extraCardTitle{
-  font-size:13px;
-  font-weight:900;
-  color:#334155;
-  margin-bottom:8px;
-}
-.extraCardActions{
-  display:grid;
-  grid-template-columns:38px 38px 38px 1fr;
-  gap:6px;
-  align-items:center;
-  margin-top:8px;
-}
-.extraCardActions .miniBtn{
-  width:38px;
-  height:38px;
-  min-height:38px;
-  padding:0;
 }
 
 
@@ -1768,13 +1741,17 @@ function esc(v){
 }
 
 function setStatus(msg,good=true){
-  status.textContent=msg;
-  status.style.color=good?'#15803d':'#b91c1c';
+  const statusEl=document.getElementById('status');
+  if(!statusEl) return;
+  statusEl.textContent=msg;
+  statusEl.style.color=good?'#15803d':'#b91c1c';
 }
 
 function setSaveStatus(msg,good=true){
-  saveStatus.textContent=msg;
-  saveStatus.style.color=good?'#15803d':'#b91c1c';
+  const saveStatusEl=document.getElementById('saveStatus');
+  if(!saveStatusEl) return;
+  saveStatusEl.textContent=msg;
+  saveStatusEl.style.color=good?'#15803d':'#b91c1c';
 }
 
 
@@ -2020,6 +1997,74 @@ const APP_CARD_META={
   avoid:{titleKey:'avoidTitle',defaultTitle:'Avoid Today',icon:'🚫',type:'array'},
   warnings:{titleKey:'warningsTitle',defaultTitle:'Call Clinic If',icon:'📞',type:'array'}
 };
+const EXTRA_CARD_ICONS=[
+  {value:'📌',label:'📌 Pin'},
+  {value:'ℹ️',label:'ℹ️ Information'},
+  {value:'✅',label:'✅ Check'},
+  {value:'⚠️',label:'⚠️ Warning'},
+  {value:'🔔',label:'🔔 Reminder'},
+  {value:'📞',label:'📞 Phone'},
+  {value:'🦷',label:'🦷 Tooth'},
+  {value:'💊',label:'💊 Medication'},
+  {value:'🧊',label:'🧊 Cold Pack'},
+  {value:'🍲',label:'🍲 Food'},
+  {value:'🥤',label:'🥤 Drink'},
+  {value:'🪥',label:'🪥 Toothbrush'},
+  {value:'🩸',label:'🩸 Bleeding'},
+  {value:'🏃',label:'🏃 Activity'},
+  {value:'😴',label:'😴 Rest'},
+  {value:'📅',label:'📅 Schedule'},
+  {value:'❤️',label:'❤️ Care'},
+  {value:'⭐',label:'⭐ Important'}
+];
+const EXTRA_CARD_MARKERS=[
+  {value:'bullet',label:'• Bullet'},
+  {value:'check',label:'✓ Check'},
+  {value:'arrow',label:'→ Arrow'},
+  {value:'star',label:'★ Star'},
+  {value:'diamond',label:'◆ Diamond'},
+  {value:'none',label:'No symbol'}
+];
+function iconOptions(selected){
+  const current=selected || '📌';
+  const icons=EXTRA_CARD_ICONS.some(option=>option.value===current)
+    ? EXTRA_CARD_ICONS
+    : [{value:current,label:current},...EXTRA_CARD_ICONS];
+  return icons.map(option=>`<option value="${esc(option.value)}" ${option.value===current?'selected':''}>${esc(option.label)}</option>`).join('');
+}
+function markerOptions(selected){
+  const current=selected || 'bullet';
+  return EXTRA_CARD_MARKERS.map(option=>`<option value="${option.value}" ${option.value===current?'selected':''}>${option.label}</option>`).join('');
+}
+function normalizeExtraCards(stage){
+  const legacy=Array.isArray(stage.customSections) ? stage.customSections : [];
+  const normalized=[];
+  legacy.forEach(sec=>{
+    if(Array.isArray(sec.items)){
+      normalized.push({...sec,icon:sec.icon||'📌',itemMarker:sec.itemMarker||'bullet',items:sec.items});
+      return;
+    }
+    if(Array.isArray(sec.cards) && sec.cards.length){
+      sec.cards.forEach(card=>{
+        normalized.push({
+          title:card.title || sec.title || 'New Card',
+          icon:card.icon || sec.icon || '📌',
+          itemMarker:card.itemMarker || sec.itemMarker || 'bullet',
+          items:Array.isArray(card.items) ? card.items : (card.text ? [card.text] : [])
+        });
+      });
+      return;
+    }
+    normalized.push({
+      title:sec.title || 'New Card',
+      icon:sec.icon || '📌',
+      itemMarker:sec.itemMarker || 'bullet',
+      items:sec.text ? [sec.text] : []
+    });
+  });
+  stage.customSections=normalized;
+  return normalized;
+}
 function ensureAppCardOrder(stage){
   if(!stage.appCardOrder || !Array.isArray(stage.appCardOrder)){
     stage.appCardOrder=[...APP_CARD_KEYS];
@@ -2073,7 +2118,7 @@ function renderStageEditor(){
   if(!st.foodsTitle) st.foodsTitle='Foods Allowed';
   if(!st.avoidTitle) st.avoidTitle='Avoid Today';
   if(!st.warningsTitle) st.warningsTitle='Call Clinic If';
-  if(!st.customSections) st.customSections=[];
+  normalizeExtraCards(st);
   ensureAppCardOrder(st);
 
   stageEditor.innerHTML=`<div class="card">
@@ -2132,9 +2177,9 @@ function arrayEditor(key,currentTitle,defaultTitle,icon){
 
 function customSectionsEditor(){
   const st=currentSurgery().stages[currentStageIndex];
-  const sections=st.customSections || [];
+  const cards=normalizeExtraCards(st);
 
-  return `<div class="appSectionBlock">
+  return `<div class="extraCardsGroup">
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">+</span> Extra App Cards</div>
@@ -2143,115 +2188,111 @@ function customSectionsEditor(){
       <button class="btn primary" onclick="addCustomSection()">+ Add Card</button>
     </div>
 
-    ${sections.length ? sections.map((sec,i)=>{
-      if(!sec.cards){
-        sec.cards = sec.text ? [{title: sec.title || 'Card', text: sec.text}] : [];
-      }
-
-      return `
-      <div class="customSectionRow">
-        <div class="row">
-          <div><label>Card Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
-          <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
+    ${cards.length ? cards.map((card,i)=>`
+      <div class="appSectionBlock customSectionRow">
+        <div class="appSectionHeader">
+          <div>
+            <div class="appSectionTitle"><span class="appSectionIcon">${esc(card.icon || '📌')}</span> ${esc(card.title || 'New Card')}</div>
+            <div class="appSectionHelp">This card uses the same format as the standard patient app cards.</div>
+          </div>
         </div>
+
+        <div class="cardOptionGrid">
+          <div>
+            <label>Card Title</label>
+            <input value="${esc(card.title || '')}" oninput="updateCustomSection(${i},'title',this.value)">
+          </div>
+          <div>
+            <label>Icon</label>
+            <select onchange="updateCustomSection(${i},'icon',this.value,true)">${iconOptions(card.icon)}</select>
+          </div>
+        </div>
+
+        <label>Card Item Symbol</label>
+        <select onchange="updateCustomSection(${i},'itemMarker',this.value,true)">${markerOptions(card.itemMarker)}</select>
+
+        <div style="height:8px"></div>
+        <label>Card Items</label>
+        <div class="arrayBox">
+          ${(card.items||[]).map((item,j)=>`<div class="arrayRow">
+            <textarea oninput="updateCustomCardItem(${i},${j},this.value)">${esc(item)}</textarea>
+            <div class="arrayActions">
+              <button class="miniBtn upBtn" title="Move item up" onclick="moveCustomCardItem(${i},${j},-1)">↑</button>
+              <button class="miniBtn downBtn" title="Move item down" onclick="moveCustomCardItem(${i},${j},1)">↓</button>
+              <button class="miniBtn deleteBtn" title="Delete item" onclick="deleteCustomCardItem(${i},${j})">×</button>
+            </div>
+          </div>`).join('')}
+        </div>
+        <button class="btn secondary" onclick="addCustomCardItem(${i})">+ Add Item to ${esc(card.title || 'Card')}</button>
 
         <div class="customSectionToolbar">
           <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomSection(${i},-1)">↑</button>
           <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomSection(${i},1)">↓</button>
           <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomSection(${i})">×</button>
-          <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
-
-        <div style="height:10px"></div>
-        <label>Cards in this Section</label>
-
-        ${(sec.cards||[]).length ? (sec.cards||[]).map((card,j)=>`
-          <div class="extraCardBox">
-            <div class="extraCardTitle">Card ${j+1}</div>
-            <div class="row">
-              <div>
-                <label>Card Title</label>
-                <input value="${esc(card.title || '')}" oninput="updateCustomCard(${i},${j},'title',this.value)">
-              </div>
-              <div>
-                <label>Card Text</label>
-                <textarea oninput="updateCustomCard(${i},${j},'text',this.value)">${esc(card.text || '')}</textarea>
-              </div>
-            </div>
-            <div class="extraCardActions">
-              <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomCard(${i},${j},-1)">↑</button>
-              <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomCard(${i},${j},1)">↓</button>
-              <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomCard(${i},${j})">×</button>
-            </div>
-          </div>
-        `).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}
-      </div>`;
-    }).join('') : `<div class="small">No extra cards added yet.</div>`}
+      </div>
+    `).join('') : `<div class="small">No extra cards added yet.</div>`}
   </div>`;
 }
 
 
-function addCustomCard(sectionIndex){
+function addCustomCardItem(cardIndex){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  if(!st.customSections) st.customSections=[];
-  const sec=st.customSections[sectionIndex];
-  if(!sec) return;
-  if(!sec.cards) sec.cards=[];
-  sec.cards.push({title:'New Card', text:''});
-  renderStages();
+  const card=normalizeExtraCards(st)[cardIndex];
+  if(!card) return;
+  card.items.push('');
+  renderStageEditor();
 }
 
-function updateCustomCard(sectionIndex,cardIndex,k,v){
+function updateCustomCardItem(cardIndex,itemIndex,value){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const sec=(st.customSections||[])[sectionIndex];
-  if(!sec) return;
-  if(!sec.cards) sec.cards=[];
-  if(!sec.cards[cardIndex]) return;
-  sec.cards[cardIndex][k]=v;
+  const card=normalizeExtraCards(st)[cardIndex];
+  if(!card || itemIndex<0 || itemIndex>=card.items.length) return;
+  card.items[itemIndex]=value;
   renderPreview();
   if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
-function moveCustomCard(sectionIndex,cardIndex,dir){
+function moveCustomCardItem(cardIndex,itemIndex,dir){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const sec=(st.customSections||[])[sectionIndex];
-  if(!sec || !sec.cards) return;
-  const arr=sec.cards;
-  const target=cardIndex+dir;
+  const card=normalizeExtraCards(st)[cardIndex];
+  if(!card) return;
+  const arr=card.items;
+  const target=itemIndex+dir;
   if(target<0 || target>=arr.length) return;
-  [arr[cardIndex],arr[target]]=[arr[target],arr[cardIndex]];
-  renderStages();
+  [arr[itemIndex],arr[target]]=[arr[target],arr[itemIndex]];
+  renderStageEditor();
 }
 
-function deleteCustomCard(sectionIndex,cardIndex){
+function deleteCustomCardItem(cardIndex,itemIndex){
   if(!requireLogin())return;
-  if(!confirm('Delete this card?'))return;
   const st=currentSurgery().stages[currentStageIndex];
-  const sec=(st.customSections||[])[sectionIndex];
-  if(!sec || !sec.cards) return;
-  sec.cards.splice(cardIndex,1);
-  renderStages();
+  const card=normalizeExtraCards(st)[cardIndex];
+  if(!card) return;
+  card.items.splice(itemIndex,1);
+  renderStageEditor();
 }
 
 
 function addCustomSection(){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  if(!st.customSections) st.customSections=[];
-  st.customSections.push({title:'New Section', icon:'📌', cards:[{title:'New Card', text:''}]});
+  normalizeExtraCards(st).push({title:'New Card', icon:'📌', itemMarker:'bullet', items:['']});
   renderStages();
 }
 
-function updateCustomSection(i,k,v){
+function updateCustomSection(i,k,v,rerenderEditor=false){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
   if(!st.customSections) st.customSections=[];
   if(!st.customSections[i]) return;
   st.customSections[i][k]=v;
+  if(rerenderEditor) renderStageEditor();
   renderPreview();
+  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
 function moveCustomSection(i,dir){
@@ -2266,7 +2307,7 @@ function moveCustomSection(i,dir){
 
 function deleteCustomSection(i){
   if(!requireLogin())return;
-  if(!confirm('Delete this app section?'))return;
+  if(!confirm('Delete this extra card?'))return;
   const st=currentSurgery().stages[currentStageIndex];
   (st.customSections||[]).splice(i,1);
   renderStages();
@@ -3181,10 +3222,15 @@ Recovery Admin v113
     }[ch]));
   }
 
-  function listHtmlV113(items){
+  function markerV113(type){
+    return {bullet:'•',check:'✓',arrow:'→',star:'★',diamond:'◆',none:''}[type] ?? '•';
+  }
+
+  function listHtmlV113(items,markerType='bullet'){
     const list=Array.isArray(items) ? items : [];
     if(!list.length) return '<ul><li>No content entered.</li></ul>';
-    return '<ul>'+list.map(x=>'<li>'+escV113(x)+'</li>').join('')+'</ul>';
+    const marker=markerV113(markerType);
+    return '<ul style="list-style:none;padding-left:0">'+list.map(x=>'<li style="display:flex;gap:8px"><span aria-hidden="true">'+escV113(marker)+'</span><span>'+escV113(x)+'</span></li>').join('')+'</ul>';
   }
 
   function todayYMDV113(){
@@ -3252,11 +3298,17 @@ Recovery Admin v113
     };
 
     const customCards=(stage.customSections||[]).map(sec=>{
+      if(Array.isArray(sec.items)){
+        return `<div class="previewBlock">
+          <h4>${escV113(sec.icon || '📌')} ${escV113(sec.title || 'Information')}</h4>
+          ${listHtmlV113(sec.items,sec.itemMarker)}
+        </div>`;
+      }
       if(sec.cards && sec.cards.length && !sec.text){
         return sec.cards.map(card=>`
           <div class="previewBlock">
-            <h4>${escV113(card.title || sec.title || 'Information')}</h4>
-            <ul><li>${escV113(card.text || '')}</li></ul>
+            <h4>${escV113(card.icon || sec.icon || '📌')} ${escV113(card.title || sec.title || 'Information')}</h4>
+            ${listHtmlV113(card.items || (card.text ? [card.text] : []),card.itemMarker || sec.itemMarker)}
           </div>
         `).join('');
       }

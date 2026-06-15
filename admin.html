@@ -1721,8 +1721,8 @@ button.danger{
       <div class="actions">
         <button class="btn primary" onclick="addStageAfterCurrent()">Add Section After Current</button>
         <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Section</button>
-        <button class="btn secondary" onclick="moveStageUp()">Move Card Up</button>
-        <button class="btn secondary" onclick="moveStageDown()">Move Card Down</button>
+        <button class="btn secondary" onclick="moveStageUp()">Move Section Up</button>
+        <button class="btn secondary" onclick="moveStageDown()">Move Section Down</button>
         <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Section</button>
       </div>
 
@@ -2090,7 +2090,7 @@ function renderStageEditor(){
       <div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div>
     </div>
 
-    <div class="cardOrderHint">Patient app cards appear in this order. Use Move Card Up / Move Card Down on each card.</div>
+    <div class="cardOrderHint"><b>Cards in This Section</b><br>Today’s Reminder, What’s Normal Today, Foods Allowed, Avoid Today, and Call Clinic If are cards. Use Move Card Up / Move Card Down to change their order.</div>
     ${st.appCardOrder.map(key=>renderAppCardEditor(key,st)).join('')}
 
     ${customSectionsEditor()}
@@ -2107,11 +2107,11 @@ function arrayEditor(key,currentTitle,defaultTitle,icon){
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">${icon}</span> ${esc(title)}</div>
-        <div class="appSectionHelp">This section title appears in the patient app.</div>
+        <div class="appSectionHelp">This card title appears in the patient app.</div>
       </div>
     </div>
 
-    <label>Section Title</label>
+    <label>Card Title</label>
     <input value="${esc(title)}" oninput="updateStage('${titleKey}',this.value)">
 
     <div style="height:8px"></div>
@@ -2138,7 +2138,7 @@ function customSectionsEditor(){
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">+</span> Extra App Cards</div>
-        <div class="appSectionHelp">Add another card section. Each section can contain multiple cards/items.</div>
+        <div class="appSectionHelp">Add more cards to the current section.</div>
       </div>
       <button class="btn primary" onclick="addCustomSection()">+ Add Card</button>
     </div>
@@ -2151,14 +2151,14 @@ function customSectionsEditor(){
       return `
       <div class="customSectionRow">
         <div class="row">
-          <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
+          <div><label>Card Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
           <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
         </div>
 
         <div class="customSectionToolbar">
-          <button class="miniBtn upBtn" title="Move section up" onclick="moveCustomSection(${i},-1)">↑</button>
-          <button class="miniBtn downBtn" title="Move section down" onclick="moveCustomSection(${i},1)">↓</button>
-          <button class="miniBtn deleteBtn" title="Delete section" onclick="deleteCustomSection(${i})">×</button>
+          <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomSection(${i},-1)">↑</button>
+          <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomSection(${i},1)">↓</button>
+          <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomSection(${i})">×</button>
           <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
 

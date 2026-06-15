@@ -1645,7 +1645,7 @@ button.danger{
       <div class="adminInlinePreview">
         <div id="adminPreviewContent" class="adminPreviewContent">
           <div class="previewEmptyIcon">▣</div>
-          <div class="previewEmptyText">Select a surgery type and stage to preview the patient guide.</div>
+          <div class="previewEmptyText">Select a surgery type and section to preview the patient guide.</div>
         </div>
       </div>
     
@@ -1715,11 +1715,11 @@ button.danger{
     </div>
 
     <div class="card">
-      <div class="sectionTitle">Recovery Timeline Management</div>
-      <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
+      <div class="sectionTitle">Recovery Section Management</div>
+      <div class="small">Add, copy, delete, or reorder sections such as First 24 Hours, Week 1, Week 2, etc.</div>
 
       <div class="actions">
-        <button class="btn primary" onclick="addStageAfterCurrent()">Add Timeline Section After Current</button>
+        <button class="btn primary" onclick="addStageAfterCurrent()">Add Section After Current</button>
         <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Section</button>
         <button class="btn secondary" onclick="moveStageUp()">Move Card Up</button>
         <button class="btn secondary" onclick="moveStageDown()">Move Card Down</button>
@@ -1828,7 +1828,7 @@ function populateAdminPreviewStages(){
   stages.forEach((stage,idx)=>{
     const opt=document.createElement('option');
     opt.value=String(idx);
-    opt.textContent=stage.label || stage.phase || ('Stage '+(idx+1));
+    opt.textContent=stage.label || stage.phase || ('Section '+(idx+1));
     stageSelect.appendChild(opt);
   });
 
@@ -1838,7 +1838,7 @@ function populateAdminPreviewStages(){
 function previewListHtml(items){
   const list=normalizeList(items);
   if(!list.length) return '<ul><li>No content entered.</li></ul>';
-  return '<ul>'+list.map(x=>'<li>'+escapeHtml(String(x))+'</li>').join('')+'</ul>';
+  return '<ul>'+list.map(x=>'<li>'+esc(String(x))+'</li>').join('')+'</ul>';
 }
 
 function renderAdminInlinePreview(){
@@ -1859,13 +1859,13 @@ function renderAdminInlinePreview(){
   const date=document.getElementById('adminPreviewSurgeryDate')?.value || todayPacificYMD();
 
   target.innerHTML=`
-    <div class="previewTitle">${escapeHtml(surgery.name || type)}</div>
-    <div class="previewMeta">Preview date: ${escapeHtml(date)} · Total days: ${escapeHtml(String(surgery.totalDays || '-'))}</div>
-    <div class="previewStagePill">${escapeHtml(stage.label || stage.phase || 'Selected stage')}</div>
+    <div class="previewTitle">${esc(surgery.name || type)}</div>
+    <div class="previewMeta">Preview date: ${esc(date)} · Total days: ${esc(String(surgery.totalDays || '-'))}</div>
+    <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected section')}</div>
 
     <div class="previewBlock previewReminder">
       <h4>Today’s Reminder</h4>
-      <ul><li>${escapeHtml(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
+      <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
     </div>
 
     <div class="previewBlock">
@@ -2005,7 +2005,7 @@ function renderStages(){
   const s=currentSurgery();
   surgeryName.value=s.name;
   totalDays.value=s.totalDays;
-  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new week at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
+  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new section at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
   renderStageEditor();
   renderPreview();
 }
@@ -2081,7 +2081,7 @@ function renderStageEditor(){
     <div class="small">Use ↑ / ↓ to change card order. Delete and add are locked behind admin login.</div>
 
     <div class="row">
-      <div><label>Timeline Section Title</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
+      <div><label>Section Title</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
       <div><label>Recovery Phase</label><input value="${esc(st.phase)}" oninput="updateStage('phase',this.value)"></div>
     </div>
 
@@ -2619,7 +2619,7 @@ function addWeekAfter(index){
   currentStageIndex=index+1;
   renderStages();
 
-  setStatus('New week added after current stage. Auto-numbering updated.');
+  setStatus('New section added after the current section. Auto-numbering updated.');
 }
 
 function addStageAfterCurrent(){
@@ -2636,7 +2636,7 @@ function copyCurrentStage(){
   s.stages.splice(currentStageIndex + 1, 0, copy);
   currentStageIndex = currentStageIndex + 1;
   renderStages();
-  setStatus('Stage copied. Edit label/day range, then Save.');
+  setStatus('Section copied. Edit the title and day range, then Save.');
 }
 
 function deleteCurrentStage(){
@@ -2644,19 +2644,19 @@ function deleteCurrentStage(){
 
   const s = currentSurgery();
   if(s.stages.length <= 1){
-    setStatus('At least one stage is required.', false);
+    setStatus('At least one section is required.', false);
     return;
   }
 
   const st = s.stages[currentStageIndex];
-  if(!confirm('Delete stage: ' + st.label + '?')){
+  if(!confirm('Delete section: ' + st.label + '?')){
     return;
   }
 
   s.stages.splice(currentStageIndex, 1);
   currentStageIndex = Math.max(0, currentStageIndex - 1);
   renderStages();
-  setStatus('Stage deleted. Click Save to Cloudflare when ready.');
+  setStatus('Section deleted. Click Save to Cloudflare when ready.');
 }
 
 function moveStageUp(){
@@ -2937,7 +2937,7 @@ function renderPreview(){
       const box=document.querySelector('.previewControlGrid');
       if(box){
         const wrap=document.createElement('div');
-        wrap.innerHTML='<label>Preview Stage / Week</label><select id="adminPreviewStage" onchange="renderAdminInlinePreview()"></select>';
+        wrap.innerHTML='<label>Preview Section</label><select id="adminPreviewStage" onchange="renderAdminInlinePreview()"></select>';
         box.insertBefore(wrap, box.children[1] || null);
         stageSelect=document.getElementById('adminPreviewStage');
       }
@@ -2952,7 +2952,7 @@ function renderPreview(){
     stages.forEach((stage,idx)=>{
       const opt=document.createElement('option');
       opt.value=String(idx);
-      opt.textContent=stage.label || stage.phase || ('Stage '+(idx+1));
+      opt.textContent=stage.label || stage.phase || ('Section '+(idx+1));
       stageSelect.appendChild(opt);
     });
 
@@ -2988,7 +2988,7 @@ function renderPreview(){
     target.innerHTML=`
       <div class="previewTitle">${esc(surgery.name || type)}</div>
       <div class="previewMeta">Preview date: ${esc(date)} · Total days: ${esc(surgery.totalDays || '-')}</div>
-      <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
+      <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected section')}</div>
 
       <div class="previewBlock previewReminder">
         <h4>Today’s Reminder</h4>

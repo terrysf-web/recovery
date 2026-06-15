@@ -232,6 +232,10 @@
   text-align:center;
   font-weight:900;
 }
+.list li{
+  display:flex;
+  gap:9px;
+}
 
 </style>
 
@@ -486,6 +490,10 @@ function guidance(day,type){
       foodsTitle: st.foodsTitle || "Foods Allowed",
       avoidTitle: st.avoidTitle || "Avoid Today",
       warningsTitle: st.warningsTitle || "Call Clinic If",
+      normalItemMarker: st.normalItemMarker || "bullet",
+      foodsItemMarker: st.foodsItemMarker || "bullet",
+      avoidItemMarker: st.avoidItemMarker || "bullet",
+      warningsItemMarker: st.warningsItemMarker || "bullet",
       customSections: st.customSections || [], appCardOrder: st.appCardOrder || ['reminder','normal','foods','avoid','warnings']
     };
   }
@@ -497,10 +505,10 @@ function guidance(day,type){
     normal: [],
     foods: [],
     avoid: [],
-    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[], appCardOrder:['reminder','normal','foods','avoid','warnings']
+    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", normalItemMarker:"bullet", foodsItemMarker:"bullet", avoidItemMarker:"bullet", warningsItemMarker:"bullet", customSections:[], appCardOrder:['reminder','normal','foods','avoid','warnings']
   };
 }
-function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);
+function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function itemMarker(type){return{bullet:"•",check:"✓",arrow:"→",star:"★",diamond:"◆",warning:"⚠",cross:"×",none:""}[type]??"•"}function escapeListText(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}function fillList(id,items,markerType="bullet"){const marker=itemMarker(markerType);document.getElementById(id).innerHTML=items.map(x=>`<li><span class="custom-card-marker">${escapeListText(marker)}</span><span>${escapeListText(x)}</span></li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal,g.normalItemMarker);fillList("foodList",g.foods,g.foodsItemMarker);fillList("avoidList",g.avoid,g.avoidItemMarker);fillList("warningList",g.warnings,g.warningsItemMarker);
 const rt=document.getElementById("reminderTitle"); if(rt) rt.textContent=g.reminderTitle||"Today’s Reminder";
 const normalTitleEl=document.querySelector("#normalList")?.closest(".card")?.querySelector(".card-title"); if(normalTitleEl) normalTitleEl.textContent="✅ "+(g.normalTitle||"What’s Normal Today");
 const foodTitleEl=document.querySelector("#foodList")?.closest(".card")?.querySelector(".card-title"); if(foodTitleEl) foodTitleEl.textContent="🍲 "+(g.foodsTitle||"Foods Allowed");
@@ -525,7 +533,7 @@ if(anchor){
 const customBox=document.getElementById("customSectionCards");
 if(customBox){
   const escapeCustom=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const customMarker=type=>({bullet:"•",check:"✓",arrow:"→",star:"★",diamond:"◆",none:""}[type]??"•");
+  const customMarker=type=>({bullet:"•",check:"✓",arrow:"→",star:"★",diamond:"◆",warning:"⚠",cross:"×",none:""}[type]??"•");
   const customCardHtml=card=>{
     const items=Array.isArray(card.items)?card.items:(card.text?[card.text]:[]);
     const marker=customMarker(card.itemMarker);

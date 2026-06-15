@@ -3168,7 +3168,7 @@ function openAdminLivePreview(){
       '?adminPreview=1' +
       '&surgeryType=' + encodeURIComponent(type) +
       '&surgeryDate=' + encodeURIComponent(date) +
-      '&v=111' +
+      '&v=114' +
       '&cache=' + Date.now();
 
     window.open(url, '_blank');
@@ -3214,12 +3214,12 @@ font-size:12px;
 font-weight:900;
 box-shadow:0 8px 24px rgba(0,0,0,.18);
 opacity:.96;">
-Recovery Admin v113
+Recovery Admin v114
 </div>
 
 
 <script>
-/* v113 Admin Reload Preview uses appCardOrder */
+/* v114 Admin Reload Preview uses appCardOrder and card item symbols */
 (function(){
   function escV113(s){
     return String(s ?? '').replace(/[&<>"']/g, ch => ({

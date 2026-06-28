@@ -1468,16 +1468,16 @@ button.danger{
 }
 
 .customSectionRow{
-  margin:14px 0;
-}
-
-.extraCardsGroup{
-  margin:20px 0 0;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:12px;
+  margin:10px 0;
+  background:white;
 }
 
 .customSectionToolbar{
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:38px 38px 38px 1fr;
   gap:6px;
   align-items:center;
   margin-top:8px;
@@ -1491,8 +1491,7 @@ button.danger{
   padding:0;
 }
 
-.titleMiniGrid,
-.cardOptionGrid{
+.titleMiniGrid{
   display:grid;
   grid-template-columns:1fr 1.2fr;
   gap:10px;
@@ -1500,10 +1499,38 @@ button.danger{
 }
 
 @media(max-width:780px){
-  .titleMiniGrid,
-  .cardOptionGrid{
+  .titleMiniGrid{
     grid-template-columns:1fr;
   }
+}
+
+
+/* v107 Extra App Section cards */
+.extraCardBox{
+  border:1px solid #dbe6f2;
+  border-radius:14px;
+  background:#fbfdff;
+  padding:12px;
+  margin:10px 0;
+}
+.extraCardTitle{
+  font-size:13px;
+  font-weight:900;
+  color:#334155;
+  margin-bottom:8px;
+}
+.extraCardActions{
+  display:grid;
+  grid-template-columns:38px 38px 38px 1fr;
+  gap:6px;
+  align-items:center;
+  margin-top:8px;
+}
+.extraCardActions .miniBtn{
+  width:38px;
+  height:38px;
+  min-height:38px;
+  padding:0;
 }
 
 
@@ -1532,7 +1559,7 @@ button.danger{
 <body>
 <div class="header">
   <h1>Recovery Guide Admin</h1>
-  <div class="sub">Admin-only Recovery App Management. Staff code generation is separated into code.html.</div>
+  <div class="sub">Admin-only Recovery Protocol Management. Patient access now uses four simple standard procedure codes: PERIO, IMPLANT, GRAFT, EXTRACT.</div>
 </div>
 
 <div class="app">
@@ -1618,7 +1645,7 @@ button.danger{
       <div class="adminInlinePreview">
         <div id="adminPreviewContent" class="adminPreviewContent">
           <div class="previewEmptyIcon">▣</div>
-          <div class="previewEmptyText">Select a surgery type and section to preview the patient guide.</div>
+          <div class="previewEmptyText">Select a surgery type and stage to preview the patient guide.</div>
         </div>
       </div>
     
@@ -1688,14 +1715,14 @@ button.danger{
     </div>
 
     <div class="card">
-      <div class="sectionTitle">Recovery Section Management</div>
-      <div class="small">Add, copy, delete, or reorder sections such as First 24 Hours, Week 1, Week 2, etc.</div>
+      <div class="sectionTitle">Recovery Timeline Management</div>
+      <div class="small">Add, copy, delete, or reorder recovery stages such as First 24 Hours, Week 1, Week 2, etc.</div>
 
       <div class="actions">
-        <button class="btn primary" onclick="addStageAfterCurrent()">Add Section After Current</button>
+        <button class="btn primary" onclick="addStageAfterCurrent()">Add Timeline Section After Current</button>
         <button class="btn secondary" onclick="copyCurrentStage()">Copy Current Section</button>
-        <button class="btn secondary" onclick="moveStageUp()">Move Section Up</button>
-        <button class="btn secondary" onclick="moveStageDown()">Move Section Down</button>
+        <button class="btn secondary" onclick="moveStageUp()">Move Card Up</button>
+        <button class="btn secondary" onclick="moveStageDown()">Move Card Down</button>
         <button class="btn danger" onclick="deleteCurrentStage()">Delete Current Section</button>
       </div>
 
@@ -1703,6 +1730,23 @@ button.danger{
         Make sure Start Day and End Day do not overlap incorrectly. Example: Week 2 = Day 8 to Day 14.
       </div>
     </div>
+
+
+<div class="card" id="standardCodesInfoCard">
+  <div class="stageTitle">Standard Patient Procedure Codes</div>
+  <div class="small">Patients no longer need individual generated codes. Use these procedure codes with the surgery date.</div>
+  <div class="codeTableWrap">
+    <table class="codeTable">
+      <thead><tr><th>Procedure</th><th>Patient Code</th></tr></thead>
+      <tbody>
+        <tr><td>Periodontal Surgery</td><td class="codeCell">PERIO</td></tr>
+        <tr><td>Implant</td><td class="codeCell">IMPLANT</td></tr>
+        <tr><td>Gum Grafting</td><td class="codeCell">GRAFT</td></tr>
+        <tr><td>Extraction</td><td class="codeCell">EXTRACT</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 <div class="card">
       <label>Procedure Type</label>
@@ -1741,17 +1785,13 @@ function esc(v){
 }
 
 function setStatus(msg,good=true){
-  const statusEl=document.getElementById('status');
-  if(!statusEl) return;
-  statusEl.textContent=msg;
-  statusEl.style.color=good?'#15803d':'#b91c1c';
+  status.textContent=msg;
+  status.style.color=good?'#15803d':'#b91c1c';
 }
 
 function setSaveStatus(msg,good=true){
-  const saveStatusEl=document.getElementById('saveStatus');
-  if(!saveStatusEl) return;
-  saveStatusEl.textContent=msg;
-  saveStatusEl.style.color=good?'#15803d':'#b91c1c';
+  saveStatus.textContent=msg;
+  saveStatus.style.color=good?'#15803d':'#b91c1c';
 }
 
 
@@ -1805,7 +1845,7 @@ function populateAdminPreviewStages(){
   stages.forEach((stage,idx)=>{
     const opt=document.createElement('option');
     opt.value=String(idx);
-    opt.textContent=stage.label || stage.phase || ('Section '+(idx+1));
+    opt.textContent=stage.label || stage.phase || ('Stage '+(idx+1));
     stageSelect.appendChild(opt);
   });
 
@@ -1815,7 +1855,7 @@ function populateAdminPreviewStages(){
 function previewListHtml(items){
   const list=normalizeList(items);
   if(!list.length) return '<ul><li>No content entered.</li></ul>';
-  return '<ul>'+list.map(x=>'<li>'+esc(String(x))+'</li>').join('')+'</ul>';
+  return '<ul>'+list.map(x=>'<li>'+escapeHtml(String(x))+'</li>').join('')+'</ul>';
 }
 
 function renderAdminInlinePreview(){
@@ -1836,13 +1876,13 @@ function renderAdminInlinePreview(){
   const date=document.getElementById('adminPreviewSurgeryDate')?.value || todayPacificYMD();
 
   target.innerHTML=`
-    <div class="previewTitle">${esc(surgery.name || type)}</div>
-    <div class="previewMeta">Preview date: ${esc(date)} · Total days: ${esc(String(surgery.totalDays || '-'))}</div>
-    <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected section')}</div>
+    <div class="previewTitle">${escapeHtml(surgery.name || type)}</div>
+    <div class="previewMeta">Preview date: ${escapeHtml(date)} · Total days: ${escapeHtml(String(surgery.totalDays || '-'))}</div>
+    <div class="previewStagePill">${escapeHtml(stage.label || stage.phase || 'Selected stage')}</div>
 
     <div class="previewBlock previewReminder">
       <h4>Today’s Reminder</h4>
-      <ul><li>${esc(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
+      <ul><li>${escapeHtml(stage.reminder || 'Follow your clinic instructions.')}</li></ul>
     </div>
 
     <div class="previewBlock">
@@ -1929,9 +1969,8 @@ async function loadProtocol(){
     protocol=data&&data.periodontal?data:JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
     initEditor();
     setStatus('Loaded current protocol.');
-    syncCodeSurgeryOptions();
-    loadPatientCodes();
-    if(document.getElementById('chartNumberInput')) chartNumberInput.value='';
+    /* v200: standard codes; individual code management hidden */
+    
   }catch(e){
     protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
     initEditor();
@@ -1944,7 +1983,7 @@ function loadDefault(){
   protocol=JSON.parse(JSON.stringify(DEFAULT_PROTOCOL));
   initEditor();
   setStatus('Loaded default protocol.');
-  syncCodeSurgeryOptions();
+  /* v200: standard codes */
 }
 
 function initEditor(){
@@ -1958,8 +1997,8 @@ function initEditor(){
   surgerySelect.innerHTML=Object.keys(protocol).map(k=>`<option value="${k}">${protocol[k].name}</option>`).join('');
   currentStageIndex=0;
   renderStages();
-  syncCodeSurgeryOptions();
-  if(document.getElementById('codeSurgeryDate')&&!codeSurgeryDate.value) codeSurgeryDate.value=todayYMD();
+  /* v200: standard codes */
+  
 }
 
 function currentSurgeryKey(){
@@ -1982,7 +2021,7 @@ function renderStages(){
   const s=currentSurgery();
   surgeryName.value=s.name;
   totalDays.value=s.totalDays;
-  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new section at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
+  stageTabs.innerHTML=s.stages.map((st,i)=>`<button class="tab ${i===currentStageIndex?'active':''}" onclick="currentStageIndex=${i};renderStages()">${st.label}</button>`).join('') + `<button class="miniBtn upBtn" style="width:38px;height:38px;border-radius:999px;margin-left:8px" title="Add new week at end" onclick="addWeekAfter(${s.stages.length-1})">+</button>`;
   renderStageEditor();
   renderPreview();
 }
@@ -1997,76 +2036,6 @@ const APP_CARD_META={
   avoid:{titleKey:'avoidTitle',defaultTitle:'Avoid Today',icon:'🚫',type:'array'},
   warnings:{titleKey:'warningsTitle',defaultTitle:'Call Clinic If',icon:'📞',type:'array'}
 };
-const EXTRA_CARD_ICONS=[
-  {value:'📌',label:'📌 Pin'},
-  {value:'ℹ️',label:'ℹ️ Information'},
-  {value:'✅',label:'✅ Check'},
-  {value:'⚠️',label:'⚠️ Warning'},
-  {value:'🔔',label:'🔔 Reminder'},
-  {value:'📞',label:'📞 Phone'},
-  {value:'🦷',label:'🦷 Tooth'},
-  {value:'💊',label:'💊 Medication'},
-  {value:'🧊',label:'🧊 Cold Pack'},
-  {value:'🍲',label:'🍲 Food'},
-  {value:'🥤',label:'🥤 Drink'},
-  {value:'🪥',label:'🪥 Toothbrush'},
-  {value:'🩸',label:'🩸 Bleeding'},
-  {value:'🏃',label:'🏃 Activity'},
-  {value:'😴',label:'😴 Rest'},
-  {value:'📅',label:'📅 Schedule'},
-  {value:'❤️',label:'❤️ Care'},
-  {value:'⭐',label:'⭐ Important'}
-];
-const EXTRA_CARD_MARKERS=[
-  {value:'bullet',label:'• Bullet'},
-  {value:'check',label:'✓ Check'},
-  {value:'arrow',label:'→ Arrow'},
-  {value:'star',label:'★ Star'},
-  {value:'diamond',label:'◆ Diamond'},
-  {value:'warning',label:'⚠ Warning'},
-  {value:'cross',label:'× Cross'},
-  {value:'none',label:'No symbol'}
-];
-function iconOptions(selected){
-  const current=selected || '📌';
-  const icons=EXTRA_CARD_ICONS.some(option=>option.value===current)
-    ? EXTRA_CARD_ICONS
-    : [{value:current,label:current},...EXTRA_CARD_ICONS];
-  return icons.map(option=>`<option value="${esc(option.value)}" ${option.value===current?'selected':''}>${esc(option.label)}</option>`).join('');
-}
-function markerOptions(selected){
-  const current=selected || 'bullet';
-  return EXTRA_CARD_MARKERS.map(option=>`<option value="${option.value}" ${option.value===current?'selected':''}>${option.label}</option>`).join('');
-}
-function normalizeExtraCards(stage){
-  const legacy=Array.isArray(stage.customSections) ? stage.customSections : [];
-  const normalized=[];
-  legacy.forEach(sec=>{
-    if(Array.isArray(sec.items)){
-      normalized.push({...sec,icon:sec.icon||'📌',itemMarker:sec.itemMarker||'bullet',items:sec.items});
-      return;
-    }
-    if(Array.isArray(sec.cards) && sec.cards.length){
-      sec.cards.forEach(card=>{
-        normalized.push({
-          title:card.title || sec.title || 'New Card',
-          icon:card.icon || sec.icon || '📌',
-          itemMarker:card.itemMarker || sec.itemMarker || 'bullet',
-          items:Array.isArray(card.items) ? card.items : (card.text ? [card.text] : [])
-        });
-      });
-      return;
-    }
-    normalized.push({
-      title:sec.title || 'New Card',
-      icon:sec.icon || '📌',
-      itemMarker:sec.itemMarker || 'bullet',
-      items:sec.text ? [sec.text] : []
-    });
-  });
-  stage.customSections=normalized;
-  return normalized;
-}
 function ensureAppCardOrder(stage){
   if(!stage.appCardOrder || !Array.isArray(stage.appCardOrder)){
     stage.appCardOrder=[...APP_CARD_KEYS];
@@ -2120,7 +2089,7 @@ function renderStageEditor(){
   if(!st.foodsTitle) st.foodsTitle='Foods Allowed';
   if(!st.avoidTitle) st.avoidTitle='Avoid Today';
   if(!st.warningsTitle) st.warningsTitle='Call Clinic If';
-  normalizeExtraCards(st);
+  if(!st.customSections) st.customSections=[];
   ensureAppCardOrder(st);
 
   stageEditor.innerHTML=`<div class="card">
@@ -2128,7 +2097,7 @@ function renderStageEditor(){
     <div class="small">Use ↑ / ↓ to change card order. Delete and add are locked behind admin login.</div>
 
     <div class="row">
-      <div><label>Section Title</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
+      <div><label>Timeline Section Title</label><input value="${esc(st.label)}" oninput="updateStage('label',this.value)"></div>
       <div><label>Recovery Phase</label><input value="${esc(st.phase)}" oninput="updateStage('phase',this.value)"></div>
     </div>
 
@@ -2137,7 +2106,7 @@ function renderStageEditor(){
       <div><label>End Day</label><input type="number" value="${st.endDay}" oninput="updateStage('endDay',Number(this.value))"></div>
     </div>
 
-    <div class="cardOrderHint"><b>Cards in This Section</b><br>Today’s Reminder, What’s Normal Today, Foods Allowed, Avoid Today, and Call Clinic If are cards. Use Move Card Up / Move Card Down to change their order.</div>
+    <div class="cardOrderHint">Patient app cards appear in this order. Use Move Card Up / Move Card Down on each card.</div>
     ${st.appCardOrder.map(key=>renderAppCardEditor(key,st)).join('')}
 
     ${customSectionsEditor()}
@@ -2148,24 +2117,18 @@ function arrayEditor(key,currentTitle,defaultTitle,icon){
   const st=currentSurgery().stages[currentStageIndex];
   const arr=st[key]||[];
   const titleKey=key+'Title';
-  const markerKey=key+'ItemMarker';
   const title=st[titleKey] || currentTitle || defaultTitle;
-  const marker=st[markerKey] || 'bullet';
 
   return `<div class="appSectionBlock">
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">${icon}</span> ${esc(title)}</div>
-        <div class="appSectionHelp">This card title appears in the patient app.</div>
+        <div class="appSectionHelp">This section title appears in the patient app.</div>
       </div>
     </div>
 
-    <label>Card Title</label>
+    <label>Section Title</label>
     <input value="${esc(title)}" oninput="updateStage('${titleKey}',this.value)">
-
-    <div style="height:8px"></div>
-    <label>Card Item Symbol</label>
-    <select onchange="updateStage('${markerKey}',this.value)">${markerOptions(marker)}</select>
 
     <div style="height:8px"></div>
     <label>Card Items</label>
@@ -2185,122 +2148,126 @@ function arrayEditor(key,currentTitle,defaultTitle,icon){
 
 function customSectionsEditor(){
   const st=currentSurgery().stages[currentStageIndex];
-  const cards=normalizeExtraCards(st);
+  const sections=st.customSections || [];
 
-  return `<div class="extraCardsGroup">
+  return `<div class="appSectionBlock">
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">+</span> Extra App Cards</div>
-        <div class="appSectionHelp">Add more cards to the current section.</div>
+        <div class="appSectionHelp">Add another card section. Each section can contain multiple cards/items.</div>
       </div>
       <button class="btn primary" onclick="addCustomSection()">+ Add Card</button>
     </div>
 
-    ${cards.length ? cards.map((card,i)=>`
-      <div class="appSectionBlock customSectionRow">
-        <div class="appSectionHeader">
-          <div>
-            <div class="appSectionTitle"><span class="appSectionIcon">${esc(card.icon || '📌')}</span> ${esc(card.title || 'New Card')}</div>
-            <div class="appSectionHelp">This card uses the same format as the standard patient app cards.</div>
-          </div>
-        </div>
+    ${sections.length ? sections.map((sec,i)=>{
+      if(!sec.cards){
+        sec.cards = sec.text ? [{title: sec.title || 'Card', text: sec.text}] : [];
+      }
 
-        <div class="cardOptionGrid">
-          <div>
-            <label>Card Title</label>
-            <input value="${esc(card.title || '')}" oninput="updateCustomSection(${i},'title',this.value)">
-          </div>
-          <div>
-            <label>Icon</label>
-            <select onchange="updateCustomSection(${i},'icon',this.value,true)">${iconOptions(card.icon)}</select>
-          </div>
+      return `
+      <div class="customSectionRow">
+        <div class="row">
+          <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
+          <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
         </div>
-
-        <label>Card Item Symbol</label>
-        <select onchange="updateCustomSection(${i},'itemMarker',this.value,true)">${markerOptions(card.itemMarker)}</select>
-
-        <div style="height:8px"></div>
-        <label>Card Items</label>
-        <div class="arrayBox">
-          ${(card.items||[]).map((item,j)=>`<div class="arrayRow">
-            <textarea oninput="updateCustomCardItem(${i},${j},this.value)">${esc(item)}</textarea>
-            <div class="arrayActions">
-              <button class="miniBtn upBtn" title="Move item up" onclick="moveCustomCardItem(${i},${j},-1)">↑</button>
-              <button class="miniBtn downBtn" title="Move item down" onclick="moveCustomCardItem(${i},${j},1)">↓</button>
-              <button class="miniBtn deleteBtn" title="Delete item" onclick="deleteCustomCardItem(${i},${j})">×</button>
-            </div>
-          </div>`).join('')}
-        </div>
-        <button class="btn secondary" onclick="addCustomCardItem(${i})">+ Add Item to ${esc(card.title || 'Card')}</button>
 
         <div class="customSectionToolbar">
-          <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomSection(${i},-1)">↑</button>
-          <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomSection(${i},1)">↓</button>
-          <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomSection(${i})">×</button>
+          <button class="miniBtn upBtn" title="Move section up" onclick="moveCustomSection(${i},-1)">↑</button>
+          <button class="miniBtn downBtn" title="Move section down" onclick="moveCustomSection(${i},1)">↓</button>
+          <button class="miniBtn deleteBtn" title="Delete section" onclick="deleteCustomSection(${i})">×</button>
+          <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
-      </div>
-    `).join('') : `<div class="small">No extra cards added yet.</div>`}
+
+        <div style="height:10px"></div>
+        <label>Cards in this Section</label>
+
+        ${(sec.cards||[]).length ? (sec.cards||[]).map((card,j)=>`
+          <div class="extraCardBox">
+            <div class="extraCardTitle">Card ${j+1}</div>
+            <div class="row">
+              <div>
+                <label>Card Title</label>
+                <input value="${esc(card.title || '')}" oninput="updateCustomCard(${i},${j},'title',this.value)">
+              </div>
+              <div>
+                <label>Card Text</label>
+                <textarea oninput="updateCustomCard(${i},${j},'text',this.value)">${esc(card.text || '')}</textarea>
+              </div>
+            </div>
+            <div class="extraCardActions">
+              <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomCard(${i},${j},-1)">↑</button>
+              <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomCard(${i},${j},1)">↓</button>
+              <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomCard(${i},${j})">×</button>
+            </div>
+          </div>
+        `).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}
+      </div>`;
+    }).join('') : `<div class="small">No extra cards added yet.</div>`}
   </div>`;
 }
 
 
-function addCustomCardItem(cardIndex){
+function addCustomCard(sectionIndex){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const card=normalizeExtraCards(st)[cardIndex];
-  if(!card) return;
-  card.items.push('');
-  renderStageEditor();
+  if(!st.customSections) st.customSections=[];
+  const sec=st.customSections[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  sec.cards.push({title:'New Card', text:''});
+  renderStages();
 }
 
-function updateCustomCardItem(cardIndex,itemIndex,value){
+function updateCustomCard(sectionIndex,cardIndex,k,v){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const card=normalizeExtraCards(st)[cardIndex];
-  if(!card || itemIndex<0 || itemIndex>=card.items.length) return;
-  card.items[itemIndex]=value;
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  if(!sec.cards[cardIndex]) return;
+  sec.cards[cardIndex][k]=v;
   renderPreview();
   if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
-function moveCustomCardItem(cardIndex,itemIndex,dir){
+function moveCustomCard(sectionIndex,cardIndex,dir){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  const card=normalizeExtraCards(st)[cardIndex];
-  if(!card) return;
-  const arr=card.items;
-  const target=itemIndex+dir;
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec || !sec.cards) return;
+  const arr=sec.cards;
+  const target=cardIndex+dir;
   if(target<0 || target>=arr.length) return;
-  [arr[itemIndex],arr[target]]=[arr[target],arr[itemIndex]];
-  renderStageEditor();
+  [arr[cardIndex],arr[target]]=[arr[target],arr[cardIndex]];
+  renderStages();
 }
 
-function deleteCustomCardItem(cardIndex,itemIndex){
+function deleteCustomCard(sectionIndex,cardIndex){
   if(!requireLogin())return;
+  if(!confirm('Delete this card?'))return;
   const st=currentSurgery().stages[currentStageIndex];
-  const card=normalizeExtraCards(st)[cardIndex];
-  if(!card) return;
-  card.items.splice(itemIndex,1);
-  renderStageEditor();
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec || !sec.cards) return;
+  sec.cards.splice(cardIndex,1);
+  renderStages();
 }
 
 
 function addCustomSection(){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
-  normalizeExtraCards(st).push({title:'New Card', icon:'📌', itemMarker:'bullet', items:['']});
+  if(!st.customSections) st.customSections=[];
+  st.customSections.push({title:'New Section', icon:'📌', cards:[{title:'New Card', text:''}]});
   renderStages();
 }
 
-function updateCustomSection(i,k,v,rerenderEditor=false){
+function updateCustomSection(i,k,v){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
   if(!st.customSections) st.customSections=[];
   if(!st.customSections[i]) return;
   st.customSections[i][k]=v;
-  if(rerenderEditor) renderStageEditor();
   renderPreview();
-  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
 function moveCustomSection(i,dir){
@@ -2315,7 +2282,7 @@ function moveCustomSection(i,dir){
 
 function deleteCustomSection(i){
   if(!requireLogin())return;
-  if(!confirm('Delete this extra card?'))return;
+  if(!confirm('Delete this app section?'))return;
   const st=currentSurgery().stages[currentStageIndex];
   (st.customSections||[]).splice(i,1);
   renderStages();
@@ -2326,7 +2293,6 @@ function updateStage(k,v){
   if(!requireLogin())return;
   currentSurgery().stages[currentStageIndex][k]=v;
   renderPreview();
-  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
 function updateArray(k,i,v){
@@ -2669,7 +2635,7 @@ function addWeekAfter(index){
   currentStageIndex=index+1;
   renderStages();
 
-  setStatus('New section added after the current section. Auto-numbering updated.');
+  setStatus('New week added after current stage. Auto-numbering updated.');
 }
 
 function addStageAfterCurrent(){
@@ -2686,7 +2652,7 @@ function copyCurrentStage(){
   s.stages.splice(currentStageIndex + 1, 0, copy);
   currentStageIndex = currentStageIndex + 1;
   renderStages();
-  setStatus('Section copied. Edit the title and day range, then Save.');
+  setStatus('Stage copied. Edit label/day range, then Save.');
 }
 
 function deleteCurrentStage(){
@@ -2694,19 +2660,19 @@ function deleteCurrentStage(){
 
   const s = currentSurgery();
   if(s.stages.length <= 1){
-    setStatus('At least one section is required.', false);
+    setStatus('At least one stage is required.', false);
     return;
   }
 
   const st = s.stages[currentStageIndex];
-  if(!confirm('Delete section: ' + st.label + '?')){
+  if(!confirm('Delete stage: ' + st.label + '?')){
     return;
   }
 
   s.stages.splice(currentStageIndex, 1);
   currentStageIndex = Math.max(0, currentStageIndex - 1);
   renderStages();
-  setStatus('Section deleted. Click Save to Cloudflare when ready.');
+  setStatus('Stage deleted. Click Save to Cloudflare when ready.');
 }
 
 function moveStageUp(){
@@ -2987,7 +2953,7 @@ function renderPreview(){
       const box=document.querySelector('.previewControlGrid');
       if(box){
         const wrap=document.createElement('div');
-        wrap.innerHTML='<label>Preview Section</label><select id="adminPreviewStage" onchange="renderAdminInlinePreview()"></select>';
+        wrap.innerHTML='<label>Preview Stage / Week</label><select id="adminPreviewStage" onchange="renderAdminInlinePreview()"></select>';
         box.insertBefore(wrap, box.children[1] || null);
         stageSelect=document.getElementById('adminPreviewStage');
       }
@@ -3002,7 +2968,7 @@ function renderPreview(){
     stages.forEach((stage,idx)=>{
       const opt=document.createElement('option');
       opt.value=String(idx);
-      opt.textContent=stage.label || stage.phase || ('Section '+(idx+1));
+      opt.textContent=stage.label || stage.phase || ('Stage '+(idx+1));
       stageSelect.appendChild(opt);
     });
 
@@ -3038,7 +3004,7 @@ function renderPreview(){
     target.innerHTML=`
       <div class="previewTitle">${esc(surgery.name || type)}</div>
       <div class="previewMeta">Preview date: ${esc(date)} · Total days: ${esc(surgery.totalDays || '-')}</div>
-      <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected section')}</div>
+      <div class="previewStagePill">${esc(stage.label || stage.phase || 'Selected stage')}</div>
 
       <div class="previewBlock previewReminder">
         <h4>Today’s Reminder</h4>
@@ -3168,7 +3134,7 @@ function openAdminLivePreview(){
       '?adminPreview=1' +
       '&surgeryType=' + encodeURIComponent(type) +
       '&surgeryDate=' + encodeURIComponent(date) +
-      '&v=114' +
+      '&v=111' +
       '&cache=' + Date.now();
 
     window.open(url, '_blank');
@@ -3214,12 +3180,12 @@ font-size:12px;
 font-weight:900;
 box-shadow:0 8px 24px rgba(0,0,0,.18);
 opacity:.96;">
-Recovery Admin v114
+Recovery Admin v200
 </div>
 
 
 <script>
-/* v114 Admin Reload Preview uses appCardOrder and card item symbols */
+/* v113 Admin Reload Preview uses appCardOrder */
 (function(){
   function escV113(s){
     return String(s ?? '').replace(/[&<>"']/g, ch => ({
@@ -3231,15 +3197,10 @@ Recovery Admin v114
     }[ch]));
   }
 
-  function markerV113(type){
-    return {bullet:'•',check:'✓',arrow:'→',star:'★',diamond:'◆',warning:'⚠',cross:'×',none:''}[type] ?? '•';
-  }
-
-  function listHtmlV113(items,markerType='bullet'){
+  function listHtmlV113(items){
     const list=Array.isArray(items) ? items : [];
     if(!list.length) return '<ul><li>No content entered.</li></ul>';
-    const marker=markerV113(markerType);
-    return '<ul style="list-style:none;padding-left:0">'+list.map(x=>'<li style="display:flex;gap:8px"><span aria-hidden="true">'+escV113(marker)+'</span><span>'+escV113(x)+'</span></li>').join('')+'</ul>';
+    return '<ul>'+list.map(x=>'<li>'+escV113(x)+'</li>').join('')+'</ul>';
   }
 
   function todayYMDV113(){
@@ -3290,34 +3251,28 @@ Recovery Admin v114
       </div>`,
       normal:`<div class="previewBlock">
         <h4>${escV113(stage.normalTitle || 'What’s Normal Today')}</h4>
-        ${listHtmlV113(stage.normal,stage.normalItemMarker)}
+        ${listHtmlV113(stage.normal)}
       </div>`,
       foods:`<div class="previewBlock previewFoods">
         <h4>${escV113(stage.foodsTitle || 'Foods Allowed')}</h4>
-        ${listHtmlV113(stage.foods,stage.foodsItemMarker)}
+        ${listHtmlV113(stage.foods)}
       </div>`,
       avoid:`<div class="previewBlock previewAvoid">
         <h4>${escV113(stage.avoidTitle || 'Avoid Today')}</h4>
-        ${listHtmlV113(stage.avoid,stage.avoidItemMarker)}
+        ${listHtmlV113(stage.avoid)}
       </div>`,
       warnings:`<div class="previewBlock previewAvoid">
         <h4>${escV113(stage.warningsTitle || 'Call Clinic If')}</h4>
-        ${listHtmlV113(stage.warnings,stage.warningsItemMarker)}
+        ${listHtmlV113(stage.warnings)}
       </div>`
     };
 
     const customCards=(stage.customSections||[]).map(sec=>{
-      if(Array.isArray(sec.items)){
-        return `<div class="previewBlock">
-          <h4>${escV113(sec.icon || '📌')} ${escV113(sec.title || 'Information')}</h4>
-          ${listHtmlV113(sec.items,sec.itemMarker)}
-        </div>`;
-      }
       if(sec.cards && sec.cards.length && !sec.text){
         return sec.cards.map(card=>`
           <div class="previewBlock">
-            <h4>${escV113(card.icon || sec.icon || '📌')} ${escV113(card.title || sec.title || 'Information')}</h4>
-            ${listHtmlV113(card.items || (card.text ? [card.text] : []),card.itemMarker || sec.itemMarker)}
+            <h4>${escV113(card.title || sec.title || 'Information')}</h4>
+            <ul><li>${escV113(card.text || '')}</li></ul>
           </div>
         `).join('');
       }
@@ -3381,3 +3336,5 @@ Recovery Admin v114
 <!-- RECOVERY_ADMIN_V112_ALL_CARD_MOVE -->
 
 <!-- RECOVERY_ADMIN_V113_RELOAD_PREVIEW_CARD_ORDER_FIX -->
+
+<!-- V200_STANDARD_PROCEDURE_CODES_ADMIN -->

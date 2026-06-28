@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dental Recovery Guide</title>
-<link rel="manifest" href="./manifest.json?v=114">
-<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=114">
+<link rel="manifest" href="./manifest.json?v=101">
+<link rel="apple-touch-icon" href="./pwa_icon_192.png?v=101">
 <meta name="theme-color" content="#062278">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Recovery Guide">
@@ -213,30 +213,6 @@
   text-align:left;
 }
 
-.custom-card-list{
-  margin:8px 0 0;
-  padding:0;
-  list-style:none;
-}
-.custom-card-list li{
-  display:flex;
-  gap:9px;
-  padding:7px 0;
-  border-bottom:1px solid rgba(15,23,42,.06);
-  font-size:14px;
-  color:#374151;
-}
-.custom-card-list li:last-child{border-bottom:0}
-.custom-card-marker{
-  flex:0 0 16px;
-  text-align:center;
-  font-weight:900;
-}
-.list li{
-  display:flex;
-  gap:9px;
-}
-
 </style>
 
 <link rel="icon" type="image/png" href="./pwa_icon_192.png">
@@ -260,17 +236,17 @@
 
     <img class="accessLogo" src="./logo.png" alt="Dental logo">
     <div class="accessTitle">Recovery Guide</div>
-    <div class="accessText">Enter your access code to open your personalized recovery guide.</div>
-    <input id="accessCodeInput" class="accessInput" placeholder="Enter code" autocomplete="one-time-code">
+    <div class="accessText">Enter your procedure code and surgery date to open your recovery guide.</div>
+    <input id="accessCodeInput" class="accessInput" placeholder="PERIO, IMPLANT, GRAFT, or EXTRACT" autocomplete="one-time-code">
 
     <label class="accessDateLabel">Surgery Date</label>
     <input id="patientSurgeryDateInput" class="accessInput" type="date" autocomplete="off">
 
     <button class="primary-btn" onclick="verifyAccessCode()">Open Recovery Guide</button>
-    <button class="staffModeBtn" onclick="openStaffMode()">Staff Code Generator</button>
+    
 
     <div id="accessMessage" class="accessError"></div>
-    <div class="codeBadge">This code expires automatically when the recovery period is complete.</div>
+    <div class="codeBadge">Procedure codes: PERIO · IMPLANT · GRAFT · EXTRACT</div>
   </div>
 </div>
 
@@ -407,14 +383,35 @@ function clearAccessCode(){
   location.reload();
 }
 
+
+const STANDARD_PROCEDURE_CODES={
+  PERIO:"periodontal",
+  IMPLANT:"implant",
+  GRAFT:"graft",
+  EXTRACT:"extraction"
+};
+
+function standardProcedureTypeFromCode(code){
+  return STANDARD_PROCEDURE_CODES[String(code||"").trim().toUpperCase()] || null;
+}
+
 async function verifyAccessCode(codeFromStorage){
   const input=document.getElementById("accessCodeInput");
   const msg=document.getElementById("accessMessage");
   const code=(codeFromStorage || (input?input.value:"")).trim().toUpperCase();
   const surgeryDateParam=(document.getElementById("patientSurgeryDateInput")?.value || localStorage.getItem("surgeryDate") || "").trim();
+  const surgeryType=standardProcedureTypeFromCode(code);
 
   if(!code){
-    if(msg) msg.textContent="Please enter your recovery code.";
+    if(msg) msg.textContent="Please enter your procedure code.";
+    return false;
+  }
+
+  if(!surgeryType){
+    if(msg){
+      msg.className="accessError";
+      msg.textContent="Invalid procedure code. Use PERIO, IMPLANT, GRAFT, or EXTRACT.";
+    }
     return false;
   }
 
@@ -423,38 +420,22 @@ async function verifyAccessCode(codeFromStorage){
     return false;
   }
 
-  if(msg) msg.textContent="Checking code...";
+  localStorage.setItem("recoveryAccessCode",code);
+  localStorage.setItem("surgeryType",surgeryType);
+  localStorage.setItem("surgeryDate",surgeryDateParam);
 
-  try{
-    const res=await fetch(ACCESS_API_URL+"/access-code?code="+encodeURIComponent(code)+"&surgeryDate="+encodeURIComponent(surgeryDateParam)+"&deviceToken="+encodeURIComponent(getDeviceToken())+"&deviceFingerprint="+encodeURIComponent(getDeviceFingerprint()),{cache:"no-store"});
-    const data=await res.json();
-    if(!res.ok) throw new Error(data.error || "Invalid access code");
-
-    localStorage.setItem("recoveryAccessCode",code);
-    localStorage.setItem("surgeryType",data.surgeryType);
-    localStorage.setItem("surgeryDate",data.surgeryDate);
-
-    if(msg){
-      msg.className="accessOk";
-      msg.textContent="Code accepted. Opening guide...";
-    }
-
-    ACCESS_READY=true;
-    if(enforceLocalExpiration()) return;
-    hideAccessGate();
-    if(!enforceLocalExpiration()) renderToday();
-    updateGeminiRemaining();
-    loadClinicProtocol();
-    return true;
-  }catch(e){
-    ACCESS_READY=false;
-    if(msg){
-      msg.className="accessError";
-      msg.textContent=e.message || "Invalid or expired code.";
-    }
-    showAccessGate();
-    return false;
+  if(msg){
+    msg.className="accessOk";
+    msg.textContent="Opening guide...";
   }
+
+  ACCESS_READY=true;
+  if(enforceLocalExpiration()) return;
+  hideAccessGate();
+  loadClinicProtocol();
+  setTimeout(()=>{ if(!enforceLocalExpiration()) renderToday(); },250);
+  updateGeminiRemaining();
+  return true;
 }
 
 async function initAccessGate(){
@@ -490,10 +471,6 @@ function guidance(day,type){
       foodsTitle: st.foodsTitle || "Foods Allowed",
       avoidTitle: st.avoidTitle || "Avoid Today",
       warningsTitle: st.warningsTitle || "Call Clinic If",
-      normalItemMarker: st.normalItemMarker || "bullet",
-      foodsItemMarker: st.foodsItemMarker || "bullet",
-      avoidItemMarker: st.avoidItemMarker || "bullet",
-      warningsItemMarker: st.warningsItemMarker || "bullet",
       customSections: st.customSections || [], appCardOrder: st.appCardOrder || ['reminder','normal','foods','avoid','warnings']
     };
   }
@@ -505,10 +482,10 @@ function guidance(day,type){
     normal: [],
     foods: [],
     avoid: [],
-    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", normalItemMarker:"bullet", foodsItemMarker:"bullet", avoidItemMarker:"bullet", warningsItemMarker:"bullet", customSections:[], appCardOrder:['reminder','normal','foods','avoid','warnings']
+    warnings: ["Contact the clinic if symptoms worsen."], reminderTitle:"Today’s Reminder", normalTitle:"What’s Normal Today", foodsTitle:"Foods Allowed", avoidTitle:"Avoid Today", warningsTitle:"Call Clinic If", customSections:[], appCardOrder:['reminder','normal','foods','avoid','warnings']
   };
 }
-function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function itemMarker(type){return{bullet:"•",check:"✓",arrow:"→",star:"★",diamond:"◆",warning:"⚠",cross:"×",none:""}[type]??"•"}function escapeListText(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]))}function fillList(id,items,markerType="bullet"){const marker=itemMarker(markerType);document.getElementById(id).innerHTML=items.map(x=>`<li><span class="custom-card-marker">${escapeListText(marker)}</span><span>${escapeListText(x)}</span></li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal,g.normalItemMarker);fillList("foodList",g.foods,g.foodsItemMarker);fillList("avoidList",g.avoid,g.avoidItemMarker);fillList("warningList",g.warnings,g.warningsItemMarker);
+function setActiveNav(w){todayNav.classList.toggle("active",w==="today");timelineNav.classList.toggle("active",w==="timeline");assistantNav.classList.toggle("active",w==="assistant")}function fillList(id,items){document.getElementById(id).innerHTML=items.map(x=>`<li>${x}</li>`).join("")}function renderToday(){const saved=getSaved();if(!saved.type||!saved.date){homeScreen.classList.remove("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.add("hidden");setActiveNav("today");return}const surgery=SURGERIES[saved.type];const day=displayRecoveryDay(saved.date);const g=guidance(day,saved.type);const pct=Math.min(100,Math.round(day/surgery.totalDays*100));homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.remove("hidden");timelineScreen.classList.add("hidden");dayNumber.textContent=recoveryDayLabel(day);phaseText.textContent=g.phase;surgeryMeta.textContent=`${surgery.name} · Surgery date: ${fmtDate(saved.date)}`;progressRing.style.setProperty("--p",pct);progressPercent.textContent=`${pct}%`;reminderText.textContent=g.reminder;fillList("normalList",g.normal);fillList("foodList",g.foods);fillList("avoidList",g.avoid);fillList("warningList",g.warnings);
 const rt=document.getElementById("reminderTitle"); if(rt) rt.textContent=g.reminderTitle||"Today’s Reminder";
 const normalTitleEl=document.querySelector("#normalList")?.closest(".card")?.querySelector(".card-title"); if(normalTitleEl) normalTitleEl.textContent="✅ "+(g.normalTitle||"What’s Normal Today");
 const foodTitleEl=document.querySelector("#foodList")?.closest(".card")?.querySelector(".card-title"); if(foodTitleEl) foodTitleEl.textContent="🍲 "+(g.foodsTitle||"Foods Allowed");
@@ -532,17 +509,10 @@ if(anchor){
 
 const customBox=document.getElementById("customSectionCards");
 if(customBox){
-  const escapeCustom=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const customMarker=type=>({bullet:"•",check:"✓",arrow:"→",star:"★",diamond:"◆",warning:"⚠",cross:"×",none:""}[type]??"•");
-  const customCardHtml=card=>{
-    const items=Array.isArray(card.items)?card.items:(card.text?[card.text]:[]);
-    const marker=customMarker(card.itemMarker);
-    return `<div class="card"><div class="card-title">${escapeCustom(card.icon||"📌")} ${escapeCustom(card.title||"Information")}</div><ul class="custom-card-list">${items.map(item=>`<li><span class="custom-card-marker">${escapeCustom(marker)}</span><span>${escapeCustom(item)}</span></li>`).join("")}</ul></div>`;
-  };
   customBox.innerHTML=(g.customSections||[]).map(sec=>{
-  if(Array.isArray(sec.items)) return customCardHtml(sec);
-  const cards=sec.cards || (sec.text ? [{title:sec.title||"Information",icon:sec.icon,text:sec.text,itemMarker:sec.itemMarker}] : []);
-  return cards.map(card=>customCardHtml({...card,icon:card.icon||sec.icon,itemMarker:card.itemMarker||sec.itemMarker})).join("");
+  const cards=sec.cards || (sec.text ? [{title:sec.title||"Information", text:sec.text}] : []);
+  const cardHtml=cards.map(card=>`<div class="card"><div class="card-title">${card.title||sec.title||"Information"}</div><div class="card-text">${card.text||""}</div></div>`).join("");
+  return `<div class="card"><div class="card-title">${sec.icon||"📌"} ${sec.title||"Additional Section"}</div></div>${cardHtml}`;
 }).join("");
 }
 const next=MILESTONES.find(m=>m.day>day&&m.day<=surgery.totalDays);nextMilestone.textContent=next?`${recoveryDayLabel(next.day)}: ${next.phase} — ${next.summary}`:"You are at the final recovery stage. Continue following your clinic’s instructions."}function showToday(){setActiveNav("today");renderToday()}function nearestMilestone(day,total){const valid=MILESTONES.filter(m=>m.day<=total).map(m=>m.day);return valid.find(m=>m>=day)||valid[valid.length-1]}function showTimeline(){const saved=getSaved();if(!saved.type||!saved.date){showToday();return}setActiveNav("timeline");homeScreen.classList.add("hidden");dateScreen.classList.add("hidden");todayScreen.classList.add("hidden");timelineScreen.classList.remove("hidden");const day=displayRecoveryDay(saved.date);const surgery=SURGERIES[saved.type];timelineList.innerHTML=MILESTONES.filter(m=>m.day<=surgery.totalDays).map(m=>{const state=m.day<day?"done":m.day===day||nearestMilestone(day,surgery.totalDays)===m.day?"current":"future";const icon=m.day<day?"✓":state==="current"?"●":"○";return `<div class="timeline-item ${state}"><div class="timeline-dot">${icon}</div><div><div class="timeline-day">${recoveryDayLabel(m.day)}${m.day===day?" · Today":""}</div><div class="timeline-phase">${m.phase}</div><div class="timeline-summary">${m.summary}</div></div></div>`}).join("")}
@@ -610,7 +580,7 @@ async function askGemini(){
   }
 }
 
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=114").catch(()=>{}))}initAccessGate();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=101").catch(()=>{}))}initAccessGate();
 
 // KV_PROTOCOL_ENABLED_V15_GUIDANCE_USES_KV
 document.addEventListener("DOMContentLoaded",()=>{
@@ -935,7 +905,7 @@ window.addEventListener('load',()=>{
 
 
 <div style="position:fixed;right:14px;bottom:14px;z-index:99999;background:#1e3a5f;color:white;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:.9;">
-Recovery Guide v114
+Recovery Guide v200
 </div>
 
 </body>
@@ -956,3 +926,5 @@ Recovery Guide v114
 <!-- RECOVERY_GUIDE_V112_ALL_CARD_MOVE -->
 
 <!-- RECOVERY_GUIDE_V113 -->
+
+<!-- V200_STANDARD_PROCEDURE_CODES_PATIENT -->

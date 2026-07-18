@@ -1750,7 +1750,8 @@ button.danger{
   <div id="milestoneEditor"></div>
   <div class="actions" style="margin-top:12px">
     <button class="btn primary" onclick="addMilestone()">+ Add Milestone</button>
-    <button class="btn primary" onclick="saveProtocol()">Save Milestones to Cloudflare</button>
+    <button class="btn secondary" onclick="saveMilestonesNow()">Save Now</button>
+    <span class="milestoneAutoSaveState" id="milestoneAutoSaveState">All changes saved</span>
   </div>
 </div>
 
@@ -2165,26 +2166,46 @@ function renderMilestoneEditor(){
     </div>
   </div>`).join('') : '<div class="small">No milestones added yet.</div>';
 }
+let milestoneAutosaveTimer=null;
+function setMilestoneAutoSaveState(message,state='ready'){
+  const el=document.getElementById('milestoneAutoSaveState');
+  if(!el)return;
+  el.textContent=message;
+  el.dataset.state=state;
+}
+function scheduleMilestoneAutosave(){
+  clearTimeout(milestoneAutosaveTimer);
+  setMilestoneAutoSaveState('Unsaved changes…','pending');
+  milestoneAutosaveTimer=setTimeout(()=>saveMilestonesNow(true),1000);
+}
+async function saveMilestonesNow(automatic=false){
+  clearTimeout(milestoneAutosaveTimer);
+  setMilestoneAutoSaveState(automatic?'Saving automatically…':'Saving…','saving');
+  await saveProtocol();
+  const result=document.getElementById('saveStatus')?.textContent||'';
+  if(result.startsWith('Saved')) setMilestoneAutoSaveState(automatic?'Saved automatically':'Saved','saved');
+  else setMilestoneAutoSaveState(result||'Save failed','error');
+}
 function addMilestone(){
   if(!requireLogin())return;
   const arr=ensureMilestones(currentSurgery());
   const last=arr[arr.length-1];
   arr.push({day:last?Number(last.day)+7:1,phase:'New Milestone',summary:''});
-  renderMilestoneEditor(); renderPreview();
+  renderMilestoneEditor(); renderPreview(); scheduleMilestoneAutosave();
 }
 function updateMilestone(i,k,v){
   if(!requireLogin())return;
   const arr=ensureMilestones(currentSurgery()); if(!arr[i])return;
-  arr[i][k]=v; renderPreview(); if(typeof renderAdminInlinePreview==='function')renderAdminInlinePreview();
+  arr[i][k]=v; renderPreview(); if(typeof renderAdminInlinePreview==='function')renderAdminInlinePreview(); scheduleMilestoneAutosave();
 }
 function moveMilestone(i,dir){
   if(!requireLogin())return;
   const arr=ensureMilestones(currentSurgery()),j=i+dir; if(j<0||j>=arr.length)return;
-  [arr[i],arr[j]]=[arr[j],arr[i]]; renderMilestoneEditor(); renderPreview();
+  [arr[i],arr[j]]=[arr[j],arr[i]]; renderMilestoneEditor(); renderPreview(); scheduleMilestoneAutosave();
 }
 function deleteMilestone(i){
   if(!requireLogin()||!confirm('Delete this milestone?'))return;
-  ensureMilestones(currentSurgery()).splice(i,1); renderMilestoneEditor(); renderPreview();
+  ensureMilestones(currentSurgery()).splice(i,1); renderMilestoneEditor(); renderPreview(); scheduleMilestoneAutosave();
 }
 
 function renderStageEditor(){
@@ -2466,6 +2487,13 @@ async function saveProtocol(){
   }catch(e){
     setSaveStatus('Save failed: '+e.message,false);
   }
+}
+let protocolAutosaveTimer=null;
+function scheduleProtocolAutosave(){
+  if(!isLoggedIn || !getPass()) return;
+  clearTimeout(protocolAutosaveTimer);
+  setSaveStatus('Unsaved changes…');
+  protocolAutosaveTimer=setTimeout(()=>saveProtocol(),1000);
 }
 
 function downloadJson(){
@@ -3370,7 +3398,7 @@ body.adminActive[data-admin-view] .app{max-width:none!important;margin:0!importa
     assignView(procedureCard,'editor');assignView(manageCard,'procedures');assignView(dataCard,'backup');
     assignView(document.getElementById('milestoneManagementCard'),'milestones');assignView(document.getElementById('aboutCard'),'about');assignView(document.getElementById('standardCodesInfoCard'),'codes');assignView(document.getElementById('adminAccountCard'),'account');
     assignView(document.getElementById('stageTabs'),'editor');assignView(document.getElementById('stageEditor'),'editor');
-    cards.forEach(card=>{const t=titleText(card);if(t==='Recovery Timeline Management')assignView(card,'editor');if(t==='Admin Session')assignView(card,'account');if(card.querySelector('#jsonPreview'))assignView(card,'editor')});
+    cards.forEach(card=>{const t=titleText(card);if(t==='Recovery Timeline Management'){card.id='recoveryTimelineManagementCard';assignView(card,'editor')}if(t==='Admin Session')assignView(card,'account');if(card.querySelector('#jsonPreview'))assignView(card,'editor')});
   }
   function switchAdminView(view){
     activeAdminView=VIEW_LABELS[view]?view:'editor';document.body.dataset.adminView=activeAdminView;
@@ -3390,6 +3418,8 @@ body.adminActive[data-admin-view] .app{max-width:none!important;margin:0!importa
     applyAutoGrow(document.getElementById('editor'));
   }
   document.addEventListener('input',e=>autoGrow(e.target));
+  document.addEventListener('input',e=>{if(e.target?.closest?.('#stageEditor')||['surgeryName','totalDays'].includes(e.target?.id))scheduleProtocolAutosave()});
+  document.addEventListener('click',e=>{if(e.target?.closest?.('#stageEditor button,#recoveryTimelineManagementCard button'))setTimeout(scheduleProtocolAutosave,0)});
   document.addEventListener('change',e=>{if(e.target?.id==='surgerySelect')setTimeout(refreshProcedureUI,0)});
   document.querySelectorAll('.adminNav button[data-view]').forEach(btn=>btn.addEventListener('click',()=>switchAdminView(btn.dataset.view)));
   const editorObserver=new MutationObserver(()=>{refreshProcedureUI();applyAutoGrow(document.getElementById('editor'))});

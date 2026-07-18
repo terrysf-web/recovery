@@ -1,0 +1,9 @@
+Recovery Guide Platform v3.1
+
+Developed for Spark Perio
+
+Copyright © 2026 Terry J. Seo. All rights reserved.
+
+This software was developed exclusively for Spark Perio. It is proprietary software and is not licensed for public distribution. Unauthorized copying, distribution, sublicensing, sale, modification, reverse engineering, or creation of derivative works is prohibited without prior written permission from the copyright owner.
+
+This notice does not replace any separate written agreement between the developer and Spark Perio.

@@ -136,6 +136,32 @@
   box-shadow:0 20px 60px rgba(15,23,42,.12);
   text-align:center;
 }
+
+/* v201 iPhone surgery-date alignment */
+#patientSurgeryDateInput{
+  display:block;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+  overflow:hidden;
+  text-transform:none !important;
+  letter-spacing:normal !important;
+}
+#patientSurgeryDateInput::-webkit-date-and-time-value{
+  min-width:0;
+  margin:0;
+  text-align:center;
+}
+#patientSurgeryDateInput::-webkit-datetime-edit{
+  min-width:0;
+  padding:0;
+}
+@media(max-width:480px){
+  .accessCard{min-width:0;overflow:hidden}
+  .accessCard > *{max-width:100%}
+}
 .expiredTitle{
   font-size:28px;
   font-weight:950;

@@ -2104,7 +2104,7 @@ function renderAppCardEditor(key,stage){
       ${appCardToolbar(key)}
     </div>`;
   }
-  return arrayEditor(key,stage[meta.titleKey],meta.defaultTitle,meta.icon)+appCardToolbar(key);
+  return arrayEditor(key,stage[meta.titleKey],meta.defaultTitle,meta.icon,key);
 }
 
 const DEFAULT_MILESTONES = [
@@ -2196,7 +2196,7 @@ function renderStageEditor(){
   </div>`;
 }
 
-function arrayEditor(key,currentTitle,defaultTitle,icon){
+function arrayEditor(key,currentTitle,defaultTitle,icon,toolbarKey){
   const st=currentSurgery().stages[currentStageIndex];
   const arr=st[key]||[];
   const titleKey=key+'Title';
@@ -2226,6 +2226,7 @@ function arrayEditor(key,currentTitle,defaultTitle,icon){
       </div>`).join('')}
     </div>
     <button class="btn secondary" onclick="addArray('${key}')">+ Add Item to ${esc(title)}</button>
+    ${toolbarKey ? appCardToolbar(toolbarKey) : ''}
   </div>`;
 }
 

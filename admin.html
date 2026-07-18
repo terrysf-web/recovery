@@ -1715,7 +1715,7 @@ button.danger{
       </div>
 
       <div class="warningBox">
-        Use a simple key with lowercase letters, numbers, or underscore only, like <b>bone_graft</b>. After adding or deleting, click <b>Save to Cloudflare</b>.
+        Use a simple key with lowercase letters, numbers, or underscore only, like <b>bone_graft</b>. Procedure changes save automatically.
       </div>
     </div>
 
@@ -3364,7 +3364,6 @@ body.adminActive[data-admin-view] .app{max-width:none!important;margin:0!importa
     <button data-view="milestones">Milestones</button>
     <div class="adminNavLabel">Workspace</div>
     <button data-view="preview">Patient preview</button>
-    <button data-view="procedures">Manage procedures</button>
     <button data-view="backup">Backup & restore</button>
     <div class="adminNavLabel">System</div>
     <button data-view="account">Account</button>
@@ -3384,7 +3383,7 @@ body.adminActive[data-admin-view] .app{max-width:none!important;margin:0!importa
   function autoGrow(el){if(!el||el.tagName!=='TEXTAREA')return;el.style.height='auto';el.style.height=Math.max(72,el.scrollHeight)+'px'}
   function applyAutoGrow(root){(root||document).querySelectorAll('textarea').forEach(autoGrow)}
   function titleText(card){return card?.querySelector('.sectionTitle,.stageTitle')?.textContent.trim()||''}
-  const VIEW_LABELS={editor:'Protocol Editor',milestones:'Milestones',preview:'Patient Preview',procedures:'Manage Procedures',backup:'Backup & Restore',account:'Account',codes:'Patient Codes',about:'About'};
+  const VIEW_LABELS={editor:'Protocol Editor',milestones:'Milestones',preview:'Patient Preview',backup:'Backup & Restore',account:'Account',codes:'Patient Codes',about:'About'};
   let activeAdminView='editor';
   function assignView(el,view){if(el)el.dataset.adminView=view}
   function prepareLayout(){
@@ -3395,7 +3394,7 @@ body.adminActive[data-admin-view] .app{max-width:none!important;margin:0!importa
     const procedureCard=cards.find(c=>c.querySelector('#surgerySelect'));
     if(procedureCard){procedureCard.id='procedureOverview';procedureCard.classList.add('procedureOverviewCard');if(!procedureCard.querySelector('.procedureEyebrow'))procedureCard.insertAdjacentHTML('afterbegin','<div class="procedureEyebrow">Active procedure</div><div class="sectionTitle">Procedure Overview</div>');const firstReal=[...editor.children].find(el=>!el.classList?.contains('mobilePreviewNotice'));if(firstReal&&firstReal!==procedureCard)editor.insertBefore(procedureCard,firstReal)}
     const milestone=document.querySelector('#milestoneManagementCard .sectionTitle');if(milestone&&!milestone.querySelector('.milestoneProcedureName'))milestone.innerHTML='<span class="milestoneProcedureName">Procedure</span> Milestones';
-    assignView(procedureCard,'editor');assignView(manageCard,'procedures');assignView(dataCard,'backup');
+    assignView(procedureCard,'editor');assignView(manageCard,'editor');assignView(dataCard,'backup');
     assignView(document.getElementById('milestoneManagementCard'),'milestones');assignView(document.getElementById('aboutCard'),'about');assignView(document.getElementById('standardCodesInfoCard'),'codes');assignView(document.getElementById('adminAccountCard'),'account');
     assignView(document.getElementById('stageTabs'),'editor');assignView(document.getElementById('stageEditor'),'editor');
     cards.forEach(card=>{const t=titleText(card);if(t==='Recovery Timeline Management'){card.id='recoveryTimelineManagementCard';assignView(card,'editor')}if(t==='Admin Session')assignView(card,'account');if(card.querySelector('#jsonPreview'))assignView(card,'editor')});
@@ -3419,7 +3418,7 @@ body.adminActive[data-admin-view] .app{max-width:none!important;margin:0!importa
   }
   document.addEventListener('input',e=>autoGrow(e.target));
   document.addEventListener('input',e=>{if(e.target?.closest?.('#stageEditor')||['surgeryName','totalDays'].includes(e.target?.id))scheduleProtocolAutosave()});
-  document.addEventListener('click',e=>{if(e.target?.closest?.('#stageEditor button,#recoveryTimelineManagementCard button'))setTimeout(scheduleProtocolAutosave,0)});
+  document.addEventListener('click',e=>{if(e.target?.closest?.('#stageEditor button,#recoveryTimelineManagementCard button,#procedureManagementCard button'))setTimeout(scheduleProtocolAutosave,0)});
   document.addEventListener('change',e=>{if(e.target?.id==='surgerySelect')setTimeout(refreshProcedureUI,0)});
   document.querySelectorAll('.adminNav button[data-view]').forEach(btn=>btn.addEventListener('click',()=>switchAdminView(btn.dataset.view)));
   const editorObserver=new MutationObserver(()=>{refreshProcedureUI();applyAutoGrow(document.getElementById('editor'))});

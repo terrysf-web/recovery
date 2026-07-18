@@ -2154,55 +2154,45 @@ function customSectionsEditor(){
     <div class="appSectionHeader">
       <div>
         <div class="appSectionTitle"><span class="appSectionIcon">+</span> Extra App Cards</div>
-        <div class="appSectionHelp">Add another card section. Each section can contain multiple cards/items.</div>
+        <div class="appSectionHelp">Add another section using the same format as the standard sections.</div>
       </div>
-      <button class="btn primary" onclick="addCustomSection()">+ Add Card</button>
+      <button class="btn primary" onclick="addCustomSection()">+ Add Section</button>
     </div>
 
     ${sections.length ? sections.map((sec,i)=>{
       if(!sec.cards){
-        sec.cards = sec.text ? [{title: sec.title || 'Card', text: sec.text}] : [];
+        sec.cards = sec.text ? [{title: sec.title || 'New Section', text: sec.text}] : [];
       }
+      sec.cards.forEach(card=>{
+        if(card) card.title=sec.title || 'New Section';
+      });
 
       return `
       <div class="customSectionRow">
-        <div class="row">
-          <div><label>Section Title</label><input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)"></div>
-          <div><label>Icon</label><input value="${esc(sec.icon || '📌')}" oninput="updateCustomSection(${i},'icon',this.value)"></div>
-        </div>
-
         <div class="customSectionToolbar">
           <button class="miniBtn upBtn" title="Move section up" onclick="moveCustomSection(${i},-1)">↑</button>
           <button class="miniBtn downBtn" title="Move section down" onclick="moveCustomSection(${i},1)">↓</button>
           <button class="miniBtn deleteBtn" title="Delete section" onclick="deleteCustomSection(${i})">×</button>
-          <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Card</button>
         </div>
 
-        <div style="height:10px"></div>
-        <label>Cards in this Section</label>
+        <label>Section Title</label>
+        <input value="${esc(sec.title || '')}" oninput="updateCustomSection(${i},'title',this.value)">
 
-        ${(sec.cards||[]).length ? (sec.cards||[]).map((card,j)=>`
-          <div class="extraCardBox">
-            <div class="extraCardTitle">Card ${j+1}</div>
-            <div class="row">
-              <div>
-                <label>Card Title</label>
-                <input value="${esc(card.title || '')}" oninput="updateCustomCard(${i},${j},'title',this.value)">
-              </div>
-              <div>
-                <label>Card Text</label>
-                <textarea oninput="updateCustomCard(${i},${j},'text',this.value)">${esc(card.text || '')}</textarea>
-              </div>
+        <div style="height:8px"></div>
+        <label>Card Items</label>
+        <div class="arrayBox">
+          ${(sec.cards||[]).map((card,j)=>`<div class="arrayRow">
+            <textarea oninput="updateCustomItem(${i},${j},this.value)">${esc(card.text || '')}</textarea>
+            <div class="arrayActions">
+              <button class="miniBtn upBtn" title="Move up" onclick="moveCustomCard(${i},${j},-1)">↑</button>
+              <button class="miniBtn downBtn" title="Move down" onclick="moveCustomCard(${i},${j},1)">↓</button>
+              <button class="miniBtn deleteBtn" title="Delete" onclick="deleteCustomCard(${i},${j})">×</button>
             </div>
-            <div class="extraCardActions">
-              <button class="miniBtn upBtn" title="Move card up" onclick="moveCustomCard(${i},${j},-1)">↑</button>
-              <button class="miniBtn downBtn" title="Move card down" onclick="moveCustomCard(${i},${j},1)">↓</button>
-              <button class="miniBtn deleteBtn" title="Delete card" onclick="deleteCustomCard(${i},${j})">×</button>
-            </div>
-          </div>
-        `).join('') : `<div class="small">No cards added yet. Click + Add Card.</div>`}
+          </div>`).join('')}
+        </div>
+        <button class="btn secondary" onclick="addCustomCard(${i})">+ Add Item to ${esc(sec.title || 'New Section')}</button>
       </div>`;
-    }).join('') : `<div class="small">No extra cards added yet.</div>`}
+    }).join('') : `<div class="small">No extra sections added yet.</div>`}
   </div>`;
 }
 
@@ -2214,8 +2204,21 @@ function addCustomCard(sectionIndex){
   const sec=st.customSections[sectionIndex];
   if(!sec) return;
   if(!sec.cards) sec.cards=[];
-  sec.cards.push({title:'New Card', text:''});
+  sec.cards.push({title:sec.title || 'New Section', text:''});
   renderStages();
+}
+
+function updateCustomItem(sectionIndex,cardIndex,v){
+  if(!requireLogin())return;
+  const st=currentSurgery().stages[currentStageIndex];
+  const sec=(st.customSections||[])[sectionIndex];
+  if(!sec) return;
+  if(!sec.cards) sec.cards=[];
+  if(!sec.cards[cardIndex]) return;
+  sec.cards[cardIndex].title=sec.title || 'New Section';
+  sec.cards[cardIndex].text=v;
+  renderPreview();
+  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
 function updateCustomCard(sectionIndex,cardIndex,k,v){
@@ -2257,7 +2260,7 @@ function addCustomSection(){
   if(!requireLogin())return;
   const st=currentSurgery().stages[currentStageIndex];
   if(!st.customSections) st.customSections=[];
-  st.customSections.push({title:'New Section', icon:'📌', cards:[{title:'New Card', text:''}]});
+  st.customSections.push({title:'New Section', icon:'📌', cards:[{title:'New Section', text:''}]});
   renderStages();
 }
 
@@ -2267,7 +2270,11 @@ function updateCustomSection(i,k,v){
   if(!st.customSections) st.customSections=[];
   if(!st.customSections[i]) return;
   st.customSections[i][k]=v;
+  if(k==='title' && st.customSections[i].cards){
+    st.customSections[i].cards.forEach(card=>{ if(card) card.title=v || 'New Section'; });
+  }
   renderPreview();
+  if(typeof renderAdminInlinePreview === 'function') renderAdminInlinePreview();
 }
 
 function moveCustomSection(i,dir){

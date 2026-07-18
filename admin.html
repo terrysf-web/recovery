@@ -1806,13 +1806,17 @@ function esc(v){
 }
 
 function setStatus(msg,good=true){
-  status.textContent=msg;
-  status.style.color=good?'#15803d':'#b91c1c';
+  const el=document.getElementById('status');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=good?'#15803d':'#b91c1c';
 }
 
 function setSaveStatus(msg,good=true){
-  saveStatus.textContent=msg;
-  saveStatus.style.color=good?'#15803d':'#b91c1c';
+  const el=document.getElementById('saveStatus');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=good?'#15803d':'#b91c1c';
 }
 
 
@@ -3327,7 +3331,7 @@ label{font-size:12px!important;font-weight:750!important;color:#475569!important
     const dataCard=cards.find(c=>c.querySelector('#jsonUpload')); if(dataCard)dataCard.id='dataManagementCard';
     const manageCard=cards.find(c=>titleText(c)==='Procedure Type Management'); if(manageCard)manageCard.id='procedureManagementCard';
     const procedureCard=cards.find(c=>c.querySelector('#surgerySelect'));
-    if(procedureCard){procedureCard.id='procedureOverview';procedureCard.classList.add('procedureOverviewCard');if(!procedureCard.querySelector('.procedureEyebrow'))procedureCard.insertAdjacentHTML('afterbegin','<div class="procedureEyebrow">Active procedure</div><div class="sectionTitle">Procedure Overview</div>');const firstReal=[...editor.children].find(el=>!el.classList?.contains('mobilePreviewNotice'));editor.insertBefore(procedureCard,firstReal||editor.firstChild)}
+    if(procedureCard){procedureCard.id='procedureOverview';procedureCard.classList.add('procedureOverviewCard');if(!procedureCard.querySelector('.procedureEyebrow'))procedureCard.insertAdjacentHTML('afterbegin','<div class="procedureEyebrow">Active procedure</div><div class="sectionTitle">Procedure Overview</div>');const firstReal=[...editor.children].find(el=>!el.classList?.contains('mobilePreviewNotice'));if(firstReal&&firstReal!==procedureCard)editor.insertBefore(procedureCard,firstReal)}
     const milestone=document.querySelector('#milestoneManagementCard .sectionTitle');if(milestone&&!milestone.querySelector('.milestoneProcedureName'))milestone.innerHTML='<span class="milestoneProcedureName">Procedure</span> Milestones';
   }
   function refreshProcedureUI(){
@@ -3339,9 +3343,9 @@ label{font-size:12px!important;font-weight:750!important;color:#475569!important
   document.addEventListener('input',e=>autoGrow(e.target));
   document.addEventListener('change',e=>{if(e.target?.id==='surgerySelect')setTimeout(refreshProcedureUI,0)});
   document.querySelectorAll('.adminNav button').forEach(btn=>btn.addEventListener('click',()=>{const el=document.getElementById(btn.dataset.target);if(el){el.scrollIntoView({behavior:'smooth',block:'start'});document.querySelectorAll('.adminNav button').forEach(b=>b.classList.toggle('active',b===btn))}}));
-  const observer=new MutationObserver(()=>{prepareLayout();refreshProcedureUI();const messages=[document.getElementById('saveStatus')?.textContent,document.getElementById('status')?.textContent].filter(Boolean);const out=document.getElementById('statusBarMessage');if(out&&messages.length&&out.textContent!==messages[0])out.textContent=messages[0]});
-  observer.observe(document.body,{childList:true,subtree:true,characterData:true});
-  window.addEventListener('load',()=>{prepareLayout();refreshProcedureUI();applyAutoGrow()});
+  const editorObserver=new MutationObserver(()=>{refreshProcedureUI();applyAutoGrow(document.getElementById('editor'))});
+  const statusObserver=new MutationObserver(()=>{const messages=[document.getElementById('saveStatus')?.textContent,document.getElementById('status')?.textContent].filter(Boolean);const out=document.getElementById('statusBarMessage');if(out&&messages.length&&out.textContent!==messages[0])out.textContent=messages[0]});
+  window.addEventListener('load',()=>{prepareLayout();refreshProcedureUI();applyAutoGrow();const editor=document.getElementById('editor');if(editor)editorObserver.observe(editor,{childList:true,subtree:true});['saveStatus','status'].forEach(id=>{const el=document.getElementById(id);if(el)statusObserver.observe(el,{childList:true,characterData:true,subtree:true})})});
 })();
 </script>
 

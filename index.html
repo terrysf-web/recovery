@@ -240,6 +240,10 @@
 }
 
 .platformFooter{padding:18px 20px 92px;text-align:center;color:#778294;font-size:11px;line-height:1.6}
+/* v202 match reminder icon and spacing to standard cards */
+.soft-orange .row:has(#reminderTitle){display:block}
+.soft-orange .row:has(#reminderTitle) > .icon-badge{display:none}
+#reminderTitle::before{content:"🔔 ";font-size:1em}
 </style>
 
 <link rel="icon" type="image/png" href="./pwa_icon_192.png">
